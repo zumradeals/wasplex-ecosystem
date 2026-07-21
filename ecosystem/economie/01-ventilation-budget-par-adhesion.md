@@ -1,7 +1,9 @@
 # Ventilation du budget publicitaire par niveau d'adhésion
 
-- **Statut :** exploration économique v0.1
-- **Source :** `sources/2026-07-21-clarification-fondateur-03-propriete-ventilation.md`
+- **Statut :** exploration économique v0.2
+- **Sources :**
+  - `sources/2026-07-21-clarification-fondateur-03-propriete-ventilation.md`
+  - `sources/2026-07-21-clarification-fondateur-04-fonds-social.md`
 - **Dépend de :** cycle fondamental de création de valeur publicitaire
 
 ## 1. Intention fondatrice
@@ -10,59 +12,44 @@ Pour un budget publicitaire de référence égal à 100 % :
 
 - 50 % reviennent à Wasplex ;
 - 50 % sont destinés à la rémunération des utilisateurs ;
-- la rémunération utilisateur dépend du niveau d'adhésion et d'un quota maximal de publicités par mois.
+- la rémunération utilisateur dépend du niveau d'adhésion ;
+- chaque niveau possède un quota maximal de publicités rémunérables par mois ;
+- les paramètres exacts sont définis par Wasplex dans la configuration administrative.
 
-Cette règle est une intention de modèle. Son assiette exacte et sa formule interne doivent être définies avant adoption.
+L'assiette exacte du partage 50/50 — montant brut ou net distribuable — reste à définir.
 
-## 2. Valeurs communiquées
+## 2. Valeurs illustratives retirées du modèle
 
-| Élément | Valeur de travail |
-|---|---:|
-| Part Wasplex | 50 % |
-| Pool utilisateurs | 50 % |
-| Gratuit | 10 |
-| Niveaux payants | 20, 30, 35, 40 |
-| Quota mensuel | variable selon le niveau |
+Les valeurs `10, 20, 30, 35, 40` communiquées lors de l'entretien étaient uniquement des exemples d'écriture. Elles ne définissent :
 
-Les valeurs associées aux niveaux ne sont pas encore qualifiées comme pourcentages absolus, poids relatifs ou multiplicateurs.
+- ni les niveaux définitifs ;
+- ni leurs pourcentages ;
+- ni leurs poids ;
+- ni leurs multiplicateurs.
 
-## 3. Problème mathématique à résoudre
+Aucune incohérence mathématique ne doit donc être déduite de ces exemples.
 
-Si 10, 20, 30, 35 et 40 sont des parts du même pool, leur somme vaut 135 et non 100. Elles ne peuvent donc pas être appliquées simultanément comme pourcentages absolus d'un même montant.
+## 3. Paramètres à administrer
 
-Trois interprétations sont possibles :
+Pour chaque niveau d'adhésion, la configuration devra pouvoir définir au minimum :
 
-### Option A — Poids relatifs
+- identifiant et nom du niveau ;
+- prix et périodicité ;
+- quota mensuel d'événements rémunérables ;
+- coefficient ou règle de rémunération ;
+- accès aux formats publicitaires ;
+- éligibilité au ciblage qualifié ;
+- date d'effet ;
+- statut actif ou retiré.
 
-Les valeurs sont des poids. Pour une période donnée :
-
-`part_niveau = pool_utilisateurs × poids_niveau / somme_des_poids_éligibles`
-
-Avantage : la totalité du pool est toujours distribuée.  
-Risque : le gain individuel dépend du nombre d'utilisateurs et de vues dans chaque niveau.
-
-### Option B — Multiplicateurs de récompense
-
-Une vue possède une récompense de base et chaque niveau applique un multiplicateur.
-
-Avantage : compréhension facile par l'utilisateur.  
-Risque : le nombre et le mélange des vues doivent rester compatibles avec le budget réellement disponible.
-
-### Option C — Sous-budgets réservés
-
-Chaque niveau reçoit un pourcentage du pool utilisateurs.
-
-Avantage : prévisibilité budgétaire.  
-Condition : les pourcentages doivent totaliser exactement 100 % et la gestion des sous-budgets non consommés doit être définie.
-
-Aucune option n'est adoptée à ce stade.
+Les paramètres devront respecter ADR-0002 sur la configuration métier versionnée.
 
 ## 4. Suggestion d'architecture économique
 
 Séparer trois notions :
 
-1. **part constitutionnelle** : 50 % Wasplex / 50 % utilisateurs, si cette règle est confirmée sur une assiette définie ;
-2. **coefficient de niveau** : avantage relatif du niveau d'adhésion ;
+1. **ventilation globale** : part Wasplex / part utilisateurs ;
+2. **coefficient de niveau** : avantage relatif défini par la configuration ;
 3. **quota mensuel** : nombre maximal d'événements rémunérables.
 
 Cette séparation évite de confondre la part globale destinée aux utilisateurs avec la récompense individuelle.
@@ -70,19 +57,19 @@ Cette séparation évite de confondre la part globale destinée aux utilisateurs
 ## 5. Garde-fous proposés
 
 - aucune récompense ne peut dépasser le budget utilisateur disponible ;
-- la somme des affectations doit être vérifiée avant activation ;
-- un quota ne doit jamais créer une promesse de revenu garanti ;
-- les valeurs affichées à l'utilisateur doivent indiquer qu'il s'agit de maxima ou de conditions, selon le cas ;
-- une campagne conserve la version de la formule applicable lors de son lancement ;
-- un changement administratif ne modifie pas rétroactivement une campagne active ;
-- les arrondis et reliquats doivent être explicitement affectés ;
-- une simulation doit précéder toute activation.
+- toute ventilation doit être mathématiquement valide avant activation ;
+- un quota ne crée jamais une promesse de revenu garanti ;
+- les valeurs affichées indiquent clairement maxima, conditions et périodes ;
+- une campagne conserve la version de formule applicable lors de son lancement ;
+- un changement administratif n'est pas rétroactif ;
+- arrondis et reliquats possèdent une destination explicite ;
+- une simulation précède toute activation ;
+- les paramètres constitutionnels ne sont pas modifiables par un simple administrateur.
 
-## 6. Questions bloquantes
+## 6. Questions restantes
 
-1. Combien de niveaux existent exactement et quels sont leurs noms ?
-2. À quels niveaux correspondent 20, 30, 35 et 40 ?
-3. Ces valeurs sont-elles des poids, des multiplicateurs ou des parts réservées ?
-4. Les 50/50 s'appliquent-ils au budget brut ou au montant net après taxes et frais ?
-5. Que devient le pool d'un niveau qui ne consomme pas son quota ?
-6. Le supplément payé par un annonceur pour cibler un niveau alimente-t-il d'abord ce niveau ?
+1. Quels seront les niveaux définitifs et leurs noms ?
+2. Quelle formule reliera niveau, quota et rémunération par événement ?
+3. Les 50/50 s'appliquent-ils au budget brut ou au montant net après taxes et frais ?
+4. Que devient un budget utilisateur non consommé ?
+5. Le supplément payé pour cibler un niveau alimente-t-il particulièrement les utilisateurs de ce niveau ?
