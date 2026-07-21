@@ -33,6 +33,13 @@
 | Capacité institutionnelle | Action précise qu'une organisation ou un utilisateur peut exercer dans une portée déterminée | Spécifié |
 | Recherche de dossiers autorisés | Recherche motivée et auditée, limitée par catégorie, territoire, période ou identifiant | Spécifié |
 | Compte technique | Identité non humaine réservée à une intégration automatisée, limitée et surveillée | Spécifié |
+| Identité déclarée | Informations fournies par une personne sans vérification suffisante par preuve externe | Proposé — AMD-0010 |
+| Identité vérifiée | Identité rapprochée de preuves suffisantes pour les capacités autorisées | Proposé — AMD-0010 |
+| Identité renforcée | Niveau d'assurance supplémentaire exigé pour une opération à risque élevé | Proposé — AMD-0010 |
+| Unicité suffisante | Assurance proportionnée qu'une personne ne contourne pas les règles par plusieurs comptes, sans prétendre à une certitude absolue | Spécifié |
+| Contrôle du compte | Preuve que la personne présente contrôle actuellement les facteurs autorisés du compte | Spécifié |
+| Authentification forte | Combinaison de facteurs indépendants appartenant à des catégories différentes | Spécifié |
+| Compte compromis | Compte probablement contrôlé ou utilisé par un tiers sans autorisation du titulaire | Spécifié |
 | Niveau d'adhésion publicitaire | Offre de service configurée augmentant capacités, accès ou outils sans garantir campagne ni revenu | Spécifié |
 | Quota publicitaire | Maximum d'événements accessibles pendant une période ; il ne garantit pas leur disponibilité | Spécifié |
 | Promotion Wasplex | Bonus temporaire financé sur les ressources propres de Wasplex et séparé du gain publicitaire | Spécifié |
