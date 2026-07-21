@@ -1,6 +1,6 @@
 # AMD-0008 — Les Cartes Wasplex : participation économique réelle
 
-**État :** proposé, en attente de validation du fondateur  
+**État :** adopté et intégré à la Constitution v0.9  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-12-cartes-wasplex.md`
 
@@ -31,6 +31,10 @@ Cet amendement conserve l'ambition de redistribution populaire de Wasplex tout e
 
 Il protège le vocabulaire, la solvabilité, la traçabilité et la simplicité du programme.
 
-## Effet proposé
+## Décision d'adoption
 
-Après adoption, cet article gouvernera toutes les Cartes Wasplex virtuelles ou physiques, leurs pools, leurs opérations partenaires et leurs redistributions.
+Le fondateur a validé cet amendement le 2026-07-21.
+
+## Effet de l'adoption
+
+Cet article gouverne toutes les Cartes Wasplex virtuelles ou physiques, leurs pools, leurs opérations partenaires et leurs redistributions.
