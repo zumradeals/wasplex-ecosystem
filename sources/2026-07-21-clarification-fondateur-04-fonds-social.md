@@ -5,6 +5,12 @@
 - **Statut :** source exploratoire
 - **Périmètre :** mécanisme général, règles détaillées à instruire ultérieurement
 
+## 0. Rectification sur les valeurs d'adhésion publicitaire
+
+Les valeurs `10, 20, 30, 35, 40` citées précédemment étaient de simples exemples d'écriture dans la conversation. Elles ne constituent ni une formule, ni les valeurs futures de configuration.
+
+Les valeurs réelles seront définies par Wasplex dans les paramètres administratifs.
+
 ## 1. Adhésion distincte
 
 L'adhésion au Fonds social est distincte de l'abonnement publicitaire Wasplex.
