@@ -1,6 +1,6 @@
 # AMD-0010 — Identité proportionnée et antifraude équitable
 
-**État :** proposé, en attente de validation du fondateur  
+**État :** adopté et intégré à la Constitution v1.1  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-14-identite-kyc-antifraude.md`
 
@@ -35,6 +35,10 @@
 
 La sécurité de Wasplex dépend d'une identité proportionnée au risque, mais l'inclusion impose de ne pas confondre pauvreté documentaire, appareil partagé ou anomalie technique avec une fraude.
 
-## Effet proposé
+## Décision d'adoption
 
-Après adoption, cet article gouvernera l'identité, le KYC, l'unicité, l'authentification, les enquêtes, sanctions, recours et récupérations.
+Le fondateur a validé cet amendement le 2026-07-21.
+
+## Effet de l'adoption
+
+Cet article gouverne l'identité, le KYC, l'unicité, l'authentification, les enquêtes, sanctions, recours et récupérations.
