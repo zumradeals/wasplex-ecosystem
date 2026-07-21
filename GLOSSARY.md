@@ -23,7 +23,9 @@
 | Résultat agrégé | Indicateur collectif ne permettant pas raisonnablement d'identifier une personne | À spécifier |
 | Annonceur | Acteur autorisé à financer et diffuser une campagne selon les règles de Wasplex | Proposé |
 | Institution affiliée | Acteur institutionnel autorisé à opérer ou soutenir un service encadré d'intérêt collectif | À préciser |
-| Niveau d'adhésion | Niveau de service pouvant ouvrir des opportunités distinctes sans supprimer le socle universel | À spécifier |
+| Niveau d'adhésion publicitaire | Offre de service configurée augmentant capacités, accès ou outils sans garantir campagne ni revenu | Spécifié |
+| Quota publicitaire | Maximum d'événements accessibles pendant une période ; il ne garantit pas leur disponibilité | Spécifié |
+| Promotion Wasplex | Bonus temporaire financé sur les ressources propres de Wasplex et séparé du gain publicitaire | Spécifié |
 | Fonds social | Module transversal dont la nature économique et les droits des membres restent à définir | Critique |
 | Carte micro-actionnaire | Mécanisme à définir ; le terme « actionnaire » n'est pas encore adopté juridiquement | Critique |
 | Alerte | Signalement civique, déclaration de perte ou urgence ; catégories à séparer | À préciser |
