@@ -38,7 +38,12 @@
 | Indice de réciprocité | Mesure transparente et contestable de la participation au Fonds, distincte d'un score social général | Spécifié |
 | Réserve d'urgence | Compartiment protégé destiné aux urgences vitales ou humanitaires validées | Spécifié |
 | Carte micro-actionnaire | Mécanisme à définir ; le terme « actionnaire » n'est pas encore adopté juridiquement | Critique |
-| Alerte | Dossier structuré relatif à une perte, découverte, disparition, danger, urgence ou information autorisée | À préciser |
+| Alerte | Dossier structuré relatif à une perte, découverte, disparition, danger, urgence ou information autorisée | Spécifié |
+| SOS | Alerte de danger immédiat pouvant être créée sans authentification complète, dont chaque état reste probant | Spécifié |
+| Correspondance | Hypothèse de rapprochement entre déclarations qui exige une validation avant toute action sensible | Spécifié |
+| Restitution | Remise vérifiée d'un bien à son propriétaire ou détenteur légitime | Spécifié |
+| Réunification | Mise en sécurité et remise d'une personne à une personne ou institution légalement habilitée | Spécifié |
+| Récompense | Somme facultative préfinancée et réservée pour la restitution vérifiée d'un bien autorisé | Spécifié |
 | Alerte sponsorisée | Alerte communautaire validée dont le déclarant finance une portée supplémentaire sans acheter urgence, confiance ou résultat | Spécifié |
 | Boost d'alerte | Offre prépayée de durée, territoire, surfaces et exposition supplémentaires | Spécifié |
 | Pause utile | Transition non publicitaire entre séquences du Feed présentant conseil, prévention ou information | Spécifié |
