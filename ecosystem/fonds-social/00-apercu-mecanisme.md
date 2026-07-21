@@ -1,10 +1,10 @@
 # Fonds social — Aperçu du mécanisme
 
-- **Statut :** exploration initiale
+- **Statut :** aperçu historique — remplacé par la spécification 01
 - **Source :** `sources/2026-07-21-clarification-fondateur-04-fonds-social.md`
-- **Instruction complète :** différée jusqu'à la stabilisation du cycle publicitaire et du wallet
+- **Spécification actuelle :** `ecosystem/fonds-social/01-pacte-financement-et-voeux.md`
 
-## Pourquoi ne pas l'instruire entièrement maintenant
+## Pourquoi l'instruction avait été différée
 
 Le Fonds social débite des wallets alimentés par les gains publicitaires. Il dépend donc de décisions encore ouvertes :
 
