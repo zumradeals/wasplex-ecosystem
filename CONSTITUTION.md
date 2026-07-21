@@ -1,18 +1,125 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** brouillon de travail v0.1  
+**Statut :** proposition de transcription v0.2  
 **Autorité :** constitutionnelle après adoption explicite  
-**Propriétaire de la vision :** le fondateur de Wasplex
+**Propriétaire de la vision :** le fondateur de Wasplex  
+**Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`
 
-## Préambule provisoire
+## Préambule proposé
 
-Wasplex part d'une conviction : l'attention des populations possède une valeur économique. L'écosystème a pour vocation de transformer l'attention publicitaire consentie en valeur mesurable, traçable et redistribuée, puis de mettre cette valeur au service de capacités économiques, sociales et civiques utiles.
+L'attention humaine est devenue l'une des ressources les plus précieuses de l'économie numérique. Pourtant, les personnes qui la produisent ne reçoivent généralement qu'une part infime de la valeur qu'elles contribuent à créer. Dans le même temps, les annonceurs financent des campagnes parfois intrusives, imprécises ou inefficaces.
 
-Cette formulation est provisoire. Elle doit être précisée avec le fondateur avant adoption.
+Wasplex entend rétablir cet équilibre.
 
-## Raison d'être provisoire
+L'écosystème transforme une attention publicitaire volontaire, consentie et vérifiable en valeur économique partagée. Il protège la vie privée des utilisateurs, permet aux annonceurs d'atteindre des audiences réellement pertinentes et organise une redistribution transparente et durable.
+
+Wasplex poursuit une ambition plus large que la seule rémunération publicitaire : démontrer que l'économie numérique peut contribuer à réduire la pauvreté et à mieux répartir la richesse sans sacrifier la dignité, la liberté ni la confidentialité des personnes.
+
+## Article 1 — Raison d'être
 
 > Transformer l'attention publicitaire en valeur économique traçable et redistribuée aux populations.
+
+## Article 2 — Dignité de l'attention
+
+1. Le temps et l'attention d'une personne constituent une richesse humaine.
+2. Wasplex valorise cette richesse ; il ne la vole pas.
+3. Toute attention éligible à rémunération doit être volontaire, consciente et soumise à une règle compréhensible.
+4. Wasplex refuse les mécanismes conçus pour provoquer une dépendance ou capter artificiellement le temps.
+5. Wasplex ne devient pas un réseau social dont le modèle économique repose sur la captation indéfinie de l'attention.
+
+## Article 3 — Attention rémunérée
+
+1. L'attention rémunérée est une participation volontaire assortie d'une condition vérifiable.
+2. Avant le visionnage, l'utilisateur doit pouvoir connaître la durée ou le seuil requis ainsi que la récompense applicable.
+3. Commencer une publicité ne crée pas automatiquement un droit à rémunération.
+4. Le droit à rémunération naît lorsque l'utilisateur atteint le seuil de complétion annoncé et que la vue satisfait aux règles de validité et de lutte contre la fraude.
+5. Si l'utilisateur quitte la publicité avant ce seuil, son wallet n'est pas crédité.
+6. L'utilisateur reste libre de ne pas commencer une publicité ou de l'interrompre ; l'interruption entraîne seulement la non-éligibilité au gain annoncé.
+7. La vérification technique ne doit pas reposer uniquement sur une affirmation du navigateur ou de l'appareil de l'utilisateur.
+
+## Article 4 — Pacte de valeur
+
+1. L'utilisateur apporte volontairement son attention, son consentement, ses préférences autorisées et sa participation.
+2. L'annonceur finance la diffusion d'une campagne vers une audience pertinente.
+3. Wasplex protège les données, constitue les segments autorisés, orchestre la diffusion, vérifie l'attention et redistribue la valeur.
+4. L'annonceur achète une capacité de diffusion ciblée ; il n'achète ni les identités ni les données personnelles des utilisateurs.
+5. Toute valeur émise ou redistribuée doit posséder une source, une destination et une formule auditables.
+
+## Article 5 — Ordre constitutionnel des intérêts
+
+L'ordre suivant est volontaire et ne peut être inversé :
+
+1. **La mission et la pérennité de Wasplex.** L'écosystème doit rester économiquement solide afin de protéger son indépendance, financer son évolution et tenir ses engagements.
+2. **Les utilisateurs.** Ils sont la raison d'être de la plateforme et doivent recevoir une rémunération équitable, des services utiles et la protection de leurs données.
+3. **Les annonceurs et les institutions affiliées.** Ils bénéficient de l'écosystème à condition de le financer ou de le servir et d'en respecter les règles.
+
+La priorité accordée à Wasplex désigne la mission et la pérennité de l'écosystème. Elle ne justifie jamais l'intérêt financier de l'organisation au détriment de la protection des utilisateurs.
+
+En cas de conflit entre un intérêt économique et les principes fondateurs ou la protection des utilisateurs, les principes fondateurs priment.
+
+## Article 6 — Place universelle et engagement individuel
+
+1. Wasplex favorise l'utilisateur quel que soit son niveau d'adhésion.
+2. Tout utilisateur doit disposer d'une place réelle et digne dans l'écosystème.
+3. Les différences de niveau d'adhésion peuvent ouvrir des opportunités distinctes, mais ne doivent pas supprimer le socle de valeur accessible aux personnes disposant de faibles moyens.
+4. Wasplex ne promet ni facilité ni gain facile.
+5. La rémunération dépend de règles annoncées, de l'engagement individuel, de la persévérance et de l'attention effectivement fournie.
+6. Une adhésion payante ne doit jamais être présentée comme la garantie d'un revenu ou d'un retour financier.
+
+Les droits exacts du socle gratuit et des niveaux d'adhésion restent à spécifier.
+
+## Article 7 — Acteurs officiels
+
+L'écosystème reconnaît quatre catégories d'acteurs :
+
+1. **Wasplex**, qui gouverne, protège, mesure, orchestre et redistribue ;
+2. **les utilisateurs**, qui participent volontairement à l'écosystème ;
+3. **les annonceurs**, qui financent et diffusent des campagnes selon les règles de Wasplex ;
+4. **les institutions affiliées**, qui opèrent ou soutiennent des services encadrés d'intérêt collectif.
+
+Le rôle « Agent » n'existe plus dans Wasplex. Il ne doit apparaître ni dans les nouvelles spécifications ni dans la future architecture.
+
+Les commerçants et autres partenaires devront être rattachés à l'une de ces catégories ou faire l'objet d'un amendement explicite ; aucune cinquième catégorie n'est créée implicitement.
+
+## Article 8 — Données et ciblage
+
+1. Wasplex ne vend jamais les données personnelles de ses utilisateurs.
+2. Le ciblage ne doit jamais divulguer l'identité ni les informations privées d'une personne à l'annonceur.
+3. Les centres d'intérêt et autres critères de ciblage doivent être recueillis selon une finalité explicite et un consentement approprié.
+4. L'annonceur reçoit des capacités de ciblage et des résultats agrégés, non une liste nominative d'utilisateurs.
+5. Les critères autorisés, interdits ou sensibles, la révocation du consentement et les seuils empêchant la réidentification doivent être spécifiés avant exploitation.
+
+## Article 9 — Refus absolus
+
+Wasplex refuse :
+
+- l'exploitation économique des populations ;
+- la vente de données personnelles ;
+- la divulgation d'identités ou d'informations privées aux annonceurs ;
+- le ciblage non consenti ;
+- la dépendance au défilement infini ou à des mécanismes d'addiction ;
+- les systèmes pyramidaux ;
+- tout modèle reposant sur le recrutement permanent ;
+- les promesses de gains irréalistes ;
+- l'exclusion des personnes aux faibles moyens ;
+- la manipulation des populations par les annonceurs ;
+- la diffusion de contenus contraires à ses principes ;
+- la captation du temps comme finalité propre.
+
+## Article 10 — Mesure de la réussite
+
+Wasplex mesure sa réussite par sa capacité à :
+
+1. rendre une valeur réelle aux personnes pour leur attention volontaire ;
+2. redistribuer une part des revenus publicitaires aux populations ;
+3. offrir aux annonceurs un retour sur investissement supérieur grâce à un ciblage précis, volontaire et éthique ;
+4. permettre au Fonds social de financer des projets, aider des familles, soutenir des communautés et répondre à des urgences ;
+5. obtenir durablement la confiance des utilisateurs par la protection de leur vie privée ;
+6. s'étendre dans plusieurs pays sans abandonner ses principes ;
+7. maintenir un écosystème économiquement viable ;
+8. démontrer qu'une autre économie de l'attention est possible.
+
+Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la réussite.
 
 ## Règles de rédaction
 
@@ -24,24 +131,20 @@ Cette formulation est provisoire. Elle doit être précisée avec le fondateur a
 6. Une donnée personnelle doit avoir une finalité, une base de consentement, une durée de conservation et une règle d'accès.
 7. La simplicité d'exploitation est une exigence, pas une dispense de sécurité.
 
-## Articles à instruire
+## Articles restant à instruire
 
-- identité et promesse centrale ;
-- modèle de création et de redistribution de valeur ;
-- acteurs, droits et responsabilités ;
-- gouvernance des données et des audiences ;
 - WasPoints, wallet, paiements et retraits ;
-- annonceurs, campagnes et tarification ;
-- abonnements et tiers ;
+- annonceurs, campagnes, ciblage et tarification ;
+- abonnements et niveaux d'adhésion ;
 - cartes de micro-actionnaires ;
-- agents et parrainage ;
 - Fonds social ;
 - alertes, restitutions, urgences et institutions ;
 - administration, audit et gouvernance ;
 - identité visuelle et langage ;
 - architecture technique et exigences de qualité ;
-- procédure d'amendement.
+- procédure d'amendement ;
+- secteurs publicitaires interdits ou sensibles.
 
 ## Clause de non-adoption
 
-Le présent document initialise le travail. Il ne constitue pas encore la version adoptée de la Constitution.
+Cette version est une transcription proposée à partir des déclarations du fondateur. Elle devient constitutionnelle uniquement après validation explicite.
