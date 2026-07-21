@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v0.4 adoptée  
+**Statut :** Constitution v0.5 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`
 
 ## Préambule adopté
 
@@ -69,7 +69,7 @@ En cas de conflit entre un intérêt économique et les principes fondateurs ou 
 5. La rémunération dépend de règles annoncées, de l'engagement individuel, de la persévérance et de l'attention effectivement fournie.
 6. Une adhésion payante ne doit jamais être présentée comme la garantie d'un revenu ou d'un retour financier.
 
-Les droits exacts du socle gratuit et des niveaux d'adhésion restent à spécifier.
+Les droits du socle gratuit et les limites des niveaux payants sont précisés par l'article 11.
 
 ## Article 7 — Acteurs officiels
 
@@ -125,7 +125,20 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 8. La qualification juridique du WP dépend des lois applicables et des fonctions effectivement activées. La présente doctrine ne soustrait pas Wasplex à une réglementation impérative.
 9. Toute somme disponible et retirable doit être rapprochable de sa source et de sa couverture financière.
 
-## Article 11 — Refus absolus
+## Article 11 — Abonnements publicitaires
+
+1. L'abonnement Wasplex achète un niveau de service, de capacité et d'accès ; il n'achète ni investissement, ni rendement, ni revenu garanti.
+2. Les gains publicitaires proviennent de campagnes préfinancées. Le prix des nouveaux abonnements ne finance pas automatiquement les gains publicitaires des anciens abonnés.
+3. Toute différence de rémunération liée à un niveau doit être financée avant diffusion par la campagne concernée ou, pour une promotion identifiée, par les ressources propres de Wasplex.
+4. Aucun abonnement ne garantit la disponibilité de campagnes, l'utilisation complète d'un quota ou un montant de gains.
+5. Le niveau gratuit demeure un accès réel et conserve les droits essentiels relatifs au compte, aux consentements, à la sécurité, au Wallet, aux gains acquis, à leur retrait et à la transparence.
+6. Un niveau payant peut améliorer les conditions de retrait, mais le niveau gratuit conserve un seuil raisonnable, réalisable et non confiscatoire.
+7. L'expiration, la résiliation ou le changement de niveau ne supprime aucun gain définitivement acquis.
+8. Aucun avantage de niveau ne s'applique rétroactivement à un événement déjà réalisé.
+9. Les niveaux, prix, durées, quotas et avantages sont administrables, versionnés et auditables, sans pouvoir contredire la Constitution.
+10. Les recettes d'abonnement demeurent comptablement séparées des budgets publicitaires préfinancés et du Fonds social.
+
+## Article 12 — Refus absolus
 
 Wasplex refuse :
 
@@ -142,7 +155,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 12 — Mesure de la réussite
+## Article 13 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -171,7 +184,6 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 - paiements, retraits et couverture financière du Wallet ;
 - annonceurs, campagnes, ciblage et tarification ;
-- abonnements et niveaux d'adhésion ;
 - cartes de micro-actionnaires ;
 - Fonds social ;
 - alertes, restitutions, urgences et institutions ;
@@ -183,4 +195,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 12 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002 et l'article 10 intègre AMD-0003, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 13 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003 et l'article 11 intègre AMD-0004, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
