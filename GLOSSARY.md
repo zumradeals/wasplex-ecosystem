@@ -22,7 +22,12 @@
 | Segment | Groupe d'audience défini par des critères de ciblage sans exposition d'identités individuelles | Proposé |
 | Résultat agrégé | Indicateur collectif ne permettant pas raisonnablement d'identifier une personne | À spécifier |
 | Annonceur | Acteur autorisé à financer et diffuser une campagne selon les règles de Wasplex | Proposé |
-| Institution affiliée | Acteur institutionnel autorisé à opérer ou soutenir un service encadré d'intérêt collectif | À préciser |
+| Institution affiliée | Organisation formellement vérifiée recevant des capacités limitées, finalisées, territorialisées, temporaires et auditables | Proposé — AMD-0006 |
+| Utilisateur institutionnel habilité | Personne nominativement rattachée à une institution et autorisée à exercer certaines capacités | Spécifié |
+| Prestataire vérifié | Fournisseur contrôlé pour une opération déterminée sans accès institutionnel durable | Spécifié |
+| Capacité institutionnelle | Action précise qu'une organisation ou un utilisateur peut exercer dans une portée déterminée | Spécifié |
+| Recherche de dossiers autorisés | Recherche motivée et auditée, limitée par catégorie, territoire, période ou identifiant | Spécifié |
+| Compte technique | Identité non humaine réservée à une intégration automatisée, limitée et surveillée | Spécifié |
 | Niveau d'adhésion publicitaire | Offre de service configurée augmentant capacités, accès ou outils sans garantir campagne ni revenu | Spécifié |
 | Quota publicitaire | Maximum d'événements accessibles pendant une période ; il ne garantit pas leur disponibilité | Spécifié |
 | Promotion Wasplex | Bonus temporaire financé sur les ressources propres de Wasplex et séparé du gain publicitaire | Spécifié |
