@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v0.6 adoptée  
+**Statut :** Constitution v0.7 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`
 
 ## Préambule adopté
 
@@ -156,7 +156,26 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 14. Les paramètres sont administrables, versionnés et auditables, sans pouvoir modifier ces invariants.
 15. La qualification juridique du mécanisme et son dispositif de garde doivent être validés dans chaque juridiction avant activation.
 
-## Article 13 — Refus absolus
+## Article 13 — Institutions affiliées
+
+1. Une institution affiliée est une organisation formellement vérifiée avant toute habilitation.
+2. Un prestataire ponctuel n'est pas automatiquement une institution affiliée et ne reçoit aucun accès institutionnel implicite.
+3. Chaque utilisateur institutionnel agit sous une identité nominative liée à son organisation ; les comptes humains partagés sont interdits pour les actions sensibles.
+4. L'affiliation ne donne jamais un accès global à Wasplex.
+5. Chaque capacité est accordée séparément selon une finalité, un territoire, une catégorie, une durée et une base d'accès déterminée.
+6. L'accès aux données sensibles est limité au strict nécessaire, normalement dossier par dossier, et expire avec sa finalité.
+7. Les recherches massives, exploratoires ou sans motif sont interdites.
+8. Toute consultation, validation, transmission ou modification sensible est auditée et ses preuves sont protégées.
+9. Chaque statut affiché correspond à une preuve réelle. Wasplex décrit ce qu'il sait et ne présente jamais une tentative comme une réception, ni une réception comme une prise en charge.
+10. Wasplex ne promet aucune intervention qu'il ne contrôle pas et affiche les moyens officiels directs lorsque la situation l'exige.
+11. Une institution n'accepte une prise en charge que si elle peut raisonnablement agir et répond de ses utilisateurs, consultations, validations et engagements selon les règles applicables.
+12. Une suspension ne supprime ni journaux, ni preuves, ni dossiers, ni responsabilités.
+13. La puissance publique, économique ou sociale d'une organisation ne lui confère aucun droit automatique sur les données.
+14. La protection des personnes prime sur la commodité opérationnelle de l'institution.
+15. Les capacités financières ou sectorielles ne sont activées qu'après vérification des autorisations correspondantes.
+16. Les paramètres et habilitations sont administrables, versionnés, expirants et auditables sans pouvoir contredire ces invariants.
+
+## Article 14 — Refus absolus
 
 Wasplex refuse :
 
@@ -173,7 +192,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 14 — Mesure de la réussite
+## Article 15 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -203,7 +222,7 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 - paiements, retraits et couverture financière du Wallet ;
 - annonceurs, campagnes, ciblage et tarification ;
 - cartes de micro-actionnaires ;
-- alertes, restitutions, urgences et institutions ;
+- alertes, restitutions et urgences ;
 - administration, audit et gouvernance ;
 - identité visuelle et langage ;
 - architecture technique et exigences de qualité ;
@@ -212,4 +231,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 14 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004 et l'article 12 intègre AMD-0005, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 15 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005 et l'article 13 intègre AMD-0006, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
