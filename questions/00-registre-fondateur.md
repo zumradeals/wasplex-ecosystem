@@ -20,30 +20,21 @@ Clarifications enregistrées :
 - Wasplex ne promet pas de gain facile ;
 - une publicité interrompue avant le seuil annoncé n'est pas rémunérée.
 
-## B. Annonceurs et audiences — deuxième entretien partiellement répondu
+## B. Annonceurs et audiences — entretiens répondus au niveau du cycle financier
 
-Source : `sources/2026-07-21-entretien-fondateur-02-publicite.md`
+Sources : `sources/2026-07-21-entretien-fondateur-02-publicite.md` et `sources/2026-07-21-entretien-fondateur-05-cycle-financier-campagne.md`
 
-Spécification : `ecosystem/publicite/01-cycle-creation-valeur.md`
+Spécifications : `ecosystem/publicite/01-cycle-creation-valeur.md` et `ecosystem/publicite/02-cycle-financier-campagne.md`
 
-1. Qu'achète l'annonceur ? — **Répondu : une attention volontaire, qualifiée et mesurable**
-2. Qu'est-ce qui rend une campagne facturable ? — **Répondu au niveau constitutionnel : une preuve vérifiable**
-3. Que voit l'annonceur ? — **Répondu : des segments et résultats agrégés, jamais les personnes**
-4. Comment le paiement est-il réparti ? — **Principe répondu ; pourcentages et assiette à définir**
-5. Le niveau d'adhésion peut-il qualifier une audience ? — **Oui en principe ; tarification et limites à définir**
-
-Troisième entretien financier répondu :
-
-Source : `sources/2026-07-21-entretien-fondateur-05-cycle-financier-campagne.md`
-
-Spécification : `ecosystem/publicite/02-cycle-financier-campagne.md`
-
-1. Préfinancement intégral ? — **Oui, avant toute diffusion**
-2. Budget non consommé ? — **Reste à l'annonceur selon les options prévues**
-3. Prix d'un événement ? — **Base et coefficients configurables, versionnés et traçables**
-4. Assiette du partage ? — **Net distribuable après taxes et frais externes imputables**
-5. Ventilation ? — **50 % Wasplex / 50 % utilisateurs**
-6. Fonds social dans cette ventilation ? — **Non, mécanisme autonome**
+1. Qu'achète l'annonceur ? — **Une attention volontaire, qualifiée et mesurable**
+2. Qu'est-ce qui rend une campagne facturable ? — **Une preuve vérifiable**
+3. Que voit l'annonceur ? — **Des segments et résultats agrégés, jamais les personnes**
+4. Préfinancement intégral ? — **Oui, avant toute diffusion**
+5. Budget non consommé ? — **Reste à l'annonceur selon les options prévues**
+6. Prix d'un événement ? — **Base et coefficients configurables, versionnés et traçables**
+7. Assiette du partage ? — **Net distribuable après taxes et frais externes imputables**
+8. Ventilation ? — **50 % Wasplex / 50 % utilisateurs ; portée constitutionnelle à confirmer**
+9. Fonds social dans cette ventilation ? — **Non, mécanisme autonome**
 
 Questions publicitaires restantes :
 
@@ -57,14 +48,27 @@ Questions publicitaires restantes :
 8. Que devient une part utilisateur non distribuée à cause des quotas ?
 9. Quelle part d'un supplément de ciblage revient spécifiquement au niveau ciblé ?
 
-## C. Valeur et WasPoints
+## C. Valeur, WasPoints et Wallet — entretien répondu
 
-1. D'où vient chaque WasPoint émis ?
-2. Un WP représente-t-il une dette de Wasplex, une récompense conditionnelle ou une unité fermée ?
-3. La parité 1 WP = 1 FCFA est-elle permanente, garantie et couverte ?
-4. Quand la valeur devient-elle retirable ?
-5. Qui finance frais, fraude, remboursements et impayés annonceurs ?
-6. Les WP expirent-ils ? Pourquoi et selon quels droits ?
+Source : `sources/2026-07-21-entretien-fondateur-06-waspoint-wallet.md`
+
+Spécification : `ecosystem/wallet/01-nature-waspoint-et-etats-wallet.md`
+
+1. Nature du WP ? — **Unité numérique interne représentant un droit économique reconnu par Wasplex**
+2. Parité ? — **1 WP = 1 FCFA, règle fondatrice proposée comme permanente**
+3. Quand la valeur devient-elle retirable ? — **Après validation complète, au passage de provisoire à disponible**
+4. États comptables ? — **Provisoire, disponible et réservé**
+5. Expiration ? — **Aucune expiration des WP définitivement acquis par simple inactivité**
+6. Opérations envisagées ? — **Réception, retrait, dépôt, transfert, réservation, paiement et historique selon activation et réglementation**
+
+Questions critiques restantes :
+
+1. Quels fonds couvrent les WP disponibles et où sont-ils détenus ?
+2. Le retrait passe-t-il exclusivement par un prestataire agréé et qui supporte les frais ?
+3. Les dépôts, transferts P2P et paiements chez des tiers sont-ils nécessaires au lancement ou à une phase réglementaire ultérieure ?
+4. Quelles règles exactes gouvernent contestation, fraude, suspension, fermeture de compte et restitution ?
+5. Quelle procédure constitutionnelle est suffisamment « exceptionnelle » pour modifier la parité ?
+6. La qualification juridique du WP a-t-elle été confirmée par un conseil compétent dans chaque pays de lancement ?
 
 ## D. Abonnements
 
