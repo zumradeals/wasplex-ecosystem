@@ -94,9 +94,32 @@ Questions restantes :
 4. Quels délais d'information encadrent renouvellement automatique et changement d'offre ?
 5. Quelles règles nationales de protection du consommateur s'appliquent dans chaque pays de lancement ?
 
-## E. Modules transversaux
+## E. Fonds Social — premier entretien répondu
 
-Pour le Fonds social, les cartes, les alertes et les institutions :
+Source : `sources/2026-07-21-entretien-fondateur-08-fonds-social.md`
+
+Spécification : `ecosystem/fonds-social/01-pacte-financement-et-voeux.md`
+
+1. Objet de l'adhésion ? — **Droit conditionnel de participation, jamais garantie de réalisation**
+2. Accès ? — **Abonnement publicitaire éligible, adhésion sociale, KYC, mandat et ancienneté**
+3. Financement ? — **Apport personnel, appel collectif plafonné et réserve autorisée**
+4. Réciprocité ? — **Transparente, contestable et limitée au Fonds**
+5. Vœu d'argent libre ? — **Interdit ; assistance conditionnelle exceptionnelle**
+6. Réalisation ? — **Paiement direct au fournisseur vérifié prioritaire**
+7. Urgences ? — **Circuit accéléré et réserve protégée sans suppression des contrôles**
+8. Transparence ? — **Financière et anonymisée, sans exposition du bénéficiaire**
+9. Recrutement permanent nécessaire ? — **Refusé**
+
+Corrections proposées avant adoption :
+
+1. L'insuffisance de solde non fautive ne doit pas diminuer automatiquement la réciprocité.
+2. Le rôle « Agent » reste interdit et devient « responsable habilité ».
+3. Une priorité commerciale reste subordonnée à l'urgence vitale.
+4. Qualification juridique et garde des fonds doivent être validées avant activation.
+
+## F. Autres modules transversaux
+
+Pour les cartes, les alertes et les institutions :
 
 1. Quel problème autonome le module résout-il ?
 2. Quel lien causal a-t-il avec la publicité ?
@@ -104,9 +127,8 @@ Pour le Fonds social, les cartes, les alertes et les institutions :
 4. Qui détient les fonds ou la responsabilité ?
 5. Quels droits reçoit l'utilisateur ?
 6. Quels abus sont possibles ?
-7. Le module peut-il survivre sans devoir recruter continuellement de nouveaux membres ?
 
-## F. Marque
+## G. Marque
 
 1. Que symbolisent le martin-pêcheur et le poisson ?
 2. Le nom officiel s'écrit-il Wasplex ou WasPlex ?
