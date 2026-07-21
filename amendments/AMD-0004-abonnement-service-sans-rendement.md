@@ -1,6 +1,6 @@
 # AMD-0004 — L'abonnement est un service, non un rendement
 
-**État :** proposé — validation constitutionnelle explicite requise  
+**État :** adopté et intégré à la Constitution v0.5  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-07-abonnements-publicitaires.md`
 
@@ -19,7 +19,8 @@ Les niveaux payants augmentent les capacités d'usage, mais ne doivent ni créer
 7. Aucun avantage de niveau ne s'applique rétroactivement à un événement déjà réalisé.
 8. Les niveaux, prix, durées, quotas et avantages sont administrables, versionnés et auditables, sans pouvoir contredire la Constitution.
 9. Les recettes d'abonnement demeurent comptablement séparées des budgets publicitaires préfinancés et du Fonds social.
+10. Un niveau payant peut améliorer les conditions de retrait, mais le niveau gratuit conserve un seuil raisonnable, réalisable et non confiscatoire.
 
-## Effet si adopté
+## Effet de l'adoption
 
-Cet amendement fixe les limites constitutionnelles du catalogue commercial. Les valeurs et noms des offres restent des paramètres métier gouvernés.
+Le fondateur a validé cet amendement et la protection du seuil de retrait gratuit le 2026-07-21. Cet amendement fixe les limites constitutionnelles du catalogue commercial. Les valeurs et noms des offres restent des paramètres métier gouvernés.
