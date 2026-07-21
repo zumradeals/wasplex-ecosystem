@@ -193,7 +193,11 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 14. Les moyens biométriques ou de reconnaissance faciale ne sont pas autorisés implicitement et exigent une décision, une base légale et des garanties spécifiques.
 15. Le retrait public d'une alerte ne supprime pas les preuves nécessaires à la sécurité, l'audit, la fraude ou au contentieux.
 16. La transparence porte sur états, preuves et fonds sans exposer inutilement la vie privée.
-17. Les catégories, durées, priorités, territoires, quotas, cadences, sponsorisations et récompenses sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
+17. Une alerte nationale critique ne peut être émise que par une institution souveraine habilitée, dans sa compétence territoriale, avec authentification renforcée, double validation nominative et audit complet.
+18. Lorsqu'elle est reçue et valide, elle interrompt immédiatement les publicités et contenus Wasplex en cours. Hors de Wasplex, son affichage dépend des capacités et autorisations du terminal.
+19. La couverture de masse indépendante de l'installation Wasplex exige une intégration souveraine avec les opérateurs ou dispositifs publics de diffusion d'urgence ; Wasplex ne prétend jamais l'assurer seul.
+20. Une alerte nationale critique ne peut être sponsorisée, monétisée, ciblée commercialement ni associée à une récompense.
+21. Les catégories, durées, priorités, territoires, quotas, cadences, sponsorisations et récompenses sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
 
 ## Article 15 — Refus absolus
 
