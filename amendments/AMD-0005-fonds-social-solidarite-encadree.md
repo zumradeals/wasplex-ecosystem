@@ -1,6 +1,6 @@
 # AMD-0005 — Fonds Social, solidarité encadrée et non garantie
 
-**État :** proposé — validation constitutionnelle explicite requise  
+**État :** adopté et intégré à la Constitution v0.6  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-08-fonds-social.md`
 
@@ -20,6 +20,10 @@
 12. Le Fonds ne dépend pas du recrutement permanent de nouveaux membres.
 13. Les paramètres sont administrables, versionnés et auditables, sans pouvoir modifier ces invariants.
 14. La qualification juridique du mécanisme et son dispositif de garde doivent être validés dans chaque juridiction avant activation.
+
+## Décision d'adoption
+
+Le fondateur a validé et amendé ce texte le 2026-07-21. Les précisions expertes ci-dessous font partie de l'amendement adopté.
 
 ## Précisions de cohérence intégrées
 
