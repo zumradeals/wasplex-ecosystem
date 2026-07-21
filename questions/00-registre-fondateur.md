@@ -2,12 +2,23 @@
 
 Ce registre organise les entretiens de conception. Il ne présume pas des réponses.
 
-## A. Wasplex
+## A. Wasplex — premier entretien répondu
 
-1. Quel problème humain Wasplex résout-il avant toute considération technologique ?
-2. Qui est le premier bénéficiaire : population, annonceur, institution ou écosystème ?
-3. Qu'est-ce que Wasplex refuse de devenir ?
-4. Quel résultat observable prouvera que Wasplex remplit sa mission ?
+Les quatre questions fondatrices ont reçu une réponse le 2026-07-21.
+
+Source : `sources/2026-07-21-entretien-fondateur-01.md`
+
+1. Quel problème humain Wasplex résout-il avant toute considération technologique ? — **Répondu**
+2. Qui est le premier bénéficiaire ? — **Répondu**
+3. Qu'est-ce que Wasplex refuse de devenir ? — **Répondu**
+4. Quel résultat observable prouvera que Wasplex remplit sa mission ? — **Répondu**
+
+Clarifications enregistrées :
+
+- le rôle « Agent » n'existe plus ;
+- chaque utilisateur possède une place quel que soit son niveau d'adhésion ;
+- Wasplex ne promet pas de gain facile ;
+- une publicité interrompue avant le seuil annoncé n'est pas rémunérée.
 
 ## B. Annonceurs et audiences
 
@@ -18,6 +29,7 @@ Ce registre organise les entretiens de conception. Il ne présume pas des répon
 5. Que voit précisément l'annonceur sur les personnes ciblées ?
 6. Quelle taille minimale empêche de réidentifier un segment ?
 7. Comment une vue est-elle validée et protégée contre la fraude ?
+8. Quels secteurs publicitaires sont interdits ou soumis à des restrictions particulières ?
 
 ## C. Valeur et WasPoints
 
@@ -30,15 +42,16 @@ Ce registre organise les entretiens de conception. Il ne présume pas des répon
 
 ## D. Abonnements
 
-1. Quel service concret achète chaque tier ?
+1. Quel service concret achète chaque niveau d'adhésion ?
 2. Pourquoi un membre payant gagne-t-il davantage ?
 3. Cette différence est-elle financée par l'annonceur, Wasplex ou les abonnements ?
 4. Existe-t-il une garantie implicite de récupérer le prix payé ?
 5. Que conserve un membre après résiliation ?
+6. Quel socle économique et fonctionnel reste accessible gratuitement ?
 
 ## E. Modules transversaux
 
-Pour le Fonds social, les cartes, les agents, les alertes et les institutions :
+Pour le Fonds social, les cartes, les alertes et les institutions :
 
 1. Quel problème autonome le module résout-il ?
 2. Quel lien causal a-t-il avec la publicité ?
@@ -46,7 +59,7 @@ Pour le Fonds social, les cartes, les agents, les alertes et les institutions :
 4. Qui détient les fonds ou la responsabilité ?
 5. Quels droits reçoit l'utilisateur ?
 6. Quels abus sont possibles ?
-7. Le module peut-il survivre sans en recruter continuellement de nouveaux membres ?
+7. Le module peut-il survivre sans devoir recruter continuellement de nouveaux membres ?
 
 ## F. Marque
 
