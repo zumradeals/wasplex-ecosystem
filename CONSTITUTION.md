@@ -169,7 +169,7 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Articles restant à instruire
 
-- WasPoints, wallet, paiements et retraits ;
+- paiements, retraits et couverture financière du Wallet ;
 - annonceurs, campagnes, ciblage et tarification ;
 - abonnements et niveaux d'adhésion ;
 - cartes de micro-actionnaires ;
