@@ -13,7 +13,7 @@
 | Complétion | Atteinte de la durée ou du seuil annoncé donnant potentiellement droit à rémunération | À spécifier |
 | Événement publicitaire qualifié | Preuve unique, vérifiable et acceptée qu'une condition de campagne a été exécutée | À valider |
 | Pertinence de la rencontre | Adéquation entre un message publicitaire et un segment d'audience constitué selon des critères consentis | Proposé |
-| WasPoint (WP) | Unité numérique interne représentant un droit économique reconnu par Wasplex ; parité proposée de 1 WP = 1 FCFA | Proposition AMD-0003 |
+| WasPoint (WP) | Unité numérique interne représentant un droit économique reconnu par Wasplex ; parité constitutionnelle de 1 WP = 1 FCFA | Adopté — AMD-0003 |
 | WP provisoire | Droit conditionnel en cours de validation, non utilisable et non retirable | Spécifié |
 | WP disponible | Droit validé, utilisable et retirable selon les règles applicables | Spécifié |
 | WP réservé | WP attribué à l'utilisateur mais temporairement bloqué pour une opération identifiée | Spécifié |
