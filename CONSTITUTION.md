@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** noyau constitutionnel v0.3 adopté  
+**Statut :** Constitution v0.4 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendement adopté :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`
 
 ## Préambule adopté
 
@@ -98,7 +98,34 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 8. Wasplex exerce cette propriété commerciale sous réserve des droits de la personne concernée et des lois applicables dans chaque pays.
 9. Les critères autorisés, interdits ou sensibles, la révocation du consentement et les seuils empêchant la réidentification doivent être spécifiés avant exploitation.
 
-## Article 9 — Refus absolus
+## Article 9 — Partage de la valeur publicitaire
+
+> Après retrait des taxes obligatoires et des frais externes directement liés à l'encaissement, toute valeur publicitaire effectivement validée est partagée à parts égales entre Wasplex et les utilisateurs.
+
+1. L'assiette du partage est le montant net distribuable de chaque événement publicitaire validé.
+2. Cinquante pour cent reviennent à Wasplex afin de financer sa mission, son fonctionnement, sa sécurité et sa pérennité.
+3. Cinquante pour cent alimentent la rémunération publicitaire des utilisateurs.
+4. Les frais internes de Wasplex sont financés par sa propre part et ne réduisent pas préalablement l'assiette distribuable.
+5. Le Fonds social est autonome et n'est pas prélevé automatiquement sur ce partage.
+6. Une provision temporaire peut retarder la disponibilité d'une somme mais ne peut modifier le ratio final, sauf perte externe réelle, justifiée et traçable.
+7. La distribution interne de la part utilisateur peut dépendre de paramètres administrables, versionnés et auditables, sans permettre à l'administration de modifier le ratio global.
+8. Le ratio 50/50 ne peut être modifié que par un nouvel amendement constitutionnel explicite.
+
+## Article 10 — WasPoint et Wallet
+
+> Le WasPoint est l'unité numérique interne de comptabilisation des droits économiques reconnus par Wasplex. Sa valeur de référence est permanente et transparente : 1 WP vaut 1 franc CFA.
+
+1. Wasplex ne présente le WP ni comme une cryptomonnaie, ni comme un investissement, ni comme une promesse de rendement.
+2. Un WP provisoire constitue un droit conditionnel, non utilisable et non retirable.
+3. Un WP disponible constitue un droit validé et utilisable selon les services autorisés.
+4. Un WP réservé demeure attribué à l'utilisateur mais est temporairement indisponible pour une opération identifiée.
+5. Un WP définitivement acquis n'expire pas par simple inactivité.
+6. Toute émission, transition, réservation, libération, règlement ou correction doit être traçable et auditable.
+7. Toute modification de la parité exige un amendement constitutionnel exceptionnel, une étude préalable de ses conséquences et une information des titulaires.
+8. La qualification juridique du WP dépend des lois applicables et des fonctions effectivement activées. La présente doctrine ne soustrait pas Wasplex à une réglementation impérative.
+9. Toute somme disponible et retirable doit être rapprochable de sa source et de sa couverture financière.
+
+## Article 11 — Refus absolus
 
 Wasplex refuse :
 
@@ -115,7 +142,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 10 — Mesure de la réussite
+## Article 12 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -156,4 +183,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 10 constituent le noyau adopté. L'article 8 intègre l'amendement AMD-0001 validé le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 12 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002 et l'article 10 intègre AMD-0003, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
