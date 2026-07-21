@@ -33,7 +33,7 @@ Spécifications : `ecosystem/publicite/01-cycle-creation-valeur.md` et `ecosyste
 5. Budget non consommé ? — **Reste à l'annonceur selon les options prévues**
 6. Prix d'un événement ? — **Base et coefficients configurables, versionnés et traçables**
 7. Assiette du partage ? — **Net distribuable après taxes et frais externes imputables**
-8. Ventilation ? — **50 % Wasplex / 50 % utilisateurs ; portée constitutionnelle à confirmer**
+8. Ventilation ? — **50 % Wasplex / 50 % utilisateurs, règle constitutionnelle adoptée**
 9. Fonds social dans cette ventilation ? — **Non, mécanisme autonome**
 
 Questions publicitaires restantes :
@@ -55,7 +55,7 @@ Source : `sources/2026-07-21-entretien-fondateur-06-waspoint-wallet.md`
 Spécification : `ecosystem/wallet/01-nature-waspoint-et-etats-wallet.md`
 
 1. Nature du WP ? — **Unité numérique interne représentant un droit économique reconnu par Wasplex**
-2. Parité ? — **1 WP = 1 FCFA, règle fondatrice proposée comme permanente**
+2. Parité ? — **1 WP = 1 FCFA, règle constitutionnelle permanente adoptée**
 3. Quand la valeur devient-elle retirable ? — **Après validation complète, au passage de provisoire à disponible**
 4. États comptables ? — **Provisoire, disponible et réservé**
 5. Expiration ? — **Aucune expiration des WP définitivement acquis par simple inactivité**
