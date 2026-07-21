@@ -20,16 +20,30 @@ Clarifications enregistrées :
 - Wasplex ne promet pas de gain facile ;
 - une publicité interrompue avant le seuil annoncé n'est pas rémunérée.
 
-## B. Annonceurs et audiences
+## B. Annonceurs et audiences — deuxième entretien partiellement répondu
 
-1. Qu'achète exactement un annonceur : diffusion, vues validées, attention mesurée, action ou résultat ?
-2. Comment les critères d'âge, pays, habitudes ou intérêts sont-ils recueillis ?
-3. Quels critères sont interdits ?
-4. L'utilisateur peut-il refuser le ciblage tout en utilisant Wasplex ?
-5. Que voit précisément l'annonceur sur les personnes ciblées ?
-6. Quelle taille minimale empêche de réidentifier un segment ?
-7. Comment une vue est-elle validée et protégée contre la fraude ?
-8. Quels secteurs publicitaires sont interdits ou soumis à des restrictions particulières ?
+Source : `sources/2026-07-21-entretien-fondateur-02-publicite.md`
+
+Spécification : `ecosystem/publicite/01-cycle-creation-valeur.md`
+
+1. Qu'achète l'annonceur ? — **Répondu : une attention volontaire, qualifiée et mesurable**
+2. Qu'est-ce qui rend une campagne facturable ? — **Répondu au niveau constitutionnel : une preuve vérifiable**
+3. Que voit l'annonceur ? — **Répondu : des segments et résultats agrégés, jamais les personnes**
+4. Comment le paiement est-il réparti ? — **Principe répondu ; pourcentages et assiette à définir**
+5. Le niveau d'adhésion peut-il qualifier une audience ? — **Oui en principe ; tarification et limites à définir**
+
+Questions restantes :
+
+1. Comment les critères d'âge, pays, habitudes ou intérêts sont-ils recueillis et mis à jour ?
+2. Quels critères sont interdits ou sensibles ?
+3. L'utilisateur peut-il refuser certains ciblages tout en utilisant Wasplex ?
+4. Quelle taille minimale empêche de réidentifier un segment ?
+5. Quelles preuves sont acceptées pour chaque format publicitaire ?
+6. Comment les preuves sont-elles protégées contre bots, fermes de clics, multi-comptes et répétitions ?
+7. Quels secteurs publicitaires sont interdits ou soumis à des restrictions ?
+8. L'annonceur préfinance-t-il intégralement sa campagne ?
+9. Quelles sommes sont distribuables après taxes, frais, remboursements et provisions ?
+10. Que signifie économiquement un niveau d'adhésion dans le ciblage, et quelle part du supplément revient à l'utilisateur ?
 
 ## C. Valeur et WasPoints
 
