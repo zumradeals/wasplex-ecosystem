@@ -1,6 +1,6 @@
 # AMD-0007 — Alertes : sécurité gratuite, vérité des états et protection
 
-**État :** proposé — validation constitutionnelle explicite requise  
+**État :** adopté et intégré à la Constitution v0.8  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-11-alertes-securite-restitutions.md`
 
@@ -24,6 +24,10 @@
 16. La transparence porte sur états, preuves et fonds sans exposer inutilement la vie privée.
 17. Les catégories, durées, priorités, territoires, quotas, cadences, sponsorisations et récompenses sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
 
-## Effet si adopté
+## Décision d'adoption
+
+Le fondateur a validé cet amendement le 2026-07-21.
+
+## Effet de l'adoption
 
 Cet article gouverne les déclarations communautaires, disparitions, SOS, diffusions dans le Feed, sponsorisations, correspondances, protections, restitutions de biens et récompenses.
