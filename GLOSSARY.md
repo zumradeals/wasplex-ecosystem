@@ -26,7 +26,12 @@
 | Niveau d'adhésion publicitaire | Offre de service configurée augmentant capacités, accès ou outils sans garantir campagne ni revenu | Spécifié |
 | Quota publicitaire | Maximum d'événements accessibles pendant une période ; il ne garantit pas leur disponibilité | Spécifié |
 | Promotion Wasplex | Bonus temporaire financé sur les ressources propres de Wasplex et séparé du gain publicitaire | Spécifié |
-| Fonds social | Module transversal dont la nature économique et les droits des membres restent à définir | Critique |
+| Fonds Social | Mécanisme autonome de solidarité encadrée donnant un droit conditionnel de participation sans garantir un vœu | Proposé — AMD-0005 |
+| Adhésion sociale | Contrat distinct ouvrant l'accès conditionnel au programme et à ses obligations | Spécifié |
+| Apport personnel | Part du coût d'un vœu réservée par son demandeur avant réalisation | Spécifié |
+| Appel collectif | Répartition plafonnée du besoin restant entre participants effectivement éligibles | Spécifié |
+| Indice de réciprocité | Mesure transparente et contestable de la participation au Fonds, distincte d'un score social général | Spécifié |
+| Réserve d'urgence | Compartiment protégé destiné aux urgences vitales ou humanitaires validées | Spécifié |
 | Carte micro-actionnaire | Mécanisme à définir ; le terme « actionnaire » n'est pas encore adopté juridiquement | Critique |
 | Alerte | Signalement civique, déclaration de perte ou urgence ; catégories à séparer | À préciser |
 | Constitution | Source normative supérieure gouvernant l'écosystème | Adopté pour le processus |
