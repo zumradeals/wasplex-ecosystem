@@ -110,10 +110,10 @@ Spécification : `ecosystem/fonds-social/01-pacte-financement-et-voeux.md`
 8. Transparence ? — **Financière et anonymisée, sans exposition du bénéficiaire**
 9. Recrutement permanent nécessaire ? — **Refusé**
 
-Corrections proposées avant adoption :
+Corrections expertes intégrées à la réponse :
 
-1. L'insuffisance de solde non fautive ne doit pas diminuer automatiquement la réciprocité.
-2. Le rôle « Agent » reste interdit et devient « responsable habilité ».
+1. L'insuffisance de solde non fautive ne diminue pas automatiquement la réciprocité.
+2. Les décisions relèvent de responsables Wasplex habilités ou de comités compétents, sans nouveau rôle autonome.
 3. Une priorité commerciale reste subordonnée à l'urgence vitale.
 4. Qualification juridique et garde des fonds doivent être validées avant activation.
 
