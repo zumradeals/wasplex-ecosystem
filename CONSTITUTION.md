@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v0.8 adoptée  
+**Statut :** Constitution v0.9 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`
 
 ## Préambule adopté
 
@@ -199,7 +199,28 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 20. Une alerte nationale critique ne peut être sponsorisée, monétisée, ciblée commercialement ni associée à une récompense.
 21. Les catégories, durées, priorités, territoires, quotas, cadences, sponsorisations et récompenses sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
 
-## Article 15 — Refus absolus
+## Article 15 — Les Cartes Wasplex
+
+1. Une Carte Wasplex est un droit personnel d'accès à des services, opérations partenaires et, lorsque les conditions sont réunies, à un programme de participation économique.
+2. Elle ne constitue ni une action, ni une valeur mobilière, ni une fraction du capital, ni une monnaie, ni un placement, ni une promesse de rendement.
+3. Le détenteur d'une Carte Wasplex n'est pas actionnaire de Wasplex du seul fait de cette acquisition.
+4. La carte est virtuelle par défaut. Un support physique facultatif et payant peut matérialiser les mêmes droits sans créer un droit économique supplémentaire.
+5. L'accès peut être conditionné à un abonnement Premium, Élite ou Master actif, mais l'expiration de cet abonnement ne supprime ni la carte payée, ni les gains définitivement acquis.
+6. Le prix de la carte rémunère des services identifiables et ne finance pas la redistribution des détenteurs antérieurs.
+7. Aucune rémunération ne dépend du recrutement, du parrainage ou de l'arrivée permanente de nouveaux acquéreurs.
+8. Seuls des revenus économiques externes, traçables, encaissés, validés et explicitement affectés peuvent alimenter une redistribution.
+9. Après retrait des taxes, frais externes directement imputables, remboursements et annulations, le revenu net partageable du programme est réparti à parts égales : 50 % pour Wasplex et 50 % pour la communauté éligible.
+10. La part communautaire peut combiner un avantage direct lié à l'opération et un pool collectif selon une formule annoncée avant l'opération, versionnée et non rétroactive.
+11. Une même valeur ne peut être distribuée deux fois. Les revenus publicitaires restent soumis exclusivement au partage constitutionnel publicitaire applicable.
+12. Une période sans revenu éligible peut produire une distribution nulle ; aucun minimum n'est garanti.
+13. Chaque carte, opération, commission, frais, part Wasplex, montant de pool et crédit Wallet est rapprochable et auditable.
+14. Les partenaires sont vérifiés, contractuellement agréés et limités aux données et capacités nécessaires à chaque opération.
+15. La carte ne devient un instrument autonome de paiement, de retrait, de transfert ou de monnaie électronique qu'après satisfaction des exigences réglementaires et activation avec des prestataires habilités.
+16. Les gains disponibles survivent à l'expiration, la suspension ou la fermeture de la carte, sauf fraude prouvée, erreur manifeste, décision judiciaire ou obligation légale.
+17. Toute fermeture de produit ou de pool exige arrêt ordonné, information, règlement des opérations, traitement des services non fournis et état de clôture auditable.
+18. Produits, prix, durées, services, coefficients, plafonds, partenaires et cycles sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
+
+## Article 16 — Refus absolus
 
 Wasplex refuse :
 
@@ -216,7 +237,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 16 — Mesure de la réussite
+## Article 17 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -245,7 +266,6 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 - paiements, retraits et couverture financière du Wallet ;
 - annonceurs, campagnes, ciblage et tarification ;
-- cartes de micro-actionnaires ;
 - administration, audit et gouvernance ;
 - identité visuelle et langage ;
 - architecture technique et exigences de qualité ;
@@ -254,4 +274,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 16 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006 et l'article 14 intègre AMD-0007, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 17 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006 l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
