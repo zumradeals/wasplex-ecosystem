@@ -1,6 +1,6 @@
 # AMD-0006 — Institutions : accès finalisé, nominatif et probant
 
-**État :** proposé — validation constitutionnelle explicite requise  
+**État :** adopté et intégré à la Constitution v0.7  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-09-institutions-affiliees.md`
 
@@ -23,6 +23,10 @@
 15. Les capacités financières ou sectorielles ne sont activées qu'après vérification des autorisations correspondantes.
 16. Les paramètres et habilitations sont administrables, versionnés, expirants et auditables sans pouvoir contredire ces invariants.
 
-## Effet si adopté
+## Décision d'adoption
+
+Le fondateur a validé cet amendement le 2026-07-21.
+
+## Effet de l'adoption
 
 Cet amendement gouverne tous les accès institutionnels présents et futurs, notamment Alertes, Fonds Social, restitutions, paiements, livraisons et validations.
