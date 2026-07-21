@@ -1,6 +1,6 @@
 # AMD-0009 — Données, consentement et profilage protégé
 
-**État :** proposé, en attente de validation du fondateur  
+**État :** adopté et intégré à la Constitution v1.0  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-13-donnees-consentement-profilage.md`
 
@@ -39,6 +39,10 @@ Cet amendement précise et renforce l'article 8 de la Constitution.
 
 Wasplex peut construire une capacité de ciblage très précise sans vendre ni exposer les personnes. Plus cette capacité possède de valeur, plus l'obligation de garde, d'explication et de limitation est forte.
 
-## Effet proposé
+## Décision d'adoption
 
-Après adoption, ce texte remplacera l'article 8 actuel et gouvernera tous les modules traitant des données.
+Le fondateur a validé cet amendement le 2026-07-21.
+
+## Effet de l'adoption
+
+Ce texte remplace l'article 8 actuel et gouvernera tous les modules traitant des données.
