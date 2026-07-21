@@ -39,6 +39,20 @@ Chaque affirmation doit pouvoir être classée comme :
 7. Faire valider par le fondateur.
 8. Enregistrer la décision et ses conséquences.
 
+## Justification obligatoire de l'ordre des travaux
+
+Avant d'ouvrir une nouvelle matière du Grand Livre, sa note d'ouverture doit expliquer :
+
+1. son lien direct avec les articles déjà adoptés ;
+2. pourquoi elle doit être instruite maintenant ;
+3. quelles décisions ultérieures dépendent d'elle ;
+4. quels risques naîtraient d'un traitement prématuré ou tardif ;
+5. ce qui demeure volontairement hors périmètre ;
+6. le résultat documentaire attendu ;
+7. le critère permettant de déclarer la matière suffisamment comprise.
+
+L'ordre des travaux suit les dépendances conceptuelles et économiques de Wasplex, non la facilité de rédaction ni l'ordre des écrans de l'ancienne application.
+
 ## Principe de traçabilité
 
 Aucune fonctionnalité ne doit apparaître dans le futur code sans référence à une règle métier, une spécification ou une décision architecturale versionnée dans ce dépôt.
