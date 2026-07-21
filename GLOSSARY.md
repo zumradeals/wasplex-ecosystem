@@ -20,7 +20,12 @@
 | Wallet | Compte de valeur personnel fondé sur un registre comptable traçable | Spécifié |
 | Audience | Ensemble de personnes pouvant recevoir une campagne selon des critères autorisés | Provisoire |
 | Segment | Groupe d'audience défini par des critères de ciblage sans exposition d'identités individuelles | Proposé |
-| Résultat agrégé | Indicateur collectif ne permettant pas raisonnablement d'identifier une personne | À spécifier |
+| Résultat agrégé | Indicateur collectif soumis à des seuils et protections empêchant raisonnablement d'identifier une personne | Spécifié |
+| Base de traitement | Fondement identifié autorisant un usage de données dans une finalité déterminée ; le consentement n'est pas l'unique base possible | Proposé — AMD-0009 |
+| Donnée déduite | Information calculée à partir de données sources, associée à une finalité, une version, une incertitude et une contestation éventuelle | Spécifié |
+| Pseudonymisation | Remplacement ou protection d'identifiants sans rendre nécessairement la personne irréidentifiable | Spécifié |
+| Anonymisation | Transformation irréversible vérifiée ne permettant plus raisonnablement d'identifier la personne | Spécifié |
+| Maîtrise commerciale des données | Droit de Wasplex sur son organisation, ses modèles, taxonomies, segments et capacités, sans propriété de la personne ni suppression de ses droits | Proposé — AMD-0009 |
 | Annonceur | Acteur autorisé à financer et diffuser une campagne selon les règles de Wasplex | Proposé |
 | Institution affiliée | Organisation formellement vérifiée recevant des capacités limitées, finalisées, territorialisées, temporaires et auditables | Proposé — AMD-0006 |
 | Utilisateur institutionnel habilité | Personne nominativement rattachée à une institution et autorisée à exercer certaines capacités | Spécifié |
