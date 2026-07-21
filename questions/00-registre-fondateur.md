@@ -70,14 +70,29 @@ Questions critiques restantes :
 5. Quelle procédure constitutionnelle est suffisamment « exceptionnelle » pour modifier la parité ?
 6. La qualification juridique du WP a-t-elle été confirmée par un conseil compétent dans chaque pays de lancement ?
 
-## D. Abonnements
+## D. Abonnements publicitaires — entretien répondu
 
-1. Quel service concret achète chaque niveau d'adhésion ?
-2. Pourquoi un membre payant gagne-t-il davantage ?
-3. Cette différence est-elle financée par l'annonceur, Wasplex ou les abonnements ?
-4. Existe-t-il une garantie implicite de récupérer le prix payé ?
-5. Que conserve un membre après résiliation ?
-6. Quel socle économique et fonctionnel reste accessible gratuitement ?
+Source : `sources/2026-07-21-entretien-fondateur-07-abonnements-publicitaires.md`
+
+Spécification : `ecosystem/abonnements/01-abonnements-publicitaires.md`
+
+1. Objet acheté ? — **Niveau de service, de capacité et d'accès ; jamais un rendement**
+2. Pourquoi les capacités diffèrent-elles ? — **Quotas, accès, priorités, plafonds, outils et avantages configurables**
+3. Source des gains supérieurs ? — **Campagne préfinancée plus chère ou promotion distincte financée par Wasplex**
+4. Les abonnements financent-ils les gains des anciens membres ? — **Non**
+5. Garantie de campagnes ou de revenu ? — **Aucune**
+6. Socle gratuit ? — **Accès réel, Wallet, gains, retrait, consentements, sécurité et transparence**
+7. Gains après expiration ou résiliation ? — **Conservés**
+8. Rétroactivité d'un nouveau niveau ? — **Interdite**
+9. Cycle commercial ? — **Configurable, avec activation après paiement, cycle anniversaire par défaut et règles publiées**
+
+Questions restantes :
+
+1. Quels avantages précis seront autorisés au lancement et lesquels seront différés ?
+2. Les seuils de retrait peuvent-ils varier par niveau sans pénaliser excessivement le niveau gratuit ?
+3. Quelle priorité entre deux utilisateurs éligibles préserve l'équité lorsqu'une campagne est rare ?
+4. Quels délais d'information encadrent renouvellement automatique et changement d'offre ?
+5. Quelles règles nationales de protection du consommateur s'appliquent dans chaque pays de lancement ?
 
 ## E. Modules transversaux
 
