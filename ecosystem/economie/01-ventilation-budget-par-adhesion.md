@@ -1,75 +1,77 @@
 # Ventilation du budget publicitaire par niveau d'adhésion
 
-- **Statut :** exploration économique v0.2
+- **Statut :** spécification économique partielle v0.3
 - **Sources :**
   - `sources/2026-07-21-clarification-fondateur-03-propriete-ventilation.md`
   - `sources/2026-07-21-clarification-fondateur-04-fonds-social.md`
-- **Dépend de :** cycle fondamental de création de valeur publicitaire
+  - `sources/2026-07-21-entretien-fondateur-05-cycle-financier-campagne.md`
+- **Dépend de :** cycle fondamental et cycle financier de la publicité
 
-## 1. Intention fondatrice
+## 1. Ventilation globale définie
 
-Pour un budget publicitaire de référence égal à 100 % :
+Pour chaque événement publicitaire validé :
 
-- 50 % reviennent à Wasplex ;
-- 50 % sont destinés à la rémunération des utilisateurs ;
-- la rémunération utilisateur dépend du niveau d'adhésion ;
-- chaque niveau possède un quota maximal de publicités rémunérables par mois ;
-- les paramètres exacts sont définis par Wasplex dans la configuration administrative.
+1. calculer le montant brut attribuable ;
+2. isoler taxes obligatoires, frais externes directement imputables, remboursements et invalidations ;
+3. obtenir le montant net distribuable ;
+4. répartir ce net à parts égales :
+   - 50 % Wasplex ;
+   - 50 % rémunération publicitaire des utilisateurs.
 
-L'assiette exacte du partage 50/50 — montant brut ou net distribuable — reste à définir.
+Les frais internes de Wasplex sont financés par sa part.
 
-## 2. Valeurs illustratives retirées du modèle
+Le Fonds social est autonome et n'intervient pas automatiquement dans cette ventilation.
 
-Les valeurs `10, 20, 30, 35, 40` communiquées lors de l'entretien étaient uniquement des exemples d'écriture. Elles ne définissent :
+Le caractère constitutionnel ou normatif renforcé du ratio est soumis à AMD-0002.
 
-- ni les niveaux définitifs ;
-- ni leurs pourcentages ;
-- ni leurs poids ;
-- ni leurs multiplicateurs.
+## 2. Distribution interne de la part utilisateur
 
-Aucune incohérence mathématique ne doit donc être déduite de ces exemples.
+La part utilisateur dépend :
+
+- du type d'événement ;
+- du niveau d'adhésion publicitaire ;
+- du quota mensuel ;
+- des coefficients et règles versionnés ;
+- de la validité de la preuve.
+
+Les valeurs `10, 20, 30, 35, 40` étaient uniquement des exemples d'écriture. Elles ne définissent aucune valeur future.
 
 ## 3. Paramètres à administrer
 
-Pour chaque niveau d'adhésion, la configuration devra pouvoir définir au minimum :
+Pour chaque niveau d'adhésion :
 
-- identifiant et nom du niveau ;
+- identifiant et nom ;
 - prix et périodicité ;
 - quota mensuel d'événements rémunérables ;
 - coefficient ou règle de rémunération ;
-- accès aux formats publicitaires ;
+- accès aux formats ;
 - éligibilité au ciblage qualifié ;
 - date d'effet ;
 - statut actif ou retiré.
 
-Les paramètres devront respecter ADR-0002 sur la configuration métier versionnée.
+Ces paramètres respectent ADR-0002.
 
-## 4. Suggestion d'architecture économique
+## 4. Séparation recommandée
 
-Séparer trois notions :
+1. **ventilation globale** : net Wasplex / utilisateurs ;
+2. **coefficient de niveau** : avantage relatif ;
+3. **quota mensuel** : plafond d'événements rémunérables.
 
-1. **ventilation globale** : part Wasplex / part utilisateurs ;
-2. **coefficient de niveau** : avantage relatif défini par la configuration ;
-3. **quota mensuel** : nombre maximal d'événements rémunérables.
+## 5. Garde-fous
 
-Cette séparation évite de confondre la part globale destinée aux utilisateurs avec la récompense individuelle.
-
-## 5. Garde-fous proposés
-
-- aucune récompense ne peut dépasser le budget utilisateur disponible ;
-- toute ventilation doit être mathématiquement valide avant activation ;
-- un quota ne crée jamais une promesse de revenu garanti ;
-- les valeurs affichées indiquent clairement maxima, conditions et périodes ;
-- une campagne conserve la version de formule applicable lors de son lancement ;
-- un changement administratif n'est pas rétroactif ;
-- arrondis et reliquats possèdent une destination explicite ;
-- une simulation précède toute activation ;
-- les paramètres constitutionnels ne sont pas modifiables par un simple administrateur.
+- aucune récompense ne dépasse le budget disponible ;
+- toute ventilation est validée mathématiquement ;
+- aucun quota ne promet un revenu garanti ;
+- maxima, conditions et périodes sont affichés clairement ;
+- la campagne conserve sa version de formule ;
+- les changements ne sont pas rétroactifs ;
+- arrondis et reliquats ont une destination explicite ;
+- une simulation précède l'activation ;
+- l'administration ne modifie pas les invariants constitutionnels.
 
 ## 6. Questions restantes
 
 1. Quels seront les niveaux définitifs et leurs noms ?
 2. Quelle formule reliera niveau, quota et rémunération par événement ?
-3. Les 50/50 s'appliquent-ils au budget brut ou au montant net après taxes et frais ?
-4. Que devient un budget utilisateur non consommé ?
-5. Le supplément payé pour cibler un niveau alimente-t-il particulièrement les utilisateurs de ce niveau ?
+3. Que devient une part utilisateur non distribuée à cause des quotas ?
+4. Le supplément de ciblage d'un niveau bénéficie-t-il particulièrement aux utilisateurs de ce niveau ?
