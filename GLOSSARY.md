@@ -17,7 +17,14 @@
 | WP provisoire | Droit conditionnel en cours de validation, non utilisable et non retirable | Spécifié |
 | WP disponible | Droit validé, utilisable et retirable selon les règles applicables | Spécifié |
 | WP réservé | WP attribué à l'utilisateur mais temporairement bloqué pour une opération identifiée | Spécifié |
-| Wallet | Compte de valeur personnel fondé sur un registre comptable traçable | Spécifié |
+| Wallet | Vue personnelle de droits économiques reconstruite depuis un ledger en partie double ; le solde affiché n'est pas la source de vérité | Proposé — AMD-0011 |
+| Ledger Wallet | Registre équilibré et reconstructible d'écritures immuables corrigées uniquement par contre-écriture | Proposé — AMD-0011 |
+| Couverture nette admissible | Fonds effectivement disponibles et reconnus pour couvrir les obligations exigibles après sorties engagées et indisponibilités | Spécifié |
+| Ratio de couverture | Rapport entre couverture nette admissible et droits utilisateurs exigibles ; minimum constitutionnel proposé de 100 % | Proposé — AMD-0011 |
+| Indisponibilité opérationnelle | Incident où la couverture existe mais le canal requis est temporairement inaccessible | Spécifié |
+| Déficit de couverture | Situation grave où les obligations exigibles dépassent la couverture nette admissible | Spécifié |
+| Point d'irréversibilité | État annoncé après lequel une opération ne peut plus être annulée unilatéralement | Spécifié |
+| Porte d'activation réglementaire | Condition empêchant l'offre d'une fonction financière avant validation juridique, contractuelle et opérationnelle par pays | Spécifié |
 | Audience | Ensemble de personnes pouvant recevoir une campagne selon des critères autorisés | Provisoire |
 | Segment | Groupe d'audience défini par des critères de ciblage sans exposition d'identités individuelles | Proposé |
 | Résultat agrégé | Indicateur collectif soumis à des seuils et protections empêchant raisonnablement d'identifier une personne | Spécifié |
