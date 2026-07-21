@@ -11,6 +11,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0004 | L'abonnement est un service, non un rendement | Adopté et intégré à la v0.5 |
 | AMD-0005 | Fonds Social, solidarité encadrée et non garantie | Adopté et intégré à la v0.6 |
 | AMD-0006 | Institutions : accès finalisé, nominatif et probant | Adopté et intégré à la v0.7 |
+| AMD-0007 | Alertes : sécurité gratuite, vérité des états et protection | Proposé après corrections expertes, adoption à valider |
 | ADR-0001 | Direction technique initiale Laravel/PostgreSQL/React/Inertia | Proposé |
 | ADR-0002 | Configuration métier administrable et versionnée | Proposé |
 | ADR-0003 | Registre comptable immuable du Wallet | Proposé |
