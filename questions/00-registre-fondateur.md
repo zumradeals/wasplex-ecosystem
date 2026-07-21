@@ -117,18 +117,40 @@ Corrections expertes intégrées à la réponse :
 3. Une priorité commerciale reste subordonnée à l'urgence vitale.
 4. Qualification juridique et garde des fonds doivent être validées avant activation.
 
-## F. Autres modules transversaux
+## F. Institutions affiliées — entretien répondu
 
-Pour les cartes, les alertes et les institutions :
+Source : `sources/2026-07-21-entretien-fondateur-09-institutions-affiliees.md`
+
+Spécification : `ecosystem/institutions/01-affiliation-capacites-responsabilites.md`
+
+1. Qui peut être affilié ? — **Organisations vérifiables et compatibles avec la mission, selon compétence et risque**
+2. Prestataire ponctuel ? — **Vérifié sans affiliation ni portail implicite**
+3. Comptes ? — **Nominatifs ; aucun compte humain partagé pour les actions sensibles**
+4. Accès ? — **Capacité par capacité, avec finalité, territoire, catégorie et durée**
+5. Recherche transversale ? — **Interdite ; uniquement des dossiers autorisés et motivés**
+6. Statuts SOS ? — **Chacun correspond à une preuve réelle**
+7. Promesse de Wasplex ? — **Uniquement les événements techniquement prouvés**
+8. Suspension ? — **Granulaire, sans suppression des preuves**
+9. Pouvoir institutionnel ? — **Aucun droit automatique sur les données**
+
+Corrections expertes intégrées :
+
+1. Aucun rôle intermédiaire autonome n'est réintroduit.
+2. « Base de données » devient « Recherche de dossiers autorisés ».
+3. Les capacités financières exigent les autorisations sectorielles correspondantes.
+4. Les responsabilités contractuelles restent soumises aux lois applicables.
+
+## G. Autres modules transversaux
+
+Pour les cartes et les alertes :
 
 1. Quel problème autonome le module résout-il ?
 2. Quel lien causal a-t-il avec la publicité ?
 3. D'où vient son financement ?
-4. Qui détient les fonds ou la responsabilité ?
-5. Quels droits reçoit l'utilisateur ?
-6. Quels abus sont possibles ?
+4. Quels droits reçoit l'utilisateur ?
+5. Quels abus sont possibles ?
 
-## G. Marque
+## H. Marque
 
 1. Que symbolisent le martin-pêcheur et le poisson ?
 2. Le nom officiel s'écrit-il Wasplex ou WasPlex ?
