@@ -12,3 +12,9 @@ Le module Alertes possède plusieurs surfaces de diffusion en plus de son espace
 5. La fréquence, les formats, les catégories et les règles de priorité doivent être administrables et non codés en dur.
 
 La conception doit séparer les urgences réelles des contenus éditoriaux ou premium et protéger les personnes concernées par une alerte.
+
+## Clarification sur les alertes premium
+
+Une alerte premium est une alerte communautaire dont le déclarant paie pour renforcer la diffusion. Le paiement achète de la portée, une durée, des surfaces ou une zone de visibilité. Il n'achète ni validation, ni urgence, ni priorité institutionnelle, ni résultat.
+
+Les urgences immédiates ne sont jamais priorisées par paiement. La sponsorisation est préfinancée, modérée, étiquetée et arrêtée lorsque l'alerte est résolue.
