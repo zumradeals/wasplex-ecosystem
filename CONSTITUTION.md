@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v0.9 adoptée  
+**Statut :** Constitution v1.0 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`
 
 ## Préambule adopté
 
@@ -84,19 +84,32 @@ Le rôle « Agent » n'existe plus dans Wasplex. Il ne doit apparaître ni dans 
 
 Les commerçants et autres partenaires devront être rattachés à l'une de ces catégories ou faire l'objet d'un amendement explicite ; aucune cinquième catégorie n'est créée implicitement.
 
-## Article 8 — Données, propriété commerciale et ciblage
+## Article 8 — Données, consentement et profilage protégé
 
-> **Chez Wasplex, la donnée personnelle n'est jamais un produit. La valeur économique provient exclusivement du consentement, de la pertinence du ciblage et de l'attention volontaire.**
-
-1. Wasplex ne vend jamais les données personnelles de ses utilisateurs.
-2. L'annonceur achète un service de ciblage et une attention qualifiée, non une personne, un fichier ou une donnée personnelle.
-3. Le ciblage ne doit jamais divulguer l'identité ni les informations privées d'une personne à l'annonceur.
-4. Les centres d'intérêt et autres critères de ciblage doivent être recueillis selon une finalité explicite et un consentement approprié.
-5. L'annonceur reçoit des capacités de ciblage et des résultats agrégés, non une liste nominative d'utilisateurs.
-6. Selon la doctrine constitutionnelle de Wasplex, s'il doit exister un propriétaire commercial des données personnelles collectées et structurées par l'écosystème, ce propriétaire est Wasplex.
-7. Cette propriété commerciale ne constitue ni une propriété de la personne, ni une suppression de ses droits, ni une autorisation de vendre son identité, ses coordonnées ou son dossier.
-8. Wasplex exerce cette propriété commerciale sous réserve des droits de la personne concernée et des lois applicables dans chaque pays.
-9. Les critères autorisés, interdits ou sensibles, la révocation du consentement et les seuils empêchant la réidentification doivent être spécifiés avant exploitation.
+1. Chez Wasplex, la donnée personnelle n'est jamais un produit. La valeur économique provient du consentement, de la pertinence du ciblage, de l'attention volontaire et de la capacité protégée de mise en correspondance.
+2. Wasplex ne collecte ni ne traite une donnée sans finalité déterminée, base de traitement identifiée, proportionnalité, durée et règle d'accès.
+3. Les données indispensables à un contrat, une obligation, une sécurité ou un service demandé sont distinguées des traitements facultatifs.
+4. Tout consentement est spécifique, compréhensible, prouvable, versionné et révocable pour l'avenir. Un consentement général ne remplace pas les choix séparés.
+5. Refuser ou retirer un traitement facultatif n'entraîne aucune punition artificielle ; seule la fonction qui en dépend réellement peut être réduite.
+6. KYC, finance, santé, vulnérabilité, Fonds Social, Alertes, Institutions et antifraude sont séparés du profil publicitaire et ne l'enrichissent pas automatiquement.
+7. Wasplex maîtrise et valorise son infrastructure, ses bases structurées, taxonomies, modèles, méthodes, segments, algorithmes et résultats agrégés.
+8. Cette maîtrise commerciale ne constitue jamais une propriété de la personne ni un droit absolu sur toute donnée brute. Elle ne supprime aucun droit applicable de la personne concernée.
+9. L'utilisateur peut, selon les règles et exceptions applicables, être informé, accéder, corriger, s'opposer, retirer, exporter, supprimer et contester un effet important.
+10. Une donnée conservée pour comptabilité, fraude, sécurité, justice ou litige est isolée et interdite de nouvel usage commercial.
+11. L'annonceur sélectionne des critères autorisés ; il ne reçoit ni identité, ni coordonnées, ni profil individuel, ni historique, ni localisation précise.
+12. Une transmission d'identité après interaction exige une action volontaire distincte de l'utilisateur et une finalité annoncée.
+13. Les segments trop petits, excessivement précis ou réidentifiables sont élargis, masqués ou refusés. Les requêtes successives permettant d'isoler une personne sont interdites.
+14. Santé, handicap, détresse, urgence, dette, pauvreté individuelle, religion, opinion politique, origine ethnique, orientation sexuelle, statut de victime, vulnérabilité familiale, justice, position intime et données de mineurs ne sont pas des critères commerciaux ordinaires.
+15. Les mineurs bénéficient d'un régime renforcé ; le ciblage comportemental avancé et les secteurs dangereux ou manipulateurs leur sont interdits.
+16. Wasplex ne déduit ni n'exploite commercialement une caractéristique sensible simplement parce qu'un algorithme peut l'estimer.
+17. Toute donnée déduite importante est finalisée, datée, explicable, incertaine, contestable et corrigible.
+18. Aucun score général de confiance, mérite ou valeur humaine n'est autorisé. Les scores de publicité, fraude, solidarité et sécurité restent séparés.
+19. Aucun score automatisé ne décide seul d'une confiscation, fermeture, retrait, vœu social, alerte, sanction ou droit essentiel.
+20. Une photo ou vidéo n'autorise aucun traitement biométrique implicite. La biométrie exige décision spécifique, base légale, sécurité renforcée et autorisations applicables.
+21. Une pseudonymisation ne vaut pas anonymisation ; toute donnée encore réidentifiable demeure protégée.
+22. Les sous-traitants, transferts transfrontaliers, incidents, violations et demandes institutionnelles sont gouvernés, limités, documentés et audités.
+23. Toute suppression, anonymisation ou conservation est vérifiable. Les données archivées ne reviennent pas silencieusement dans les systèmes commerciaux.
+24. Toute utilisation de données est administrable et versionnée dans les limites de ces invariants ; l'administration ne peut autoriser ce que la Constitution interdit.
 
 ## Article 9 — Partage de la valeur publicitaire
 
@@ -274,4 +287,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 17 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 17 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
