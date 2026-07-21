@@ -13,8 +13,11 @@
 | Complétion | Atteinte de la durée ou du seuil annoncé donnant potentiellement droit à rémunération | À spécifier |
 | Événement publicitaire qualifié | Preuve unique, vérifiable et acceptée qu'une condition de campagne a été exécutée | À valider |
 | Pertinence de la rencontre | Adéquation entre un message publicitaire et un segment d'audience constitué selon des critères consentis | Proposé |
-| WasPoint (WP) | Unité de valeur interne ; convertibilité, garantie et statut juridique à définir | Critique |
-| Wallet | Représentation des droits économiques d'un utilisateur dans Wasplex | À préciser |
+| WasPoint (WP) | Unité numérique interne représentant un droit économique reconnu par Wasplex ; parité proposée de 1 WP = 1 FCFA | Proposition AMD-0003 |
+| WP provisoire | Droit conditionnel en cours de validation, non utilisable et non retirable | Spécifié |
+| WP disponible | Droit validé, utilisable et retirable selon les règles applicables | Spécifié |
+| WP réservé | WP attribué à l'utilisateur mais temporairement bloqué pour une opération identifiée | Spécifié |
+| Wallet | Compte de valeur personnel fondé sur un registre comptable traçable | Spécifié |
 | Audience | Ensemble de personnes pouvant recevoir une campagne selon des critères autorisés | Provisoire |
 | Segment | Groupe d'audience défini par des critères de ciblage sans exposition d'identités individuelles | Proposé |
 | Résultat agrégé | Indicateur collectif ne permettant pas raisonnablement d'identifier une personne | À spécifier |
@@ -32,8 +35,10 @@ Les quatre catégories actuelles sont : Wasplex, utilisateurs, annonceurs et ins
 
 Le terme « Agent » est retiré du modèle. Toute réintroduction d'une catégorie d'acteur exige un amendement explicite.
 
-## Règle
+## Règles
 
 Aucun terme commercial sensible — notamment « épargne », « actionnaire », « investissement », « rendement », « garanti » ou « base de données à louer » — ne doit être publié avant définition constitutionnelle et validation juridique appropriée.
 
-La donnée personnelle ne doit pas être décrite comme une propriété commerciale de Wasplex. Le futur cadre distinguera les droits de la personne, le consentement, le contrôle, la garde et les responsabilités de traitement.
+Conformément à AMD-0001, Wasplex peut revendiquer la propriété commerciale des données collectées et structurées, sans vendre les données personnelles ni supprimer les droits de la personne concernée. Les notions de droits de la personne, consentement, contrôle, garde et responsabilité de traitement demeurent distinctes.
+
+La qualification juridique d'un mécanisme dépend de son fonctionnement réel, pas uniquement de son nom dans le produit.
