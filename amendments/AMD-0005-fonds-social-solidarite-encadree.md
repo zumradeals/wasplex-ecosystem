@@ -21,9 +21,9 @@
 13. Les paramètres sont administrables, versionnés et auditables, sans pouvoir modifier ces invariants.
 14. La qualification juridique du mécanisme et son dispositif de garde doivent être validés dans chaque juridiction avant activation.
 
-## Corrections constitutionnelles intégrées
+## Précisions de cohérence intégrées
 
-- « responsable habilité » remplace tout rôle nommé « Agent » ;
+- les décisions relèvent de responsables Wasplex habilités ou de comités compétents, sans créer une catégorie autonome d'intermédiaire ;
 - une incapacité financière non fautive n'abaisse pas automatiquement la réciprocité ;
 - une priorité liée au programme reste subordonnée à la priorité vitale ;
 - l'affirmation commerciale selon laquelle le Fonds n'est ni assurance ni activité réglementée demeure soumise à la qualification des autorités et conseils compétents.
