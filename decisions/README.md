@@ -14,7 +14,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0007 | Alertes : sécurité gratuite, vérité des états et protection | Adopté et intégré à la v0.8 |
 | AMD-0008 | Les Cartes Wasplex : participation économique réelle | Adopté et intégré à la v0.9 |
 | AMD-0009 | Données, consentement et profilage protégé | Adopté et intégré à la v1.0 |
-| AMD-0010 | Identité proportionnée et antifraude équitable | Proposé, en attente de validation |
+| AMD-0010 | Identité proportionnée et antifraude équitable | Adopté et intégré à la v1.1 |
 | ADR-0001 | Direction technique initiale Laravel/PostgreSQL/React/Inertia | Proposé |
 | ADR-0002 | Configuration métier administrable et versionnée | Proposé |
 | ADR-0003 | Registre comptable immuable du Wallet | Proposé |
