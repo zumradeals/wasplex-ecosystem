@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v1.1 adoptée  
+**Statut :** Constitution v1.2 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`
 
 ## Préambule adopté
 
@@ -260,7 +260,34 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 23. Toute fusion ou consolidation conserve l'origine des écritures, preuves et consentements.
 24. Niveaux, plafonds, preuves, délais, facteurs et règles sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
 
-## Article 17 — Refus absolus
+## Article 17 — Wallet couvert, séparé et reconstructible
+
+1. Aucun WP disponible n'existe sans source économique identifiée, couverture correspondante et écriture traçable.
+2. La totalité des droits utilisateurs disponibles et réservés exigibles est couverte au minimum à 100 %.
+3. La couverture est identifiable, rapprochable, disponible, diversifiée et séparée de la trésorerie ordinaire de Wasplex.
+4. Wasplex administre cette couverture mais ne l'utilise jamais, même temporairement, pour salaires, fonctionnement, investissement, avance, dette ou perte propre.
+5. Budgets annonceurs, parts provisoires, WP disponibles, WP réservés, retraits en transit, recettes Wasplex, Fonds Social, pools des Cartes, dépôts éventuels, taxes, frais et provisions sont comptablement séparés.
+6. Une séparation comptable ne vaut pas automatiquement protection juridique en insolvabilité ; garde, cantonnement, droits et restitution sont validés dans chaque juridiction.
+7. Le Wallet repose sur un ledger en partie double, reconstructible, dont les écritures ne sont ni supprimées ni réécrites et sont corrigées par contre-écriture.
+8. Le solde affiché est une projection du ledger et non la source de vérité.
+9. Toute émission, réservation, libération, conversion, débit, remboursement ou annulation référence sa source et sa preuve.
+10. Une promotion Wasplex ne devient WP disponible qu'après transfert effectif de sa couverture depuis les ressources propres.
+11. Un retrait réserve atomiquement les WP avant transmission et ne devient payé qu'après preuve externe suffisante.
+12. Un retrait échoué ne libère la réserve qu'après confirmation empêchant un double paiement ; un résultat incertain reste en rapprochement.
+13. Frais, taxes, conversion, destination et montant net sont affichés avant confirmation.
+14. Chaque opération possède un point d'irréversibilité annoncé. Après celui-ci, aucune reprise n'intervient sans procédure, consentement ou décision autorisée.
+15. Dépôt, transfert entre utilisateurs, paiement partenaire, chargement ou fonction financière d'une Carte restent désactivés jusqu'à validation réglementaire et opérationnelle par pays.
+16. Une capacité comptable interne ne constitue jamais, à elle seule, l'autorisation d'offrir un service financier.
+17. Une panne de canal et un déficit de couverture sont deux états distincts, communiqués sans ambiguïté.
+18. Une panne ne supprime aucun droit ; une suspension de retrait n'est pas une confiscation.
+19. Un déficit bloque toute émission ou sortie l'aggravant, interdit les transferts vers Wasplex et déclenche une gouvernance de crise.
+20. Les retraits validés suivent une politique publique et stable sans faveur liée à l'abonnement, la richesse, l'influence ou la proximité.
+21. Une rétrofacturation postérieure à l'acquisition légitime n'est pas reprise automatiquement à l'utilisateur honnête.
+22. Fermeture d'un pays, défaillance d'un prestataire ou insolvabilité ne transforme aucun fonds utilisateur en revenu propre.
+23. Le registre, les preuves, sauvegardes et contrats permettent la reconstruction des droits et une sortie ordonnée.
+24. Prestataires, seuils, plafonds, frais, délais, concentrations, états et contrôles sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
+
+## Article 18 — Refus absolus
 
 Wasplex refuse :
 
@@ -277,7 +304,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 18 — Mesure de la réussite
+## Article 19 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -304,7 +331,6 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Articles restant à instruire
 
-- paiements, retraits et couverture financière du Wallet ;
 - annonceurs, campagnes, ciblage et tarification ;
 - administration, audit et gouvernance ;
 - identité visuelle et langage ;
@@ -314,4 +340,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 18 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008 et l'article 16 intègre AMD-0010, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 19 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008 et l'article 16 intègre AMD-0010 et l'article 17 intègre AMD-0011, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
