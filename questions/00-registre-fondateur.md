@@ -32,7 +32,20 @@ Spécification : `ecosystem/publicite/01-cycle-creation-valeur.md`
 4. Comment le paiement est-il réparti ? — **Principe répondu ; pourcentages et assiette à définir**
 5. Le niveau d'adhésion peut-il qualifier une audience ? — **Oui en principe ; tarification et limites à définir**
 
-Questions restantes :
+Troisième entretien financier répondu :
+
+Source : `sources/2026-07-21-entretien-fondateur-05-cycle-financier-campagne.md`
+
+Spécification : `ecosystem/publicite/02-cycle-financier-campagne.md`
+
+1. Préfinancement intégral ? — **Oui, avant toute diffusion**
+2. Budget non consommé ? — **Reste à l'annonceur selon les options prévues**
+3. Prix d'un événement ? — **Base et coefficients configurables, versionnés et traçables**
+4. Assiette du partage ? — **Net distribuable après taxes et frais externes imputables**
+5. Ventilation ? — **50 % Wasplex / 50 % utilisateurs**
+6. Fonds social dans cette ventilation ? — **Non, mécanisme autonome**
+
+Questions publicitaires restantes :
 
 1. Comment les critères d'âge, pays, habitudes ou intérêts sont-ils recueillis et mis à jour ?
 2. Quels critères sont interdits ou sensibles ?
@@ -41,9 +54,8 @@ Questions restantes :
 5. Quelles preuves sont acceptées pour chaque format publicitaire ?
 6. Comment les preuves sont-elles protégées contre bots, fermes de clics, multi-comptes et répétitions ?
 7. Quels secteurs publicitaires sont interdits ou soumis à des restrictions ?
-8. L'annonceur préfinance-t-il intégralement sa campagne ?
-9. Quelles sommes sont distribuables après taxes, frais, remboursements et provisions ?
-10. Que signifie économiquement un niveau d'adhésion dans le ciblage, et quelle part du supplément revient à l'utilisateur ?
+8. Que devient une part utilisateur non distribuée à cause des quotas ?
+9. Quelle part d'un supplément de ciblage revient spécifiquement au niveau ciblé ?
 
 ## C. Valeur et WasPoints
 
