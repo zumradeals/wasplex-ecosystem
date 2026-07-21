@@ -1,8 +1,9 @@
 # Entretien fondateur 08 — Fonds Social Wasplex
 
 **Date :** 2026-07-21  
-**Statut :** source fondatrice enregistrée  
-**Source originale :** document « Fonds Social Wasplex — Réponses fondatrices du premier entretien » (19 pages)
+**Statut :** source fondatrice corrigée et normalisée  
+**Source originale :** document « Fonds Social Wasplex — Réponses fondatrices du premier entretien » (19 pages)  
+**Autorité éditoriale :** la présente transcription corrigée prévaut pour la conception
 
 ## Préambule
 
@@ -34,7 +35,7 @@ Sont débitables les membres actifs, éligibles, non suspendus, sous mandat, sou
 
 Le besoin collectif restant après apport est réparti selon une formule configurable, égale ou pondérée, sans dépasser solde ni plafonds. L'information précède normalement le débit. Aucun Wallet ne devient négatif.
 
-Le refus conforme au mandat peut réduire l'éligibilité, avec droit de contestation. La révocation agit pour l'avenir et suspend normalement les nouveaux vœux.
+Le refus injustifié d'un appel conforme au mandat peut réduire l'éligibilité, avec droit de contestation. Une insuffisance de solde, un plafond atteint ou une erreur technique constitue une situation protégée et non un refus fautif. La révocation agit pour l'avenir et suspend normalement les nouveaux vœux.
 
 L'indice de réciprocité est transparent, versionné, explicable et contestable. Il mesure uniquement la participation au Fonds.
 
@@ -46,7 +47,7 @@ Sont notamment exclus : illégalité, spéculation, jeux, armes, financement pol
 
 Chaque catégorie et programme définit justificatifs, plafonds, apport, délai et quota. Un adhérent ne possède normalement qu'un vœu majeur actif.
 
-Le classement considère gravité, urgence, vulnérabilité, impact, ancienneté, faisabilité, apport, réciprocité, aides antérieures et disponibilité d'un fournisseur. Il demeure explicable et soumis à validation humaine habilitée.
+Le classement considère gravité, urgence, vulnérabilité, impact, ancienneté, faisabilité, apport, réciprocité, aides antérieures et disponibilité d'un fournisseur. Il demeure explicable et soumis à validation par un responsable Wasplex habilité ou un comité compétent.
 
 Une urgence vitale vérifiée peut utiliser une procédure accélérée, une réserve protégée, un apport réduit ou nul et des exceptions d'ancienneté ou de réciprocité.
 
@@ -68,9 +69,9 @@ Les fonds sont séparés de la trésorerie ordinaire. Les frais sont annoncés e
 
 La transparence porte sur montants, participants, coût, frais, reliquat, réserve et réalisation sous forme anonymisée, jamais sur l'exposition de la vulnérabilité du bénéficiaire.
 
-## Points de cohérence à résoudre avant adoption
+## Corrections expertes intégrées
 
-1. L'insuffisance de solde ne doit pas, à elle seule, être assimilée à un refus fautif.
-2. Le rôle « Agent » reste supprimé ; employer « responsable habilité ».
-3. La priorité commerciale d'un programme ne peut dépasser une urgence vitale.
-4. La qualification juridique et le mode de garde des fonds doivent être validés avant lancement.
+1. L'insuffisance de solde, la pauvreté, un plafond atteint ou une erreur technique ne sont pas assimilés à un refus fautif.
+2. Toute décision opérationnelle relève d'un responsable Wasplex habilité ou d'un comité compétent, sans créer une catégorie autonome d'intermédiaire.
+3. La priorité commerciale d'un programme ne peut dépasser une urgence vitale validée.
+4. La qualification juridique et le dispositif de garde des fonds doivent être validés avant lancement.
