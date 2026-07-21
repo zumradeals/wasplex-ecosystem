@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v0.7 adoptée  
+**Statut :** Constitution v0.8 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`
 
 ## Préambule adopté
 
@@ -175,7 +175,27 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 15. Les capacités financières ou sectorielles ne sont activées qu'après vérification des autorisations correspondantes.
 16. Les paramètres et habilitations sont administrables, versionnés, expirants et auditables sans pouvoir contredire ces invariants.
 
-## Article 14 — Refus absolus
+## Article 14 — Alertes, Sécurité et Restitutions
+
+1. Les fonctions essentielles de sécurité, de SOS, de disparition et de consultation des alertes critiques restent accessibles gratuitement.
+2. Un SOS peut être créé sans authentification complète lorsque l'urgence l'exige, mais Wasplex ne prétend aucune transmission en l'absence de preuve réseau.
+3. Chaque alerte est traitée selon sa gravité réelle ; aucun paiement ne modifie sa criticité ni sa priorité institutionnelle.
+4. Une alerte sponsorisée ne peut imiter une urgence ou acheter validation, confiance, intervention ou résultat.
+5. Chaque statut affiché correspond littéralement à une preuve réelle.
+6. Wasplex ne laisse jamais croire qu'une institution intervient sans acceptation confirmée et maintient visibles les moyens officiels directs lorsque nécessaire.
+7. La diffusion est limitée aux personnes, données, territoires, durées et finalités nécessaires.
+8. Mineurs, victimes, témoins, personnes disparues ou vulnérables et données médicales bénéficient d'une protection renforcée.
+9. Une correspondance automatisée reste une hypothèse et ne décide pas seule d'un dossier humain sensible.
+10. Une personne retrouvée fait l'objet d'une mise en sécurité, réunification ou orientation légitime ; elle n'est jamais traitée comme un bien à restituer.
+11. Toute restitution de bien sensible est vérifiée, confirmée et auditée.
+12. Toute récompense est facultative, préfinancée et bloquée jusqu'à restitution vérifiée et fin du délai de contestation.
+13. Aucune récompense n'est autorisée pour localiser ou remettre une personne, traiter un SOS ou accomplir une mission publique normale.
+14. Les moyens biométriques ou de reconnaissance faciale ne sont pas autorisés implicitement et exigent une décision, une base légale et des garanties spécifiques.
+15. Le retrait public d'une alerte ne supprime pas les preuves nécessaires à la sécurité, l'audit, la fraude ou au contentieux.
+16. La transparence porte sur états, preuves et fonds sans exposer inutilement la vie privée.
+17. Les catégories, durées, priorités, territoires, quotas, cadences, sponsorisations et récompenses sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
+
+## Article 15 — Refus absolus
 
 Wasplex refuse :
 
@@ -192,7 +212,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 15 — Mesure de la réussite
+## Article 16 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -222,7 +242,6 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 - paiements, retraits et couverture financière du Wallet ;
 - annonceurs, campagnes, ciblage et tarification ;
 - cartes de micro-actionnaires ;
-- alertes, restitutions et urgences ;
 - administration, audit et gouvernance ;
 - identité visuelle et langage ;
 - architecture technique et exigences de qualité ;
@@ -231,4 +250,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 15 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005 et l'article 13 intègre AMD-0006, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 16 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006 et l'article 14 intègre AMD-0007, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
