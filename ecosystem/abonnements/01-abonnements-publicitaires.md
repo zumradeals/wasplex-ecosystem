@@ -2,7 +2,7 @@
 
 **Statut :** spécification métier fondatrice  
 **Source :** `sources/2026-07-21-entretien-fondateur-07-abonnements-publicitaires.md`  
-**Dépendances :** Constitution v0.4, AMD-0004 proposé, ADR-0002
+**Dépendances :** Constitution v0.5, AMD-0004 adopté, ADR-0002
 
 ## 1. Objet du contrat
 
@@ -22,6 +22,8 @@ Tout utilisateur conserve gratuitement :
 - sécurité essentielle, récupération de compte, assistance et recours.
 
 Un niveau payant ne peut acheter une meilleure protection des données, la propriété des gains déjà acquis ou un traitement de fraude moins rigoureux.
+
+Un niveau payant peut réduire un seuil de retrait ou améliorer ses conditions. Le seuil général du niveau gratuit reste raisonnable, atteignable au regard des gains accessibles et non confiscatoire. L'administration doit empêcher toute configuration qui rendrait durablement le retrait gratuit pratiquement impossible.
 
 ## 3. Catalogue versionné
 
