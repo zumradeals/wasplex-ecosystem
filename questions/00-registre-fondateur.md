@@ -140,9 +140,38 @@ Corrections expertes intégrées :
 3. Les capacités financières exigent les autorisations sectorielles correspondantes.
 4. Les responsabilités contractuelles restent soumises aux lois applicables.
 
-## G. Autres modules transversaux
+## G. Alertes, Sécurité et Restitutions — entretien répondu
 
-Pour les cartes et les alertes :
+Source : `sources/2026-07-21-entretien-fondateur-11-alertes-securite-restitutions.md`
+
+Spécifications :
+
+- `ecosystem/alertes/00-diffusion-et-respiration-feed.md`
+- `ecosystem/alertes/01-sponsorisation-alertes.md`
+- `ecosystem/alertes/02-cycle-alertes-restitutions.md`
+
+1. Accès essentiel ? — **Gratuit**
+2. Familles ? — **Pertes et découvertes, disparitions, sécurité, SOS**
+3. SOS sans compte ? — **Oui sans authentification complète ; aucune transmission prétendue sans réseau**
+4. Priorité ? — **Gravité réelle avant paiement**
+5. Diffusion ? — **Feed, onglet, rail, pause utile, push et institutions selon sensibilité**
+6. Données ? — **Minimum nécessaire, classifié et territorialisé**
+7. Statuts ? — **Chaque état correspond à une preuve**
+8. Personne retrouvée ? — **Protection et réunification, jamais restitution d'un bien**
+9. Récompense ? — **Préfinancée pour certains biens ; interdite pour personnes, SOS et mission publique**
+10. Sponsorisation ? — **Achète de la portée, jamais urgence, validation ou résultat**
+
+Corrections expertes intégrées :
+
+1. « Sans connexion » signifie sans authentification, non sans réseau.
+2. Personnes et biens suivent des processus distincts.
+3. Aucune chasse à prime concernant une personne.
+4. La biométrie exige une décision et un cadre spécifiques.
+5. La pause utile peut suivre une cadence régulière administrable.
+
+## H. Autres modules transversaux
+
+Pour les cartes :
 
 1. Quel problème autonome le module résout-il ?
 2. Quel lien causal a-t-il avec la publicité ?
@@ -150,7 +179,7 @@ Pour les cartes et les alertes :
 4. Quels droits reçoit l'utilisateur ?
 5. Quels abus sont possibles ?
 
-## H. Marque
+## I. Marque
 
 1. Que symbolisent le martin-pêcheur et le poisson ?
 2. Le nom officiel s'écrit-il Wasplex ou WasPlex ?
