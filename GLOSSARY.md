@@ -37,7 +37,12 @@
 | Appel collectif | Répartition plafonnée du besoin restant entre participants effectivement éligibles | Spécifié |
 | Indice de réciprocité | Mesure transparente et contestable de la participation au Fonds, distincte d'un score social général | Spécifié |
 | Réserve d'urgence | Compartiment protégé destiné aux urgences vitales ou humanitaires validées | Spécifié |
-| Carte micro-actionnaire | Mécanisme à définir ; le terme « actionnaire » n'est pas encore adopté juridiquement | Critique |
+| Carte Wasplex | Droit personnel d'accès à des services, opérations partenaires et, sous conditions, à un programme de participation économique ; ne confère aucun droit sur le capital de Wasplex | Proposé — AMD-0008 |
+| Programme de participation économique | Mécanisme partageant des revenus externes réels, validés et affectés entre Wasplex et la communauté éligible | Proposé — AMD-0008 |
+| Partenaire agréé | Qualification contractuelle d'un annonceur ou d'une institution affiliée autorisé à exercer des capacités limitées liées aux Cartes Wasplex | Spécifié |
+| Revenu net partageable des Cartes | Revenu partenaire validé après taxes, frais externes, remboursements et annulations, sans double affectation | Spécifié |
+| Pool de participation | Compartiment comptable recevant une part communautaire et la répartissant selon des unités, périodes et plafonds annoncés | Spécifié |
+| Avantage direct | Part de la valeur communautaire attribuée à l'utilisateur dont l'opération qualifiée a généré le revenu | Spécifié |
 | Alerte | Dossier structuré relatif à une perte, découverte, disparition, danger, urgence ou information autorisée | Spécifié |
 | SOS | Alerte de danger immédiat pouvant être créée sans authentification complète, dont chaque état reste probant | Spécifié |
 | Correspondance | Hypothèse de rapprochement entre déclarations qui exige une validation avant toute action sensible | Spécifié |
