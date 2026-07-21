@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v0.5 adoptée  
+**Statut :** Constitution v0.6 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`
 
 ## Préambule adopté
 
@@ -138,7 +138,25 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 9. Les niveaux, prix, durées, quotas et avantages sont administrables, versionnés et auditables, sans pouvoir contredire la Constitution.
 10. Les recettes d'abonnement demeurent comptablement séparées des budgets publicitaires préfinancés et du Fonds social.
 
-## Article 12 — Refus absolus
+## Article 12 — Fonds Social Wasplex
+
+1. Le Fonds Social est un mécanisme autonome de solidarité entre utilisateurs consentants, distinct de l'abonnement publicitaire, des budgets annonceurs et du Wallet ordinaire.
+2. L'adhésion donne un droit conditionnel de participer, contribuer et demander l'évaluation d'un vœu ; elle ne garantit ni remboursement des contributions mutualisées ni réalisation du vœu.
+3. Tout appel collectif repose sur un mandat explicite, plafonné, révocable pour l'avenir et incapable de créer un solde négatif.
+4. Le bénéficiaire fournit normalement un apport personnel. Une urgence vitale vérifiée peut bénéficier d'un apport réduit ou nul.
+5. Celui qui demande la solidarité doit normalement y avoir participé. L'insuffisance de solde, la pauvreté, l'atteinte d'un plafond ou une erreur technique ne constituent ni fraude ni refus fautif.
+6. La priorité dépend d'abord de la gravité, de l'urgence, de la vulnérabilité et de l'impact. Aucun niveau commercial ne peut dépasser une urgence vitale validée.
+7. Aucun vœu n'est promis ou réalisé sans contrôle, conformité, financement disponible et traçabilité.
+8. Wasplex privilégie la réalisation concrète et le paiement direct au fournisseur. La trésorerie libre est interdite ; l'assistance monétaire conditionnelle demeure exceptionnelle et contrôlée.
+9. Apports, contributions, réserves, frais, paiements et reliquats sont comptablement séparés et auditables.
+10. Les fonds affectés au mécanisme ne se confondent pas avec la trésorerie ordinaire de Wasplex.
+11. La transparence porte sur les fonds et les décisions, jamais sur l'exposition de la vulnérabilité ou des données privées du bénéficiaire.
+12. Le Fonds ne dépend pas du recrutement permanent de nouveaux membres.
+13. Les décisions relèvent de responsables Wasplex habilités ou de comités compétents, sans créer une catégorie autonome d'intermédiaire.
+14. Les paramètres sont administrables, versionnés et auditables, sans pouvoir modifier ces invariants.
+15. La qualification juridique du mécanisme et son dispositif de garde doivent être validés dans chaque juridiction avant activation.
+
+## Article 13 — Refus absolus
 
 Wasplex refuse :
 
@@ -155,7 +173,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 13 — Mesure de la réussite
+## Article 14 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -185,7 +203,6 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 - paiements, retraits et couverture financière du Wallet ;
 - annonceurs, campagnes, ciblage et tarification ;
 - cartes de micro-actionnaires ;
-- Fonds social ;
 - alertes, restitutions, urgences et institutions ;
 - administration, audit et gouvernance ;
 - identité visuelle et langage ;
@@ -195,4 +212,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 13 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003 et l'article 11 intègre AMD-0004, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 14 constituent le noyau adopté. L'article 8 intègre AMD-0001, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004 et l'article 12 intègre AMD-0005, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
