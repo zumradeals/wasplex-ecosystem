@@ -22,7 +22,12 @@
 14. Les moyens biométriques ou de reconnaissance faciale ne sont pas autorisés implicitement et exigent une décision, une base légale et des garanties spécifiques.
 15. Le retrait public d'une alerte ne supprime pas les preuves nécessaires à la sécurité, l'audit, la fraude ou au contentieux.
 16. La transparence porte sur états, preuves et fonds sans exposer inutilement la vie privée.
-17. Les catégories, durées, priorités, territoires, quotas, cadences, sponsorisations et récompenses sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
+17. Une alerte nationale critique ne peut être émise que par une institution souveraine habilitée, dans sa compétence territoriale, avec authentification renforcée, double validation nominative et journal d'audit inaltérable.
+18. Lorsqu'elle est reçue et valide, l'alerte nationale critique interrompt immédiatement les publicités et contenus Wasplex en cours et demeure prioritaire jusqu'à acquittement, expiration ou révocation officielle.
+19. Hors de Wasplex, sa présentation dépend des capacités, autorisations et réglages du système d'exploitation. Wasplex ne promet jamais une superposition sur tout écran qu'il ne contrôle pas.
+20. La couverture de masse indépendante de l'installation Wasplex exige l'intégration aux dispositifs souverains de télécommunication, notamment la diffusion cellulaire d'urgence lorsque disponible.
+21. Une alerte nationale critique ne peut être sponsorisée, monétisée, ciblée commercialement ni utilisée à des fins publicitaires.
+22. Les catégories, durées, priorités, territoires, quotas, cadences, sponsorisations et récompenses sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
 
 ## Décision d'adoption
 
@@ -30,4 +35,4 @@ Le fondateur a validé cet amendement le 2026-07-21.
 
 ## Effet de l'adoption
 
-Cet article gouverne les déclarations communautaires, disparitions, SOS, diffusions dans le Feed, sponsorisations, correspondances, protections, restitutions de biens et récompenses.
+Cet article, précisé le 2026-07-21 pour les alertes nationales critiques, gouverne les déclarations communautaires, disparitions, SOS, diffusions dans le Feed, sponsorisations, correspondances, protections, restitutions de biens et récompenses.
