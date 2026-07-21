@@ -1,6 +1,6 @@
 # AMD-0011 — Wallet couvert, séparé et reconstructible
 
-**État :** proposé, en attente de validation du fondateur  
+**État :** adopté et intégré à la Constitution v1.2  
 **Date de proposition :** 2026-07-21  
 **Source :** `sources/2026-07-21-entretien-fondateur-15-paiements-retraits-couverture-wallet.md`
 
@@ -35,6 +35,10 @@
 
 La parité 1 WP = 1 FCFA n'inspire confiance que si chaque droit exigible est couvert, séparé, rapproché et reconstructible, y compris pendant une panne ou une crise.
 
-## Effet proposé
+## Décision d'adoption
 
-Après adoption, cet article gouvernera le ledger, la couverture, les retraits, mouvements internes, incidents, liquidité et sorties.
+Le fondateur a validé cet amendement le 2026-07-21.
+
+## Effet de l'adoption
+
+Cet article gouverne le ledger, la couverture, les retraits, mouvements internes, incidents, liquidité et sorties.
