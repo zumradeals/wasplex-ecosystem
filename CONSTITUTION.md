@@ -1,11 +1,13 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** proposition de transcription v0.2  
-**Autorité :** constitutionnelle après adoption explicite  
+**Statut :** noyau constitutionnel v0.2 adopté  
+**Autorité :** constitutionnelle  
+**Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
-**Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`
+**Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
+**Décision d'adoption :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`
 
-## Préambule proposé
+## Préambule adopté
 
 L'attention humaine est devenue l'une des ressources les plus précieuses de l'économie numérique. Pourtant, les personnes qui la produisent ne reçoivent généralement qu'une part infime de la valeur qu'elles contribuent à créer. Dans le même temps, les annonceurs financent des campagnes parfois intrusives, imprécises ou inefficaces.
 
@@ -145,6 +147,6 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 - procédure d'amendement ;
 - secteurs publicitaires interdits ou sensibles.
 
-## Clause de non-adoption
+## Registre d'adoption
 
-Cette version est une transcription proposée à partir des déclarations du fondateur. Elle devient constitutionnelle uniquement après validation explicite.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 10 constituent le noyau adopté. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
