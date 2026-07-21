@@ -9,7 +9,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0002 | Partage égal du net publicitaire distribuable | Adopté et intégré à la v0.4 |
 | AMD-0003 | Nature du WasPoint et parité 1 WP = 1 FCFA | Adopté et intégré à la v0.4 |
 | AMD-0004 | L'abonnement est un service, non un rendement | Adopté et intégré à la v0.5 |
-| AMD-0005 | Fonds Social, solidarité encadrée et non garantie | Proposé après corrections expertes, adoption à valider |
+| AMD-0005 | Fonds Social, solidarité encadrée et non garantie | Adopté et intégré à la v0.6 |
 | ADR-0001 | Direction technique initiale Laravel/PostgreSQL/React/Inertia | Proposé |
 | ADR-0002 | Configuration métier administrable et versionnée | Proposé |
 | ADR-0003 | Registre comptable immuable du Wallet | Proposé |
