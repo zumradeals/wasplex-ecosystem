@@ -14,7 +14,8 @@
 - restitution de biens ;
 - réunification ou orientation de personnes ;
 - récompenses de biens ;
-- sponsorisation et diffusion éditoriale.
+- sponsorisation et diffusion éditoriale ;
+- alertes nationales critiques et diffusion souveraine.
 
 Ils partagent un registre de dossiers mais pas nécessairement les mêmes états, données ou permissions.
 
@@ -84,13 +85,53 @@ Le boost est distinct de la récompense :
 
 Les deux utilisent des comptes et cycles séparés.
 
-## 10. Conservation et audit
+## 10. Alertes nationales critiques
+
+Une alerte nationale critique concerne un danger majeur pour une population ou un territoire : catastrophe, attaque, menace militaire, risque sanitaire extrême, évacuation ou autre événement officiellement qualifié.
+
+### Autorité et émission
+
+- seuls des comptes nominatifs d'une institution souveraine explicitement habilitée peuvent préparer l'alerte ;
+- l'émission exige une authentification renforcée et deux validations nominatives distinctes ;
+- le territoire, la période, la catégorie, les consignes, la source officielle et les langues doivent être définis ;
+- la création, les validations, l'émission, les modifications, l'expiration et la révocation sont auditées ;
+- aucun rôle Wasplex ordinaire ne peut fabriquer ou élever une alerte à ce niveau.
+
+### Comportement dans Wasplex
+
+Lorsqu'une alerte valide est reçue :
+
+1. la publicité ou le contenu en cours est interrompu ;
+2. aucun événement publicitaire interrompu n'est frauduleusement marqué comme accompli ;
+3. l'alerte se superpose à toute interface Wasplex ;
+4. elle présente des consignes courtes, authentifiées, accessibles et traduisibles ;
+5. l'utilisateur peut acquitter sa lecture sans empêcher les mises à jour critiques ;
+6. l'alerte reste consultable dans un historique officiel.
+
+### Comportement hors de Wasplex
+
+L'application Android peut utiliser les mécanismes de notification prioritaires autorisés, mais le système d'exploitation, les permissions de l'utilisateur et le constructeur conservent le contrôle final. La version Web ne peut pas garantir l'affichage lorsque le navigateur est fermé.
+
+Une diffusion à tous les téléphones d'un territoire, y compris sans Wasplex installé, relève d'un partenariat souverain avec les opérateurs et des dispositifs de diffusion cellulaire d'urgence. Wasplex complète ces dispositifs ; il ne prétend pas les remplacer.
+
+### Interdictions
+
+Une alerte nationale critique :
+
+- n'est jamais sponsorisée ;
+- ne contient aucune publicité ;
+- n'accorde aucun WP ;
+- ne dépend d'aucun abonnement ;
+- ne sert ni au ciblage commercial ni à la collecte opportuniste de données ;
+- ne peut être testée sur la population sans signalement explicite d'exercice.
+
+## 11. Conservation et audit
 
 Le retrait public masque la diffusion mais ne détruit pas automatiquement dossier, preuves, événements ou journaux. Les durées varient par catégorie, finalité et obligation.
 
 Toute consultation sensible, modification, transmission, correspondance, remise, paiement et clôture est auditée.
 
-## 11. Administration
+## 12. Administration
 
 Sont configurables et versionnés : catégories, preuves, visibilité, durée, territoire, priorité, cadence Feed, limites, sponsorisation, récompenses, rétention et institutions destinataires.
 
