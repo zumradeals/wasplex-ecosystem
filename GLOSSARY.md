@@ -84,6 +84,14 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| API de première partie | Contrat externe réservé aux applications officielles Wasplex sans duplication des règles métier | Proposé — ADR-0007 |
+| API d'organisation | Contrat limité destiné à une organisation annonceur, institutionnelle ou partenaire vérifiée | Proposé — ADR-0007 |
+| Webhook entrant | Notification externe non fiable avant authentification, validation, déduplication et rapprochement | Proposé — ADR-0007 |
+| Webhook sortant | Livraison signée et rejouable d'un fait Wasplex à un destinataire abonné | Proposé — ADR-0007 |
+| Adaptateur anticorruption | Couche traduisant un prestataire externe vers le modèle Wasplex sans lui céder la décision métier | Spécifié |
+| Idempotency-Key | Clé liant une commande répétable à une unique intention et à l'empreinte de son contenu | Spécifié |
+| Sandbox partenaire | Environnement isolé à données fictives et identifiants incompatibles avec la production | Spécifié |
+| Disjoncteur | Protection suspendant temporairement les appels vers une dépendance défaillante afin de contenir les pannes | Spécifié |
 | Propriétaire fonctionnel d'une donnée | Module seul autorisé à définir, modifier, interpréter et gérer le cycle de vie d'une donnée | Proposé — ADR-0006 |
 | Classification D0-D4 | Échelle de protection allant de donnée publique à donnée critique | Proposé — ADR-0006 |
 | Identifiant interne | UUID stable, non réattribué et indépendant des coordonnées ou documents d'une personne | Spécifié |
