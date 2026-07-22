@@ -84,6 +84,14 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Sous-registre opérationnel | Ledger détaillé des mouvements Wasplex alimentant la comptabilité légale sans nécessairement la remplacer | Proposé — ADR-0003 |
+| Posting | Ligne de débit ou crédit appartenant à une transaction équilibrée du ledger | Spécifié |
+| Transaction comptable | Ensemble atomique d'au moins deux postings dont débits et crédits s'équilibrent par devise | Spécifié |
+| Intention de paiement | Objet unique décrivant un mouvement externe demandé avant connaissance de son résultat définitif | Spécifié |
+| Résultat de paiement inconnu | État où ni succès ni échec ne sont suffisamment prouvés et où les WP restent réservés | Spécifié |
+| Contre-écriture | Transaction équilibrée qui neutralise une écriture erronée sans la supprimer ni la modifier | Spécifié |
+| Actif de couverture admissible | Fonds contrôlé, disponible, rapproché et non grevé pouvant couvrir des droits utilisateurs exigibles | Spécifié |
+| Dossier de rapprochement | Objet documentant un écart entre ledger, prestataire et règlement jusqu'à sa résolution probante | Spécifié |
 | Niveau de configuration C0 | Invariant constitutionnel absent des champs administrables et modifiable uniquement par amendement et livraison contrôlée | Proposé — ADR-0002 |
 | Niveau de configuration C1 | Paramètre financier ou de droits exigeant simulation et double validation indépendante | Proposé — ADR-0002 |
 | Niveau de configuration C2 | Paramètre commercial ou opérationnel sensible exigeant auteur et approbateur distincts | Proposé — ADR-0002 |
