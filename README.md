@@ -31,4 +31,4 @@ Monolithe modulaire Laravel, PostgreSQL, React, TypeScript, Inertia et Vite. Sup
 
 ## Branche principale
 
-`main` est destinée à devenir la branche stable de référence. Les branches historiques restent consultables tant qu'elles ne sont pas explicitement archivées ou supprimées.
+`main` est la branche stable de référence. Les branches historiques restent consultables tant qu'elles ne sont pas explicitement archivées ou supprimées.
