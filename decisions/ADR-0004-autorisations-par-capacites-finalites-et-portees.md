@@ -1,6 +1,6 @@
 # ADR-0004 — Autorisations par capacités, finalités et portées
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur architectural :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, AMD-0006, AMD-0009, AMD-0010, AMD-0012, ADR-0001, ADR-0002, ADR-0003
