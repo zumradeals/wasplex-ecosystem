@@ -1,6 +1,6 @@
 # Modèle de contrat d'écran
 
-**Statut :** spécification proposée — UX-0002
+**Statut :** spécification adoptée — UX-0002
 
 Ce modèle est rempli avant la fabrication ou la validation d'une maquette importante. Une rubrique non applicable est marquée explicitement comme telle.
 
