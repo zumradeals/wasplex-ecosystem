@@ -1,6 +1,6 @@
 # Flux intermodules de référence
 
-**Statut :** spécification proposée — ADR-0005
+**Statut :** spécification d'application — ADR-0005 adopté
 
 ## Rémunération publicitaire
 
@@ -34,6 +34,14 @@ La déclaration, la restitution et la rémunération sont des faits distincts. U
 `Cartes → Calcul de pool → Wallet → Cartes/Notifications`
 
 Cartes justifie le revenu externe et la formule. Wallet vérifie et comptabilise. Une période de pool clôturée n'est pas recalculée.
+
+## Récompense Live
+
+`Live → Qualification d'intervalle/interaction → Saga rémunération → Wallet → Live/Notifications`
+
+Live possède la session, la présence et la preuve. Publicité possède le budget lorsqu'il s'agit d'un Live publicitaire. Wallet possède le droit WP. Une instruction porte une clé idempotente, la publication de configuration et l'enveloppe réservée ; aucune présence seule ne crée de valeur.
+
+Une interruption arrête prospectivement les nouveaux événements. Les événements déjà qualifiés restent contrôlables et ne sont annulés qu'avec une cause probante.
 
 ## Transmission institutionnelle
 

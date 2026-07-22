@@ -10,7 +10,7 @@
 2. Elle ne constitue ni une action, ni une valeur mobilière, ni une fraction du capital, ni une monnaie, ni un placement, ni une promesse de rendement.
 3. Le détenteur d'une Carte Wasplex n'est pas actionnaire de Wasplex du seul fait de cette acquisition.
 4. La carte est virtuelle par défaut. Un support physique facultatif et payant peut matérialiser les mêmes droits sans créer un droit économique supplémentaire.
-5. L'accès peut être conditionné à un abonnement Premium, Élite ou Master actif, mais l'expiration de cet abonnement ne supprime ni la carte payée, ni les gains définitivement acquis.
+5. L'accès peut être conditionné à un niveau d'abonnement déclaré éligible par une configuration versionnée. Les libellés commerciaux, notamment Premium, Élite ou Master, ne constituent jamais des clés d'autorisation et ne doivent pas être codés en dur. L'expiration de l'abonnement ne supprime ni la carte payée, ni les gains définitivement acquis.
 6. Le prix de la carte rémunère des services identifiables et ne finance pas la redistribution des détenteurs antérieurs.
 7. Aucune rémunération ne dépend du recrutement, du parrainage ou de l'arrivée permanente de nouveaux acquéreurs.
 8. Seuls des revenus économiques externes, traçables, encaissés, validés et explicitement affectés peuvent alimenter une redistribution.
@@ -38,3 +38,7 @@ Le fondateur a validé cet amendement le 2026-07-21.
 ## Effet de l'adoption
 
 Cet article gouverne toutes les Cartes Wasplex virtuelles ou physiques, leurs pools, leurs opérations partenaires et leurs redistributions.
+
+## Clarification de mise en œuvre — consolidation v1.5
+
+L'autorisation stable est la capacité `cards.acquire`. Elle est accordée lorsque l'abonnement actif appartient à la liste versionnée des offres éligibles (`cards.eligible_subscription_offer_ids`) et que les autres conditions sont remplies. Les noms commerciaux restent modifiables sans changer le code ni les droits historiques.

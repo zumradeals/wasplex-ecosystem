@@ -1,6 +1,6 @@
 # Incidents, continuité et runbooks
 
-**Statut :** spécification proposée — ADR-0009
+**Statut :** spécification d'application — ADR-0009 adopté
 
 ## Runbooks obligatoires
 

@@ -1,6 +1,6 @@
 # Moteur de configuration métier
 
-**Statut :** spécification proposée — ADR-0002
+**Statut :** spécification d'application — ADR-0002 adopté
 
 ## Objet
 

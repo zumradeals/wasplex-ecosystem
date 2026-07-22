@@ -1,7 +1,6 @@
 # Gouvernance — Rôles, capacités et séparation
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0012
 ## 1. Capacités plutôt que super-administrateur
 
 Chaque droit d'administration est une capacité atomique : consulter, proposer, approuver, exécuter, exporter, suspendre, révoquer ou auditer une ressource dans un périmètre.

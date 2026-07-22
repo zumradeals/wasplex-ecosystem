@@ -1,6 +1,6 @@
 # Webhooks et adaptateurs externes
 
-**Statut :** spécification proposée — ADR-0007
+**Statut :** spécification d'application — ADR-0007 adopté
 
 ## Entrée
 

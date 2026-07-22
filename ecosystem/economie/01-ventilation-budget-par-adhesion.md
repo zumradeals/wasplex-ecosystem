@@ -1,6 +1,6 @@
 # Ventilation du budget publicitaire par niveau d'adhésion
 
-- **Statut :** spécification économique partielle v0.3
+- **Statut :** spécification adoptée — AMD-0002 et AMD-0004
 - **Sources :**
   - `sources/2026-07-21-clarification-fondateur-03-propriete-ventilation.md`
   - `sources/2026-07-21-clarification-fondateur-04-fonds-social.md`
@@ -22,7 +22,7 @@ Les frais internes de Wasplex sont financés par sa part.
 
 Le Fonds social est autonome et n'intervient pas automatiquement dans cette ventilation.
 
-Le caractère constitutionnel ou normatif renforcé du ratio est soumis à AMD-0002.
+Le ratio est constitutionnel, adopté par l'article 9 et AMD-0002 ; il n'est pas administrable.
 
 ## 2. Distribution interne de la part utilisateur
 

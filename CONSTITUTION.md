@@ -218,7 +218,7 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 2. Elle ne constitue ni une action, ni une valeur mobilière, ni une fraction du capital, ni une monnaie, ni un placement, ni une promesse de rendement.
 3. Le détenteur d'une Carte Wasplex n'est pas actionnaire de Wasplex du seul fait de cette acquisition.
 4. La carte est virtuelle par défaut. Un support physique facultatif et payant peut matérialiser les mêmes droits sans créer un droit économique supplémentaire.
-5. L'accès peut être conditionné à un abonnement Premium, Élite ou Master actif, mais l'expiration de cet abonnement ne supprime ni la carte payée, ni les gains définitivement acquis.
+5. L'accès peut être conditionné à un niveau d'abonnement déclaré éligible par une configuration versionnée. Les libellés commerciaux, notamment Premium, Élite ou Master, ne constituent jamais des clés d'autorisation et ne doivent pas être codés en dur. L'expiration de l'abonnement ne supprime ni la carte payée, ni les gains définitivement acquis.
 6. Le prix de la carte rémunère des services identifiables et ne finance pas la redistribution des détenteurs antérieurs.
 7. Aucune rémunération ne dépend du recrutement, du parrainage ou de l'arrivée permanente de nouveaux acquéreurs.
 8. Seuls des revenus économiques externes, traçables, encaissés, validés et explicitement affectés peuvent alimenter une redistribution.
@@ -397,12 +397,12 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 6. Une donnée personnelle doit avoir une finalité, une base de consentement, une durée de conservation et une règle d'accès.
 7. La simplicité d'exploitation est une exigence, pas une dispense de sécurité.
 
-## Articles restant à instruire
+## Articles et portes restant à instruire
 
-- annonceurs, campagnes, ciblage et tarification ;
-- identité visuelle et langage ;
-- architecture technique et exigences de qualité ;
-- procédure d'amendement ;
+Les chapitres annonceurs, identité visuelle, architecture et qualité ont été instruits par les amendements et décisions adoptés. Restent ouverts :
+
+- la procédure formelle d'amendement et de versionnement constitutionnel ;
+- les validations juridiques, réglementaires, contractuelles et opérationnelles propres à chaque pays avant activation des capacités concernées.
 
 ## Registre d'adoption
 

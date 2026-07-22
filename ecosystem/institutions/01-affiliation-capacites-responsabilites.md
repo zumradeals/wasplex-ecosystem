@@ -2,7 +2,7 @@
 
 **Statut :** spécification métier fondatrice  
 **Source :** `sources/2026-07-21-entretien-fondateur-09-institutions-affiliees.md`  
-**Dépendances :** Constitution v0.7, AMD-0006 adopté, validation juridique et sectorielle
+**Dépendances :** Constitution v1.5, AMD-0006 adopté, validation juridique et sectorielle
 
 ## 1. Modèle
 

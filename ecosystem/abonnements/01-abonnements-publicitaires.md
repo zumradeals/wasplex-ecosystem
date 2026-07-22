@@ -2,7 +2,7 @@
 
 **Statut :** spécification métier fondatrice  
 **Source :** `sources/2026-07-21-entretien-fondateur-07-abonnements-publicitaires.md`  
-**Dépendances :** Constitution v0.5, AMD-0004 adopté, ADR-0002
+**Dépendances :** Constitution v1.5, AMD-0004 adopté, ADR-0002
 
 ## 1. Objet du contrat
 

@@ -1,7 +1,6 @@
 # Gouvernance — Audit et preuves
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0012
 ## 1. Événements
 
 Journalisation obligatoire des authentifications privilégiées, élévations, consultations sensibles, exports, rôles, configurations, campagnes, Wallet exceptionnel, antifraude, Fonds Social, Alertes, Institutions, contenus, accès techniques et urgences.

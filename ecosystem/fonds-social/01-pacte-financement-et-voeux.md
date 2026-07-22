@@ -2,7 +2,7 @@
 
 **Statut :** spécification métier fondatrice  
 **Source :** `sources/2026-07-21-entretien-fondateur-08-fonds-social.md`  
-**Dépendances :** Constitution v0.6, Wallet immuable, AMD-0005 adopté, validation juridique
+**Dépendances :** Constitution v1.5, Wallet immuable, AMD-0005 adopté, validation juridique
 
 ## 1. Double éligibilité
 

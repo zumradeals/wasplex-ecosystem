@@ -1,9 +1,9 @@
 # Alertes — Sponsorisation et amplification communautaire
 
-**Statut :** spécification métier proposée  
-**Date :** 2026-07-21  
-**Source :** clarification du fondateur sur les alertes premium  
-**Dépendances :** Constitution v0.7, institutions affiliées, règles de diffusion du Feed
+**Statut :** spécification adoptée — AMD-0007
+**Date :** 2026-07-21
+**Source :** clarification du fondateur sur les alertes premium
+**Dépendances :** Constitution v1.5, institutions affiliées, règles de diffusion du Feed
 
 ## 1. Nature
 

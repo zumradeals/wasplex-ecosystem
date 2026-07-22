@@ -1,8 +1,8 @@
 # Les Cartes Wasplex — Modèle économique et pools
 
-**Statut :** spécification proposée  
-**Source :** `sources/2026-07-21-entretien-fondateur-12-cartes-wasplex.md`  
-**Dépendances :** Constitution v0.8, Wallet, abonnements, partenaires agréés
+**Statut :** spécification adoptée — AMD-0008
+**Source :** `sources/2026-07-21-entretien-fondateur-12-cartes-wasplex.md`
+**Dépendances :** Constitution v1.5, AMD-0008, Wallet, abonnements, partenaires agréés
 
 ## 1. Objet
 
@@ -18,7 +18,7 @@ Chaque produit de carte possède une version immuable après commercialisation :
 - pays, devise et territoires ;
 - prix virtuel et frais éventuels ;
 - durée de validité ;
-- abonnements requis ;
+- identifiants stables des offres d'abonnement éligibles ;
 - services et partenaires accessibles ;
 - coefficient maximal de pool ;
 - plafonds individuels et collectifs ;

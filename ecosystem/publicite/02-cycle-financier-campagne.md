@@ -1,6 +1,6 @@
 # Cycle financier d'une campagne publicitaire
 
-- **Statut :** spécification métier v0.1 à valider
+- **Statut :** spécification adoptée — Constitution et AMD-0002
 - **Source :** `sources/2026-07-21-entretien-fondateur-05-cycle-financier-campagne.md`
 - **Dépend de :** `01-cycle-creation-valeur.md`
 

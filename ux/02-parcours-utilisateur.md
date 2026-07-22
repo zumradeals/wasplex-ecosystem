@@ -1,6 +1,6 @@
 # Parcours utilisateur
 
-**Statut :** spécification proposée — UX-0001
+**Statut :** spécification d'application — UX-0001 adopté
 
 ## Parcours prioritaires P0
 

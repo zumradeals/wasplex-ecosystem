@@ -1,6 +1,6 @@
 # API REST, versionnement et sécurité
 
-**Statut :** spécification proposée — ADR-0007
+**Statut :** spécification d'application — ADR-0007 adopté
 
 ## Convention d'endpoint
 

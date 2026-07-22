@@ -1,6 +1,6 @@
 # Propriété des données et schémas PostgreSQL
 
-**Statut :** spécification proposée — ADR-0006
+**Statut :** spécification d'application — ADR-0006 adopté
 
 ## Carte de propriété
 
@@ -15,6 +15,7 @@
 | alerts | Alertes | SOS, dossiers, restitutions | ciblage commercial |
 | institutions | Institutions | affiliations, capacités, actions | accès général |
 | cards | Cartes Wasplex | cartes, pools, opérations | création autonome de valeur |
+| live | Live | sessions, présence, interactions, preuves, modération | solde, budget annonceur, profil publicitaire brut |
 | governance | Administration | configurations, autorisations, approbations | modification du Ledger |
 | integration | Intégrations | outbox, inbox, sagas, preuves externes | décision métier |
 | reporting | Reporting | projections reconstruites | état souverain |

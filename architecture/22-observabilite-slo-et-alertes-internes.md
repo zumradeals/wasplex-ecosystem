@@ -1,6 +1,6 @@
 # Observabilité, SLO et alertes internes
 
-**Statut :** spécification proposée — ADR-0009
+**Statut :** spécification d'application — ADR-0009 adopté
 
 ## Tableaux de bord minimaux
 
@@ -23,6 +23,12 @@ Authentifications, privilèges, exports, bris de glace, secrets et incidents.
 ### Alertes
 
 SOS reçus, transmissions, accusés, délais, institutions indisponibles et notifications nationales.
+
+### Live
+
+Sessions planifiées et actives, capacité média, latence de lecture, ruptures réseau, présence qualifiable, événements rejetés ou dupliqués, enveloppes réservées, instructions Wallet en attente, signalements, interruptions de modération et priorité d'alerte nationale.
+
+Les métriques de présence et d'interaction utilisent des identifiants techniques protégés et des agrégats ; elles ne deviennent ni un score humain général ni une source de ciblage non consenti.
 
 ## Qualité d'une alerte
 

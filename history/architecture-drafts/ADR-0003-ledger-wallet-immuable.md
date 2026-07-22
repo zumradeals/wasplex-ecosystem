@@ -1,4 +1,4 @@
-# ADR-0003 — Registre comptable immuable du Wallet
+# ADR-0003 — Registre comptable immuable du Wallet — brouillon historique non normatif
 
 **État :** proposé  
 **Date :** 2026-07-21

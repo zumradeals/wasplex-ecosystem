@@ -1,6 +1,6 @@
 # Contrats : commandes, requêtes et événements
 
-**Statut :** spécification proposée — ADR-0005
+**Statut :** spécification d'application — ADR-0005 adopté
 
 ## Commande
 

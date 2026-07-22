@@ -1,6 +1,6 @@
 # Architecture de l'information et navigation
 
-**Statut :** spécification proposée — UX-0001
+**Statut :** spécification d'application — UX-0001 adopté
 
 ## Carte publique
 

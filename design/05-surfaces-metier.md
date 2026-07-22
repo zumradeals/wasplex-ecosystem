@@ -1,6 +1,6 @@
 # Surfaces métier
 
-**Statut :** spécification proposée — DS-0001
+**Statut :** spécification d'application — DS-0001 adopté
 
 ## Application utilisateur
 
@@ -9,6 +9,10 @@ Mobile-first, navigation au pouce, Feed immersif mais contrôlable, Wallet centr
 ## Annonceur
 
 Desktop prioritaire, tableaux lisibles, budget et preuve au premier plan, aucun design de jeu ou de réseau social.
+
+## Live
+
+La régie et la modération sont desktop-first ; l'expérience spectateur est mobile-first. Avant l'entrée, l'écran annonce diffuseur, sujet, consommation de données estimée, présence ou absence de récompense, règles et signalement. Pendant la session, les gains restent secondaires au contenu et n'imitent jamais une pluie d'argent garantie.
 
 ## Institution
 

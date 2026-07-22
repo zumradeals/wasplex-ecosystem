@@ -1,6 +1,6 @@
 # Wallet — Ledger et couverture
 
-**Statut :** spécification proposée  
+**Statut :** spécification adoptée — AMD-0011
 **Source :** `sources/2026-07-21-entretien-fondateur-15-paiements-retraits-couverture-wallet.md`
 
 ## 1. Ledger

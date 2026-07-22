@@ -2,7 +2,7 @@
 
 **Statut :** spécification métier fondatrice  
 **Source :** `sources/2026-07-21-entretien-fondateur-11-alertes-securite-restitutions.md`  
-**Dépendances :** Constitution v0.8, Institutions affiliées, sponsorisation, AMD-0007 adopté
+**Dépendances :** Constitution v1.5, Institutions affiliées, sponsorisation, AMD-0007 adopté
 
 ## 1. Sous-domaines séparés
 

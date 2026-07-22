@@ -1,7 +1,7 @@
 # WasPoint et états du Wallet
 
-**Statut :** spécification métier issue de la doctrine fondatrice  
-**Dépendances :** `CONSTITUTION.md`, AMD-0003 proposé, validation juridique locale
+**Statut :** spécification adoptée — AMD-0003 et AMD-0011
+**Dépendances :** `CONSTITUTION.md`, AMD-0003, AMD-0011, validation juridique locale
 
 ## 1. Définition fonctionnelle
 

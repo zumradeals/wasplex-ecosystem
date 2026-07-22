@@ -1,6 +1,6 @@
 # Canaux, accès et mode dégradé
 
-**Statut :** spécification proposée — ADR-0001
+**Statut :** spécification d'application — ADR-0001 adopté
 
 ## Ordre de livraison
 

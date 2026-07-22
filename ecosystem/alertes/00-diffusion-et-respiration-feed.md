@@ -2,7 +2,7 @@
 
 **Statut :** principe fonctionnel initial  
 **Source :** `sources/2026-07-21-clarification-fondateur-10-alertes-dans-feed.md`  
-**Dépendances :** Constitution v0.7 et Institutions affiliées
+**Dépendances :** Constitution v1.5 et Institutions affiliées
 
 ## 1. Quatre familles de contenu
 

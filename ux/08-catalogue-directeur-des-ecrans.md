@@ -199,7 +199,21 @@ Ce catalogue fixe le premier périmètre. Un contrat peut couvrir plusieurs lign
 | W-004-03 | Journal d'audit | D | Q0 | recherche, corrélation, export contrôlé |
 | W-004-04 | Gestion des accès privilégiés | D | Q0 | demande, approbation, révocation |
 
+## L12 — Live
+
+| ID | Écran | Terminal | Risque | États/variantes clés |
+|---|---|---:|---:|---|
+| U-019-01 | Découverte et fiche préalable d'un Live | M | Q1 | programmé, actif, terminé, réseau/coût annoncé |
+| U-019-02 | Salle Live spectateur | M | Q1 | lecture, retard, reconnexion, modération, alerte nationale |
+| U-019-03 | Interactions et signalement | M | Q1 | autorisée, refusée, ralentie, signalée |
+| U-020-01 | Règles et progression de récompense | M | Q0/Q1 | non rémunéré, intervalle, plafond, bonus |
+| U-020-02 | Résultat d'un événement Live | M | Q0 | provisoire, validé, refusé, inconnu, recours |
+| A-005-01 | Planification et dossier d'un Live | D | Q1 | brouillon, vérification, modération, approuvé |
+| A-005-02 | Budget, intervalles et interactions | D | Q0 | simulation, couverture, réservé, insuffisant |
+| A-005-03 | Régie et rapport Live | D | Q0/Q1 | prêt, en direct, interrompu, terminé, rapproché |
+| I-004-01 | Live institutionnel | D | Q1 | finalité, territoire, capacité, preuve d'autorité |
+| W-005-01 | Console de modération Live | D | Q0/Q1 | file, direct, signal, suspension, clôture |
+
 ## Contrôle du catalogue
 
 Avant chaque lot, les lignes concernées sont vérifiées contre la Constitution, les décisions, les contrats métier et les flux intermodules. Les écrans nouvellement découverts sont ajoutés avant leur maquettage ; ils ne restent pas cachés dans un prompt.
-

@@ -51,6 +51,10 @@ L10 : configurations, Ledger, accès, audit et incidents sont exploitables par r
 
 L11 : états rares, assistance, langues, accessibilité et cohérence intermodules sont revus.
 
+### J8 — Live démontrable
+
+L12 : un Live peut être découvert, rejoint, modéré et interrompu ; une récompense éventuelle reste préfinancée, plafonnée, prouvée et visible dans ses états provisoire, validé, refusé ou inconnu. L'alerte nationale conserve sa priorité absolue.
+
 ## 3. Première tranche Lovable
 
 La première commande visuelle ne demande pas « toute l'application Wasplex ». Elle couvre un ensemble témoin :
@@ -93,4 +97,3 @@ La revue répond à cinq questions :
 5. Une IA peut-elle implémenter sans devoir inventer ?
 
 Une réponse négative empêche le statut « implémentable ».
-

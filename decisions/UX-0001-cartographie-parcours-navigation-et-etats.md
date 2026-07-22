@@ -812,3 +812,13 @@ Ces coûts sont acceptés : une expérience simple n'est pas une expérience qui
 > Aucun parcours Wasplex ne se termine par une ambiguïté silencieuse. La personne doit connaître l'état, la valeur protégée, la prochaine action et la voie de recours.
 
 Tout futur prompt d'écran ou parcours doit citer UX-0001.
+
+## Addendum v1.5 — parcours Live
+
+**Source :** AMD-0014 adopté le 2026-07-22.
+
+Le Live s'insère dans l'expérience utilisateur sans créer un sixième onglet principal obligatoire. Il peut être découvert depuis le Feed, une notification ou un lien profond autorisé. La fiche préalable annonce diffuseur, sujet, horaires, consommation de données estimée, règles d'interaction et présence ou absence de récompense.
+
+Une session distingue lecture média, présence technique, intervalle qualifié, interaction qualifiée et crédit Wallet. Leur apparence ne doit jamais les confondre. La reconnexion conserve la continuité sans doubler les événements ; un résultat financier incertain reste inconnu.
+
+Annonceurs, institutions habilitées et Wasplex disposent de parcours desktop distincts pour planification, preuve d'autorité, budget, modération et clôture. Une alerte nationale critique interrompt ou recouvre le Live selon sa portée et reste exempte de publicité, réaction sociale et récompense.

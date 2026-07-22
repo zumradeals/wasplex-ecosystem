@@ -1,4 +1,4 @@
-# ADR-0001 — Direction technique initiale
+# ADR-0001 — Direction technique initiale — brouillon historique non normatif
 
 - **État :** proposé
 - **Date :** 2026-07-20
