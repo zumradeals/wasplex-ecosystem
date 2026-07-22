@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v1.3 adoptée  
+**Statut :** Constitution v1.4 adoptée  
 **Autorité :** constitutionnelle  
-**Date d'adoption :** 2026-07-21  
+**Date d'adoption :** 2026-07-22  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`, `amendments/AMD-0012-gouvernance-limitee-configuration-versionnee-et-audit.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`, `amendments/AMD-0012-gouvernance-limitee-configuration-versionnee-et-audit.md`, `amendments/AMD-0013-publicite-compatible-avec-la-dignite-et-la-securite.md`
 
 ## Préambule adopté
 
@@ -316,7 +316,26 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 25. Toute crise se termine par rapprochement, vérification, reprise contrôlée, rapport et actions correctives.
 26. Rôles, capacités, quorums, délais, durées, journaux et politiques sont administrables et versionnés sans pouvoir autoriser ce que la Constitution ou la loi interdit.
 
-## Article 19 — Refus absolus
+## Article 19 — Publicité compatible avec la dignité et la sécurité
+
+1. Wasplex n'accepte que les campagnes compatibles avec sa mission, la dignité humaine, la sécurité et les droits des personnes ; cette protection prime sur le revenu publicitaire.
+2. Les offres illicites, criminelles, frauduleuses, exploitantes, haineuses, dangereuses ou trompeuses ainsi que toute imitation de Wasplex, d'une alerte ou d'une autorité sont interdites.
+3. La publicité commerciale pour le tabac et les produits nicotiniques est interdite ; seuls des contenus vérifiés de prévention et de sevrage peuvent être admis.
+4. Au lancement, les campagnes commerciales de jeux d'argent ou paris et la persuasion politique ou électorale payante sont interdites. Leur admission future exige un amendement constitutionnel explicite.
+5. L'information civique ou institutionnelle neutre exige une institution habilitée, une source visible, une finalité déterminée, une diffusion auditée et aucun ciblage politique ou sensible.
+6. Les secteurs licites à risque sont soumis à des règles renforcées adaptées au pays. La règle la plus protectrice entre la loi, la Constitution et la matrice nationale s'applique.
+7. L'annonceur prouve son identité, son autorité, la licéité de l'offre, ses allégations et ses droits.
+8. Les créations, paramètres, audiences et destinations constituent une version indivisible et traçable. Toute modification matérielle exige une nouvelle validation.
+9. Le contrôle couvre la destination réelle, ses redirections, formulaires, messageries et moyens de paiement. La dissimulation ou substitution de destination est interdite.
+10. Tout utilisateur peut signaler une campagne. Un signalement déclenche une évaluation proportionnée sans constituer seul une preuve définitive.
+11. Wasplex peut prendre toute mesure conservatoire nécessaire ; un recours ne suspend pas automatiquement une mesure de sécurité.
+12. L'utilisateur ayant exécuté de bonne foi un événement valide conserve son droit à la rémunération préfinancée même si une faute de l'annonceur est découverte ensuite.
+13. Seules l'invalidité de l'événement, la collusion démontrée ou une obligation juridique peuvent écarter ce droit.
+14. Pendant une enquête, le budget non consommé reste réservé jusqu'à couverture des événements valides et obligations établies.
+15. Sanctions, retenues et remboursements sont motivés, proportionnés, audités et contestables ; Wasplex ne s'approprie jamais silencieusement un reliquat.
+16. L'administration peut configurer les contrôles permis, mais ne peut activer une catégorie constitutionnellement interdite ni réduire une garantie fondamentale.
+
+## Article 20 — Refus absolus
 
 Wasplex refuse :
 
@@ -333,7 +352,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 20 — Mesure de la réussite
+## Article 21 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -364,8 +383,7 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 - identité visuelle et langage ;
 - architecture technique et exigences de qualité ;
 - procédure d'amendement ;
-- secteurs publicitaires interdits ou sensibles.
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 20 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008 et l'article 16 intègre AMD-0010 et l'article 17 intègre AMD-0011 et l'article 18 intègre AMD-0012, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 20 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008 et l'article 16 intègre AMD-0010 et l'article 17 intègre AMD-0011 et l'article 18 intègre AMD-0012 et l'article 19 intègre AMD-0013. AMD-0013 a été validé le 2026-07-22 ; les amendements antérieurs demeurent adoptés selon leur registre. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
