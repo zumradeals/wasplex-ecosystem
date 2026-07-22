@@ -1,13 +1,13 @@
 # AMD-0013 — Publicité compatible avec la dignité et la sécurité
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté et intégré à la Constitution v1.4  
 **Date :** 22 juillet 2026
 
 ## Motif
 
 La publicité finance la mission de Wasplex, mais la recherche de revenus ne peut justifier l'exposition des populations à la fraude, à la manipulation, à la dépendance, à la discrimination ou au danger.
 
-## Amendement proposé
+## Amendement adopté
 
 ### Article 1 — Primauté de la protection
 
@@ -51,4 +51,4 @@ L'administration configure les contrôles et restrictions permis, mais ne peut a
 
 ## Effets documentaires
 
-Après adoption, cet amendement devra être intégré à la Constitution suivante et rendra normatives les spécifications du dossier `ecosystem/publicite/` dans la limite de leur compatibilité avec le droit applicable.
+Cet amendement est intégré à la Constitution v1.4 et rend normatives les spécifications du dossier `ecosystem/publicite/` dans la limite de leur compatibilité avec le droit applicable.
