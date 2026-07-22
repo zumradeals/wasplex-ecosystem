@@ -1,6 +1,6 @@
 # ADR-0002 — Configuration métier administrable et versionnée
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur architectural :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, AMD-0012, AMD-0013, ADR-0001
