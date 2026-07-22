@@ -10,6 +10,12 @@
 | Attention publicitaire | Temps et engagement volontaire d'une personne envers un contenu publicitaire | Proposé |
 | Attention qualifiée | Attention volontaire correspondant à une audience consentie et satisfaisant une condition mesurable | Proposé |
 | Attention rémunérée | Attention ayant atteint le seuil annoncé et satisfait aux règles de validité et de lutte contre la fraude | Proposé |
+| Live Wasplex | Session de diffusion synchronisée, bornée et versionnée organisée par un diffuseur autorisé pour une finalité déterminée | Adopté — AMD-0014 |
+| Intervalle Live qualifié | Fenêtre de présence satisfaisant une condition annoncée, préfinancée, plafonnée, idempotente et vérifiable | Adopté — AMD-0014 |
+| Interaction Live rémunérable | Action annoncée dont le critère, la preuve, le montant, la fenêtre et le maximum sont définis avant validation | Adopté — AMD-0014 |
+| Bonus de complétion Live | Récompense conditionnée à une étape annoncée sans reprise rétroactive des intervalles antérieurs acquis | Adopté — AMD-0014 |
+| Diffuseur Live autorisé | Wasplex, annonceur vérifié, institution habilitée ou partenaire agréé disposant de la capacité et de la finalité requises | Adopté — AMD-0014 |
+| Gain Live provisoire | Somme non disponible issue d'événements Live enregistrés et restant soumise aux preuves et contrôles | Adopté — AMD-0014 |
 | Complétion | Atteinte de la durée ou du seuil annoncé donnant potentiellement droit à rémunération | À spécifier |
 | Événement publicitaire qualifié | Preuve unique, vérifiable et acceptée qu'une condition de campagne a été exécutée | À valider |
 | Pertinence de la rencontre | Adéquation entre un message publicitaire et un segment d'audience constitué selon des critères consentis | Proposé |
