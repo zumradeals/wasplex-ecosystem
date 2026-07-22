@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v1.2 adoptée  
+**Statut :** Constitution v1.3 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-21  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`, `amendments/AMD-0012-gouvernance-limitee-configuration-versionnee-et-audit.md`
 
 ## Préambule adopté
 
@@ -287,7 +287,36 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 23. Le registre, les preuves, sauvegardes et contrats permettent la reconstruction des droits et une sortie ordonnée.
 24. Prestataires, seuils, plafonds, frais, délais, concentrations, états et contrôles sont administrables, versionnés et auditables sans pouvoir contredire ces invariants.
 
-## Article 18 — Refus absolus
+## Article 18 — Gouvernance limitée, configuration versionnée et audit
+
+1. Wasplex sépare gouvernance, administration, exploitation, contrôle et audit.
+2. Aucun administrateur, dirigeant ou fondateur ne possède seul tous les pouvoirs ou un accès technique absolu.
+3. Le fondateur protège la vision selon la procédure constitutionnelle, sans pouvoir modifier un solde, effacer une preuve ou désactiver un contrôle.
+4. La continuité du gardien de la vision prévoit délégation, incapacité, succession, vacance et compromission selon une procédure adoptée.
+5. Les décisions majeures relèvent d'une gouvernance collégiale dont quorum, majorité, conflits et preuves sont définis.
+6. L'auditeur conserve son indépendance et ne décide pas normalement l'acte exécutif qu'il devra auditer.
+7. Tout compte privilégié est nominatif, fortement authentifié, limité, temporaire et périodiquement révisé ; les comptes humains partagés sont interdits.
+8. Les droits sont attribués par capacités et finalités, non par un titre donnant accès global.
+9. L'auteur d'une action critique ne peut être son unique approbateur, auditeur ou bénéficiaire.
+10. Toute configuration est versionnée avec motif, auteur, approbateurs, périmètre, analyse d'impact, date d'effet et historique reconstructible.
+11. Les changements ordinaires, financiers sensibles, critiques et constitutionnels suivent des procédures distinctes.
+12. Aucun paramètre constitutionnel n'est modifiable depuis une administration ordinaire.
+13. Une règle nouvelle ne réduit pas rétroactivement un droit acquis ni ne réécrit une opération exécutée, sauf base supérieure ou fraude propre prouvée.
+14. Un retour de configuration crée une nouvelle version et ne rembobine jamais le ledger ni les événements passés.
+15. Toute action administrative sensible, consultation de données, export, décision, urgence et opération exceptionnelle produit une preuve durable.
+16. Les journaux critiques sont protégés, append-only ou équivalents, répliqués, vérifiables et séparés des pouvoirs opérationnels ordinaires.
+17. Les secrets et données sensibles ne sont jamais copiés inutilement ou en clair dans les journaux.
+18. L'accès, la recherche et l'export des journaux sont eux-mêmes audités.
+19. Aucun acteur n'est l'unique contrôleur de ses propres actions critiques.
+20. Un accès exceptionnel de bris de glace est minimal, fortement authentifié, signalé, expirant et soumis à revue indépendante.
+21. Tout pouvoir d'urgence possède motif, gravité, périmètre, durée, confirmation, communication et procédure de sortie.
+22. Une action unilatérale immédiate n'est permise que pour contenir un dommage imminent et expire sans confirmation rapide.
+23. Le mode lecture seule est privilégié lorsqu'il protège l'intégrité tout en conservant la visibilité des droits.
+24. Seule une institution souveraine habilitée émet une alerte nationale ; Wasplex l'authentifie, la relaie et l'audite sans en créer l'autorité.
+25. Toute crise se termine par rapprochement, vérification, reprise contrôlée, rapport et actions correctives.
+26. Rôles, capacités, quorums, délais, durées, journaux et politiques sont administrables et versionnés sans pouvoir autoriser ce que la Constitution ou la loi interdit.
+
+## Article 19 — Refus absolus
 
 Wasplex refuse :
 
@@ -304,7 +333,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 19 — Mesure de la réussite
+## Article 20 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -332,7 +361,6 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 ## Articles restant à instruire
 
 - annonceurs, campagnes, ciblage et tarification ;
-- administration, audit et gouvernance ;
 - identité visuelle et langage ;
 - architecture technique et exigences de qualité ;
 - procédure d'amendement ;
@@ -340,4 +368,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 19 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008 et l'article 16 intègre AMD-0010 et l'article 17 intègre AMD-0011, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 20 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008 et l'article 16 intègre AMD-0010 et l'article 17 intègre AMD-0011 et l'article 18 intègre AMD-0012, tous validés le 2026-07-21. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
