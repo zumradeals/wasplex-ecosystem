@@ -24,6 +24,6 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | ADR-0004 | Autorisations par capacités, finalités, portées et durées | Adopté |
 | ADR-0005 | Contrats intermodules, événements et cohérence transactionnelle | Adopté |
 | ADR-0006 | Architecture des données, identifiants et isolation | Adopté |
-| ADR-0007 | API, webhooks et intégrations externes | À instruire |
+| ADR-0007 | API, webhooks et intégrations externes | Proposé |
 
 Une décision ou un amendement n'est « adopté » qu'après validation explicite du fondateur.
