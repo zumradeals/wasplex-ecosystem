@@ -84,6 +84,13 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Monolithe modulaire | Application déployable comme une unité, structurée en domaines aux données et contrats strictement séparés | Proposé — ADR-0001 |
+| Source de vérité fonctionnelle | Module seul autorisé à gouverner l'état canonique d'une information déterminée | Spécifié |
+| Idempotence | Propriété garantissant que la répétition d'une même demande ne produit pas un second effet économique | Spécifié |
+| Outbox transactionnelle | Registre écrit dans la même transaction que l'état métier afin de publier un événement sans perte ni double effet | Spécifié |
+| RPO | Perte maximale de données acceptable après incident, définie et testée par capacité | À paramétrer |
+| RTO | Délai maximal visé pour restaurer une capacité après incident, défini et testé par capacité | À paramétrer |
+| Mode dégradé | Fonctionnement partiel dont les limites et la fraîcheur des données sont explicitement affichées | Spécifié |
 | Constitution | Source normative supérieure gouvernant l'écosystème | Adopté pour le processus |
 
 ## Acteurs officiels
