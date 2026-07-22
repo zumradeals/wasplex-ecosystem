@@ -1,6 +1,6 @@
 # FND-00-01 — Catalogue de prototypes et sélecteur de fixtures
 
-**État :** proposé à validation  
+**État :** adopté — L00-A  
 **Parcours parent :** fondation transversale  
 **Risque :** Q2, avec contenu de démonstration Q0/Q1  
 **Terminal primaire :** desktop ; consultation mobile obligatoire  
