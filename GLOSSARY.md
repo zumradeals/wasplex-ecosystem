@@ -71,6 +71,12 @@
 | Alerte sponsorisée | Alerte communautaire validée dont le déclarant finance une portée supplémentaire sans acheter urgence, confiance ou résultat | Spécifié |
 | Boost d'alerte | Offre prépayée de durée, territoire, surfaces et exposition supplémentaires | Spécifié |
 | Pause utile | Transition non publicitaire entre séquences du Feed présentant conseil, prévention ou information | Spécifié |
+| Gouvernance collégiale | Instance décidant des changements majeurs selon quorum, majorité, conflits et preuves définis | Proposé — AMD-0012 |
+| Capacité administrative | Permission atomique accordée à une identité, pour une action, une finalité, un périmètre et une durée | Spécifié |
+| Séparation des tâches | Interdiction qu'une même personne initie, approuve et contrôle seule une action critique | Spécifié |
+| Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
+| Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
+| Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
 | Constitution | Source normative supérieure gouvernant l'écosystème | Adopté pour le processus |
 
 ## Acteurs officiels
