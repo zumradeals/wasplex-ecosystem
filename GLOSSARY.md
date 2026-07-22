@@ -84,6 +84,13 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Couleur de marque | Couleur exprimant l'identité Wasplex sans déterminer à elle seule l'état d'une opération | Proposé — DS-0001 |
+| Couleur sémantique | Couleur au sens stable réservé à succès, attente, danger, information ou résultat inconnu | Proposé — DS-0001 |
+| Token de design | Valeur nommée et versionnée utilisée par les composants plutôt qu'une valeur visuelle arbitraire | Proposé — DS-0001 |
+| Composant d'interface | Élément React documenté encapsulant présentation, états généraux et accessibilité sans décider la règle métier | Proposé — DS-0001 |
+| État inconnu d'interface | Présentation explicite qu'un résultat n'est ni confirmé réussi ni confirmé échoué | Spécifié |
+| Alerte nationale critique | Surface souveraine prioritaire interrompant le contenu sans publicité, récompense ni réaction sociale | Spécifié |
+| Pause utile | Contenu de respiration, prévention ou information clairement distinct d'une publicité et d'une urgence | Spécifié |
 | Feature flag | Contrôle temporaire d'exposition technique d'une fonction sans modifier sa règle contractuelle | Proposé — ADR-0009 |
 | Mode de crise | État opérationnel gouverné protégeant intégrité, fonds et preuves lors d'un incident grave | Proposé — ADR-0009 |
 | SLI | Indicateur mesurant le niveau de service réellement fourni par une capacité | Spécifié |
