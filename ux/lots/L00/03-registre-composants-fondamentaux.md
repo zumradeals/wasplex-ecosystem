@@ -1,6 +1,6 @@
 # Registre des composants fondamentaux
 
-**État :** proposition L00  
+**État :** adopté comme registre initial — L00-A  
 **Dépendances :** DS-0001, UX-0001, UX-0002, UX-0003
 
 ## 1. Niveaux
