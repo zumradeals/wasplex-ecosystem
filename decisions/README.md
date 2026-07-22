@@ -28,6 +28,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | ADR-0008 | Stratégie de tests, qualité et critères de livraison | Adopté |
 | ADR-0009 | Déploiement, observabilité et exploitation | Adopté |
 | DS-0001 | Identité visuelle, langage d'interface et Design System | Adopté |
-| UX-0001 | Cartographie des parcours, navigation et états | Proposé |
+| UX-0001 | Cartographie des parcours, navigation et états | Adopté |
+| UX-0002 | Catalogue des écrans et contrats d'interface | À instruire |
 
 Une décision ou un amendement n'est « adopté » qu'après validation explicite du fondateur.
