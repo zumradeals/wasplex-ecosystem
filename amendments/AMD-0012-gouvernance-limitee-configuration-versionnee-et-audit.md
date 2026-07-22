@@ -1,6 +1,6 @@
 # AMD-0012 — Gouvernance limitée, configuration versionnée et audit
 
-**État :** proposé, en attente de validation du fondateur  
+**État :** adopté et intégré à la Constitution v1.3  
 **Date de proposition :** 2026-07-22  
 **Source :** `sources/2026-07-22-entretien-fondateur-16-gouvernance-administration-audit.md`
 
@@ -37,6 +37,10 @@
 
 La configurabilité de Wasplex ne reste une force que si aucun acteur ne peut l'utiliser pour contourner la Constitution, altérer les preuves ou concentrer silencieusement les pouvoirs.
 
-## Effet proposé
+## Décision d'adoption
 
-Après adoption, cet article gouvernera les rôles, capacités, configurations, audits, changements et pouvoirs d'urgence.
+Le fondateur a validé cet amendement le 2026-07-22.
+
+## Effet de l'adoption
+
+Cet article gouverne les rôles, capacités, configurations, audits, changements et pouvoirs d'urgence.
