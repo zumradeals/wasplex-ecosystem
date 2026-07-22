@@ -30,5 +30,6 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | DS-0001 | Identité visuelle, langage d'interface et Design System | Adopté |
 | UX-0001 | Cartographie des parcours, navigation et états | Adopté |
 | UX-0002 | Catalogue des écrans, contrats et maquettes exécutables | Adopté |
+| UX-0003 | Plan directeur des écrans et lots de maquettage | Proposé à validation |
 
 Une décision ou un amendement n'est « adopté » qu'après validation explicite du fondateur.
