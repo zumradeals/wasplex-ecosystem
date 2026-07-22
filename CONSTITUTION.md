@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v1.4 adoptée  
+**Statut :** Constitution v1.5 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-22  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`, `amendments/AMD-0012-gouvernance-limitee-configuration-versionnee-et-audit.md`, `amendments/AMD-0013-publicite-compatible-avec-la-dignite-et-la-securite.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`, `amendments/AMD-0012-gouvernance-limitee-configuration-versionnee-et-audit.md`, `amendments/AMD-0013-publicite-compatible-avec-la-dignite-et-la-securite.md`, `amendments/AMD-0014-live-volontaire-qualifie-et-sur.md`
 
 ## Préambule adopté
 
@@ -335,7 +335,27 @@ Les commerçants et autres partenaires devront être rattachés à l'une de ces 
 15. Sanctions, retenues et remboursements sont motivés, proportionnés, audités et contestables ; Wasplex ne s'approprie jamais silencieusement un reliquat.
 16. L'administration peut configurer les contrôles permis, mais ne peut activer une catégorie constitutionnellement interdite ni réduire une garantie fondamentale.
 
-## Article 20 — Refus absolus
+## Article 20 — Live volontaire, qualifié et prioritairement sûr
+
+1. Le Module Live organise une rencontre volontaire, limitée, utile et traçable entre un diffuseur autorisé et un public consentant.
+2. Au lancement, seuls Wasplex, les annonceurs vérifiés, les institutions habilitées et les partenaires agréés peuvent diffuser selon leurs capacités et finalités.
+3. Les utilisateurs ne disposent pas par défaut d'un droit de diffusion publique ; toute ouverture future exige identité, contrat, modération, droits de contenu, protection des mineurs et activation explicite.
+4. Un Live rémunéré peut valoriser l'attention par intervalles qualifiés et attribuer des récompenses pour des interactions annoncées ou autorisées.
+5. Chaque intervalle ou interaction est préfinancé, plafonné, idempotent et vérifiable ; le simple maintien d'une vidéo ouverte ne crée pas automatiquement un droit à rémunération.
+6. Les intervalles exécutés de bonne foi et validés restent acquis si le spectateur quitte avant la fin. Un bonus de complétion peut exiger une étape annoncée sans reprendre les tranches antérieures.
+7. Les critères, plafonds et enveloppes d'interaction sont définis avant attribution ou par une règle promotionnelle versionnée. Les distributions arbitraires, trompeuses ou assimilables à un jeu d'argent sont interdites sans cadre spécifique.
+8. Toute rémunération Live est couverte avant sa promesse. La somme des intervalles, interactions, complétions et bonus ne dépasse jamais l'enveloppe disponible.
+9. Le net distribuable d'une campagne Live publicitaire reste partagé à parts égales : 50 % pour Wasplex et 50 % pour les utilisateurs. Toute autre source identifie sa finalité et son régime sans contourner ce partage.
+10. Les WP affichés pendant le Live restent provisoires jusqu'à validation. Une animation représente un événement enregistré, jamais un solde disponible garanti.
+11. L'interface distingue présence, interaction, complétion, total provisoire, montant validé ou refusé, motif et recours.
+12. Une coupure crédible conserve les intervalles précédemment validés. Reprise, délai de grâce, déduplication et état inconnu protègent équité et intégrité.
+13. Les contrôles antifraude restent proportionnés ; caméra, microphone, biométrie ou surveillance intrusive ne constituent pas une preuve d'attention par défaut.
+14. Tout Live est soumis aux règles de dignité, publicité, sécurité, mineurs, propriété intellectuelle, modération, signalement et conservation de preuve.
+15. Une alerte nationale ou vitale authentifiée a priorité absolue, interrompt le Live, protège la progression acquise et affiche l'instruction officielle. Le Live ne remplace jamais le SOS ou le Module Alertes.
+16. Chaque session possède une finalité et une fin. Flux infini, faux compteurs, pertes rétroactives punitives et promesses de richesse facile sont interdits.
+17. Durées, intervalles, montants, plafonds, places, enveloppes, formats, diffuseurs, interactions, délais de grâce, contrôles, quotas et accès sont administrables, versionnés et auditables sans réécrire le passé.
+
+## Article 21 — Refus absolus
 
 Wasplex refuse :
 
@@ -352,7 +372,7 @@ Wasplex refuse :
 - la diffusion de contenus contraires à ses principes ;
 - la captation du temps comme finalité propre.
 
-## Article 21 — Mesure de la réussite
+## Article 22 — Mesure de la réussite
 
 Wasplex mesure sa réussite par sa capacité à :
 
@@ -386,4 +406,4 @@ Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la r�
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 20 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007 et l'article 15 intègre AMD-0008 et l'article 16 intègre AMD-0010 et l'article 17 intègre AMD-0011 et l'article 18 intègre AMD-0012 et l'article 19 intègre AMD-0013. AMD-0013 a été validé le 2026-07-22 ; les amendements antérieurs demeurent adoptés selon leur registre. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 22 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007, l'article 15 intègre AMD-0008, l'article 16 intègre AMD-0010, l'article 17 intègre AMD-0011, l'article 18 intègre AMD-0012, l'article 19 intègre AMD-0013 et l'article 20 intègre AMD-0014. AMD-0014 a été validé le 2026-07-22 ; les amendements antérieurs demeurent adoptés selon leur registre. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
