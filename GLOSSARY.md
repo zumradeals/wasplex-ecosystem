@@ -71,6 +71,13 @@
 | Alerte sponsorisée | Alerte communautaire validée dont le déclarant finance une portée supplémentaire sans acheter urgence, confiance ou résultat | Spécifié |
 | Boost d'alerte | Offre prépayée de durée, territoire, surfaces et exposition supplémentaires | Spécifié |
 | Pause utile | Transition non publicitaire entre séquences du Feed présentant conseil, prévention ou information | Spécifié |
+| Secteur publicitaire interdit | Catégorie qu'aucun réglage administratif ne peut activer sans amendement constitutionnel | Proposé — AMD-0013 |
+| Secteur publicitaire sensible | Catégorie licite soumise à preuves, restrictions et contrôle renforcés selon le pays et le risque | Proposé — AMD-0013 |
+| Matrice publicitaire nationale | Version approuvée des règles sectorielles applicables à un pays, sans pouvoir diminuer la Constitution | Spécifié |
+| Destination publicitaire | Ensemble réel des pages, redirections, formulaires, messageries et moyens de paiement atteints depuis une campagne | Spécifié |
+| Cloaking publicitaire | Présentation trompeuse d'un contenu ou d'une destination différente au contrôle et à l'utilisateur | Interdit |
+| Information civique neutre | Message institutionnel vérifié qui informe sans persuasion politique ni ciblage sensible | Proposé — AMD-0013 |
+| Utilisateur de bonne foi | Utilisateur ayant exécuté un événement valide sans participation démontrée à la fraude de l'annonceur | Spécifié |
 | Gouvernance collégiale | Instance décidant des changements majeurs selon quorum, majorité, conflits et preuves définis | Proposé — AMD-0012 |
 | Capacité administrative | Permission atomique accordée à une identité, pour une action, une finalité, un périmètre et une durée | Spécifié |
 | Séparation des tâches | Interdiction qu'une même personne initie, approuve et contrôle seule une action critique | Spécifié |
