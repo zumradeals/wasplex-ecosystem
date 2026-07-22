@@ -1,6 +1,6 @@
 # Manifeste des tokens exécutables
 
-**État :** proposition L00  
+**État :** adopté — L00-A  
 **Source normative :** DS-0001
 
 ## 1. Principe
