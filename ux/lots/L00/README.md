@@ -25,7 +25,26 @@ L00 doit produire :
 - le premier paquet de contexte réutilisable pour Lovable ;
 - une procédure d'extraction et normalisation des TSX générés.
 
-## 3. Hors périmètre
+## 3. Emplacement officiel
+
+Le catalogue exécutable est conservé dans le présent dépôt `wasplex-ecosystem`, sous le répertoire racine :
+
+> `ui-catalogue/`
+
+Ce choix maintient dans un même dépôt les décisions, contrats, prototypes normalisés, fixtures et captures qui se valident mutuellement.
+
+Le répertoire `ui-catalogue/` :
+
+- possède son propre manifeste de dépendances et ses commandes documentées ;
+- ne transforme pas le dépôt en application de production ;
+- ne contient ni Laravel, ni backend, ni secret ;
+- ne devient pas une seconde implémentation métier ;
+- fournit les composants et références que le futur dépôt applicatif devra intégrer conformément aux contrats ;
+- conserve une provenance explicite pour tout TSX issu de Lovable ou d'une autre IA.
+
+Aucun second dépôt de maquettage ne doit être créé sans nouvelle décision explicite.
+
+## 4. Hors périmètre
 
 L00 ne décide pas :
 
