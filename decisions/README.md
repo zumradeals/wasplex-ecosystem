@@ -25,6 +25,6 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | ADR-0005 | Contrats intermodules, événements et cohérence transactionnelle | Adopté |
 | ADR-0006 | Architecture des données, identifiants et isolation | Adopté |
 | ADR-0007 | API, webhooks et intégrations externes | Adopté |
-| ADR-0008 | Stratégie de tests, qualité et critères de livraison | À instruire |
+| ADR-0008 | Stratégie de tests, qualité et critères de livraison | Proposé |
 
 Une décision ou un amendement n'est « adopté » qu'après validation explicite du fondateur.
