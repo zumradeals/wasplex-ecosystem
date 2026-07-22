@@ -1,6 +1,6 @@
 # L00 — Fondations et catalogue exécutable
 
-**État du lot :** ouvert — cadrage proposé  
+**État du lot :** en construction — L00-A validé  
 **Date d'ouverture :** 22 juillet 2026  
 **Dépendances :** DS-0001, UX-0001, UX-0002, UX-0003, ADR-0001, ADR-0008
 
