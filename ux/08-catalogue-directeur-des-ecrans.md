@@ -1,6 +1,6 @@
 # Catalogue directeur des écrans
 
-**Statut :** spécification proposée — UX-0003  
+**Statut :** spécification adoptée — UX-0003  
 **Légende terminal :** M mobile, D desktop, U universel  
 **Statut initial :** à spécifier, sauf mention contraire
 
