@@ -84,6 +84,13 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Niveau de qualité Q0-Q3 | Classification du risque d'une exigence déterminant tests, revues et preuves obligatoires | Proposé — ADR-0008 |
+| Test fondé sur une propriété | Test générant de nombreux cas pour vérifier un invariant général plutôt qu'un exemple unique | Proposé — ADR-0008 |
+| Gate de qualité | Contrôle automatique ou humain dont l'échec bloque une fusion ou une livraison | Spécifié |
+| Definition of Done Wasplex | Ensemble des preuves nécessaires avant de déclarer une fonctionnalité réellement terminée | Proposé — ADR-0008 |
+| Test instable | Test donnant des résultats variables sans modification pertinente et nécessitant diagnostic, propriétaire et correction | Spécifié |
+| Artefact immuable | Paquet construit une fois puis promu sans recompilation divergente entre environnements | Spécifié |
+| Donnée de test synthétique | Donnée fictive conçue pour les scénarios de test sans copier une personne réelle | Spécifié |
 | API de première partie | Contrat externe réservé aux applications officielles Wasplex sans duplication des règles métier | Proposé — ADR-0007 |
 | API d'organisation | Contrat limité destiné à une organisation annonceur, institutionnelle ou partenaire vérifiée | Proposé — ADR-0007 |
 | Webhook entrant | Notification externe non fiable avant authentification, validation, déduplication et rapprochement | Proposé — ADR-0007 |
