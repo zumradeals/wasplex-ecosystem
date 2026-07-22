@@ -1,6 +1,6 @@
 # AMD-0014 — Live volontaire, qualifié et prioritairement sûr
 
-**État :** proposé à validation du fondateur  
+**État :** adopté et intégré à la Constitution v1.5  
 **Date :** 22 juillet 2026  
 **Source :** `sources/2026-07-22-clarification-fondateur-19-module-live.md`
 
