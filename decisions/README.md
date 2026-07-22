@@ -29,6 +29,6 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | ADR-0009 | Déploiement, observabilité et exploitation | Adopté |
 | DS-0001 | Identité visuelle, langage d'interface et Design System | Adopté |
 | UX-0001 | Cartographie des parcours, navigation et états | Adopté |
-| UX-0002 | Catalogue des écrans et contrats d'interface | À instruire |
+| UX-0002 | Catalogue des écrans, contrats et maquettes exécutables | Proposé à validation |
 
 Une décision ou un amendement n'est « adopté » qu'après validation explicite du fondateur.
