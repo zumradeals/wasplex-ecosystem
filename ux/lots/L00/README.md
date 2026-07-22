@@ -58,7 +58,7 @@ L00 ne décide pas :
 
 Le logo actuel peut être représenté par un emplacement explicitement marqué « référence provisoire ».
 
-## 4. Tranches de travail
+## 5. Tranches de travail
 
 ### L00-A — Atelier
 
@@ -98,7 +98,7 @@ Le logo actuel peut être représenté par un emplacement explicitement marqué 
 - FND-00-03 coquille professionnelle ;
 - FND-00-10 tableaux et files de travail.
 
-## 5. Ordre de réalisation
+## 6. Ordre de réalisation
 
 1. adopter le contrat FND-00-01 et le manifeste de tokens ;
 2. créer le catalogue minimal sans backend ;
@@ -111,7 +111,7 @@ Le logo actuel peut être représenté par un emplacement explicitement marqué 
 9. produire le paquet Lovable de référence ;
 10. déclarer L00 terminé.
 
-## 6. Règles de construction
+## 7. Règles de construction
 
 - React et TypeScript strict ;
 - HTML sémantique ;
@@ -125,7 +125,7 @@ Le logo actuel peut être représenté par un emplacement explicitement marqué 
 - dépendances limitées et justifiées ;
 - captures reproductibles.
 
-## 7. Portes de qualité
+## 8. Portes de qualité
 
 L00 ne sort pas tant que :
 
@@ -140,7 +140,7 @@ L00 ne sort pas tant que :
 - les captures attendues passent la revue humaine ;
 - le catalogue ne dépend d'aucun backend.
 
-## 8. Livrables documentaires initiaux
+## 9. Livrables documentaires initiaux
 
 - `01-contrat-FND-00-01-catalogue-prototypes.md` ;
 - `02-manifeste-tokens-executables.md` ;
