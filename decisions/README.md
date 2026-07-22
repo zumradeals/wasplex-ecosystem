@@ -19,7 +19,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0012 | Gouvernance limitée, configuration versionnée et audit | Adopté et intégré à la v1.3 |
 | AMD-0013 | Publicité compatible avec la dignité et la sécurité | Adopté et intégré à la v1.4 |
 | ADR-0001 | Architecture initiale : monolithe modulaire Laravel/PostgreSQL/React/Inertia | Adopté |
-| ADR-0002 | Moteur de configuration métier typé, administrable et versionné | Proposé |
+| ADR-0002 | Moteur de configuration métier typé, administrable et versionné | Adopté |
 | ADR-0003 | Registre comptable immuable du Wallet | Proposé |
 | ADR-0004 | Habilitations institutionnelles par capacités et portées | Proposé |
 
