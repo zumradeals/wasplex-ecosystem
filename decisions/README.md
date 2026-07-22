@@ -18,6 +18,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0011 | Wallet couvert, séparé et reconstructible | Adopté et intégré à la v1.2 |
 | AMD-0012 | Gouvernance limitée, configuration versionnée et audit | Adopté et intégré à la v1.3 |
 | AMD-0013 | Publicité compatible avec la dignité et la sécurité | Adopté et intégré à la v1.4 |
+| AMD-0014 | Live volontaire, qualifié et prioritairement sûr | Proposé à validation |
 | ADR-0001 | Architecture initiale : monolithe modulaire Laravel/PostgreSQL/React/Inertia | Adopté |
 | ADR-0002 | Moteur de configuration métier typé, administrable et versionné | Adopté |
 | ADR-0003 | Ledger Wallet en partie double, immuable et rapprochable | Adopté |
