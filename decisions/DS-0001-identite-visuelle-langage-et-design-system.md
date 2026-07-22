@@ -1,6 +1,6 @@
 # DS-0001 — Identité visuelle, langage d'interface et Design System
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur design :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, AMD-0007, AMD-0008, ADR-0001, ADR-0004, ADR-0006, ADR-0008  
