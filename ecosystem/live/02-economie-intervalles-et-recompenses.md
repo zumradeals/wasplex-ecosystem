@@ -1,6 +1,6 @@
 # Module Live — Économie, intervalles et récompenses
 
-**Statut :** spécification proposée — AMD-0014
+**Statut :** spécification adoptée — AMD-0014
 
 ## 1. Enveloppe financière
 
