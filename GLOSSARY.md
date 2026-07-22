@@ -84,6 +84,14 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Propriétaire fonctionnel d'une donnée | Module seul autorisé à définir, modifier, interpréter et gérer le cycle de vie d'une donnée | Proposé — ADR-0006 |
+| Classification D0-D4 | Échelle de protection allant de donnée publique à donnée critique | Proposé — ADR-0006 |
+| Identifiant interne | UUID stable, non réattribué et indépendant des coordonnées ou documents d'une personne | Spécifié |
+| Identifiant public | Référence opaque distincte pouvant être exposée sans constituer une autorisation | Spécifié |
+| Date métier | Moment où le fait s'est produit ou a pris effet, distinct de sa date d'enregistrement technique | Spécifié |
+| Projection de données | Copie de lecture reconstruisible, datée et non souveraine dérivée d'une source fonctionnelle | Spécifié |
+| Registre des données | Inventaire des champs protégés avec finalité, source, accès, chiffrement, conservation et fin de vie | Proposé — ADR-0006 |
+| Gel légal | Suspension documentée d'une suppression en raison d'une obligation, enquête ou litige applicable | Spécifié |
 | Commande métier | Demande impérative, typée et idempotente adressée à un seul module propriétaire pour modifier potentiellement son état | Proposé — ADR-0005 |
 | Requête métier | Consultation sans effet métier dont le résultat précise source, fraîcheur, portée et masquage | Proposé — ADR-0005 |
 | Événement métier | Fait immuable au passé, versionné et publié par le propriétaire de l'état concerné | Proposé — ADR-0005 |
