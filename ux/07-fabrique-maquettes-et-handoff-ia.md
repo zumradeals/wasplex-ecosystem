@@ -1,6 +1,6 @@
 # Fabrique des maquettes et passation à l'IA
 
-**Statut :** spécification proposée — UX-0002
+**Statut :** spécification adoptée — UX-0002
 
 ## 1. Principe
 
