@@ -161,7 +161,17 @@ Le contrôle de largeur simule un viewport sans prétendre remplacer les tests s
 - fixtures contrôlées contre téléphone, e-mail, identifiant et géolocalisation réels ;
 - bannière persistante « Démonstration — données fictives ».
 
-## 12. Structure technique indicative
+## 12. Emplacement et frontière du code
+
+L'implémentation de ce contrat réside dans :
+
+> `wasplex-ecosystem/ui-catalogue/`
+
+Elle reste autonome, front-end uniquement et consultable sans backend. Les contrats demeurent dans `ux/lots/` ; les composants, fixtures, histoires, tests et captures exécutables résident dans `ui-catalogue/`.
+
+Le futur dépôt applicatif consommera ou réimplémentera les composants normalisés selon la stratégie d'intégration alors adoptée. Il ne doit pas importer les outils internes du catalogue dans le bundle de production.
+
+## 13. Structure technique indicative
 
 La structure exacte sera adaptée au futur dépôt applicatif, mais sépare :
 
