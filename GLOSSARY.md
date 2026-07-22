@@ -84,6 +84,12 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Lien profond | Lien vers une destination précise qui conserve l'intention sans constituer une autorisation | Proposé — UX-0001 |
+| Intention de parcours | Référence temporaire permettant de revenir à l'action initiale après authentification, KYC ou paiement | Spécifié |
+| Centre de notifications | Source consultable des notifications Wasplex, distincte des canaux externes de rappel | Proposé — UX-0001 |
+| État transversal | Vocabulaire commun de brouillon, attente, confirmé, inconnu, suspendu, compensé ou clôturé adapté par domaine | Proposé — UX-0001 |
+| Parcours professionnel | Expérience annonceur, institutionnelle ou interne organisée par organisation, capacité, preuve et file de travail | Spécifié |
+| Appareil partagé | Contexte normal où plusieurs personnes utilisent le même terminal et où compte actif, session et notifications doivent rester isolés | Spécifié |
 | Couleur de marque | Couleur exprimant l'identité Wasplex sans déterminer à elle seule l'état d'une opération | Proposé — DS-0001 |
 | Couleur sémantique | Couleur au sens stable réservé à succès, attente, danger, information ou résultat inconnu | Proposé — DS-0001 |
 | Token de design | Valeur nommée et versionnée utilisée par les composants plutôt qu'une valeur visuelle arbitraire | Proposé — DS-0001 |
