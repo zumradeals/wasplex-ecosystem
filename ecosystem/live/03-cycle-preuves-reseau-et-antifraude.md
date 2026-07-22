@@ -1,6 +1,6 @@
 # Module Live — Cycle, preuves, réseau et antifraude
 
-**Statut :** spécification proposée — AMD-0014
+**Statut :** spécification adoptée — AMD-0014
 
 ## 1. Cycle de session
 
