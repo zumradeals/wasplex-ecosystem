@@ -1,6 +1,6 @@
 # ADR-0007 — API, webhooks et intégrations externes
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur architectural :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, ADR-0001 à ADR-0006
