@@ -1,6 +1,6 @@
 # ADR-0005 — Contrats intermodules, événements et cohérence transactionnelle
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur architectural :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, ADR-0001, ADR-0002, ADR-0003, ADR-0004
