@@ -187,7 +187,7 @@ La structure exacte sera adaptée au futur dépôt applicatif, mais sépare :
 
 Le catalogue ne doit pas importer les contrôleurs, modèles ou adaptateurs de production pour fonctionner.
 
-## 13. Captures attendues
+## 14. Captures attendues
 
 - page Fondations en clair et sombre ;
 - composant avec sélecteur de fixture ;
@@ -199,7 +199,7 @@ Le catalogue ne doit pas importer les contrôleurs, modèles ou adaptateurs de p
 - composant en erreur ;
 - mode capture.
 
-## 14. Critères d'acceptation
+## 15. Critères d'acceptation
 
 - lancement local en une commande documentée ;
 - fonctionnement sans réseau ;
@@ -213,7 +213,7 @@ Le catalogue ne doit pas importer les contrôleurs, modèles ou adaptateurs de p
 - métadonnées de traçabilité visibles ;
 - tests automatiques et revue humaine réalisés.
 
-## 15. Interdictions
+## 16. Interdictions
 
 - connecter Supabase ou Lovable Cloud ;
 - présenter le catalogue comme environnement de staging ;
