@@ -21,6 +21,6 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | ADR-0001 | Architecture initiale : monolithe modulaire Laravel/PostgreSQL/React/Inertia | Adopté |
 | ADR-0002 | Moteur de configuration métier typé, administrable et versionné | Adopté |
 | ADR-0003 | Ledger Wallet en partie double, immuable et rapprochable | Adopté |
-| ADR-0004 | Habilitations institutionnelles par capacités et portées | Proposé |
+| ADR-0004 | Autorisations par capacités, finalités, portées et durées | Proposé |
 
 Une décision ou un amendement n'est « adopté » qu'après validation explicite du fondateur.
