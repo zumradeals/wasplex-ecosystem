@@ -1,6 +1,6 @@
 # UX-0001 — Cartographie des parcours, navigation et états
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur UX :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, décisions métier adoptées, ADR-0001 à ADR-0009, DS-0001
