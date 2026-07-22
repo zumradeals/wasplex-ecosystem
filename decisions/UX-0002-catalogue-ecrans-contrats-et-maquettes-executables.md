@@ -1,6 +1,6 @@
 # UX-0002 — Catalogue des écrans, contrats et maquettes exécutables
 
-**État :** proposé à validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur UX :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, ADR-0001, ADR-0004, ADR-0006, ADR-0008, DS-0001, UX-0001
