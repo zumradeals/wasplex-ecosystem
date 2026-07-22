@@ -17,7 +17,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0010 | Identité proportionnée et antifraude équitable | Adopté et intégré à la v1.1 |
 | AMD-0011 | Wallet couvert, séparé et reconstructible | Adopté et intégré à la v1.2 |
 | AMD-0012 | Gouvernance limitée, configuration versionnée et audit | Adopté et intégré à la v1.3 |
-| AMD-0013 | Publicité compatible avec la dignité et la sécurité | Proposé |
+| AMD-0013 | Publicité compatible avec la dignité et la sécurité | Adopté et intégré à la v1.4 |
 | ADR-0001 | Direction technique initiale Laravel/PostgreSQL/React/Inertia | Proposé |
 | ADR-0002 | Configuration métier administrable et versionnée | Proposé |
 | ADR-0003 | Registre comptable immuable du Wallet | Proposé |
