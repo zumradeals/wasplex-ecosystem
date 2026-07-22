@@ -84,6 +84,13 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Capacité atomique | Action métier précise qui ne devient autorisée qu'avec sa finalité, sa portée, sa durée et ses conditions | Proposé — ADR-0004 |
+| Attribution d'accès | Association auditée entre un sujet, une capacité, une ressource, une portée, une finalité et une validité | Proposé — ADR-0004 |
+| Rôle modèle | Ensemble versionné de capacités proposées qui simplifie l'attribution sans constituer un passe-partout | Proposé — ADR-0004 |
+| Portée d'autorisation | Limite organisationnelle, territoriale, documentaire, financière, temporelle ou par champ d'une capacité | Spécifié |
+| Finalité d'accès | Raison autorisée et vérifiable pour laquelle une donnée ou action sensible est demandée | Spécifié |
+| Délégation | Transmission temporaire et non extensible d'une attribution dans les limites du délégant | Spécifié |
+| Décision d'autorisation | Résultat explicite autorisé, refusé, renforcé, soumis à approbation, masqué ou lecture seule | Spécifié |
 | Sous-registre opérationnel | Ledger détaillé des mouvements Wasplex alimentant la comptabilité légale sans nécessairement la remplacer | Proposé — ADR-0003 |
 | Posting | Ligne de débit ou crédit appartenant à une transaction équilibrée du ledger | Spécifié |
 | Transaction comptable | Ensemble atomique d'au moins deux postings dont débits et crédits s'équilibrent par devise | Spécifié |
