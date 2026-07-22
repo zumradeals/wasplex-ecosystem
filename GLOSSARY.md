@@ -84,6 +84,15 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Commande métier | Demande impérative, typée et idempotente adressée à un seul module propriétaire pour modifier potentiellement son état | Proposé — ADR-0005 |
+| Requête métier | Consultation sans effet métier dont le résultat précise source, fraîcheur, portée et masquage | Proposé — ADR-0005 |
+| Événement métier | Fait immuable au passé, versionné et publié par le propriétaire de l'état concerné | Proposé — ADR-0005 |
+| Inbox idempotente | Registre consommateur empêchant qu'un événement répété produise plusieurs effets | Proposé — ADR-0005 |
+| Saga | Processus persistant coordonnant plusieurs étapes, modules ou systèmes externes sans transaction distribuée | Proposé — ADR-0005 |
+| Compensation | Nouvelle opération traçable neutralisant un effet réversible sans supprimer ni réécrire le passé | Spécifié |
+| Correlation ID | Identifiant commun reliant toutes les étapes d'un même parcours intermodule | Spécifié |
+| Causation ID | Identifiant de l'action ou de l'événement ayant directement provoqué un nouvel effet | Spécifié |
+| Quarantaine de messages | Espace contrôlé recevant un traitement impossible à achever automatiquement, avec propriétaire et procédure de résolution | Spécifié |
 | Capacité atomique | Action métier précise qui ne devient autorisée qu'avec sa finalité, sa portée, sa durée et ses conditions | Proposé — ADR-0004 |
 | Attribution d'accès | Association auditée entre un sujet, une capacité, une ressource, une portée, une finalité et une validité | Proposé — ADR-0004 |
 | Rôle modèle | Ensemble versionné de capacités proposées qui simplifie l'attribution sans constituer un passe-partout | Proposé — ADR-0004 |
