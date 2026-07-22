@@ -1,6 +1,6 @@
 # ADR-0001 — Architecture technique initiale de Wasplex
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026
 
 ## Contexte
@@ -62,4 +62,4 @@ Cette décision minimise le coût initial et la complexité opérationnelle tout
 - `architecture/02-monolithe-modulaire-et-frontieres.md`
 - `architecture/03-resilience-securite-et-exploitation.md`
 
-La validation du fondateur rendra cet ADR officiel sans transformer les choix de versions logicielles en principes constitutionnels.
+Cet ADR est officiel. Les choix de versions logicielles demeurent des décisions d'exploitation et non des principes constitutionnels.
