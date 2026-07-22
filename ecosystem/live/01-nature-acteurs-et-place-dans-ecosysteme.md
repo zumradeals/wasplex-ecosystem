@@ -1,6 +1,6 @@
 # Module Live — Nature, acteurs et place dans l'écosystème
 
-**Statut :** spécification proposée — AMD-0014
+**Statut :** spécification adoptée — AMD-0014
 
 ## 1. Définition
 
