@@ -1,6 +1,6 @@
 # ADR-0006 — Architecture des données, identifiants et isolation
 
-**État :** proposé à la validation du fondateur  
+**État :** adopté par le fondateur  
 **Date :** 22 juillet 2026  
 **Décideur architectural :** SIRR, sur mandat du fondateur  
 **Dépendances :** Constitution v1.4, AMD-0009, AMD-0010, AMD-0011, AMD-0012, ADR-0001 à ADR-0005
