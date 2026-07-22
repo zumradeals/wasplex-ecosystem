@@ -84,6 +84,13 @@
 | Bris de glace | Accès exceptionnel minimal, expirant, signalé et revu pour contenir un dommage imminent | Spécifié |
 | Configuration versionnée | Règle dont chaque version conserve auteur, justification, approbation, périmètre, date d'effet et impact | Spécifié |
 | Mode lecture seule | État de crise préservant consultation et preuves tout en suspendant les nouvelles écritures non essentielles | Spécifié |
+| Niveau de configuration C0 | Invariant constitutionnel absent des champs administrables et modifiable uniquement par amendement et livraison contrôlée | Proposé — ADR-0002 |
+| Niveau de configuration C1 | Paramètre financier ou de droits exigeant simulation et double validation indépendante | Proposé — ADR-0002 |
+| Niveau de configuration C2 | Paramètre commercial ou opérationnel sensible exigeant auteur et approbateur distincts | Proposé — ADR-0002 |
+| Niveau de configuration C3 | Paramètre de présentation ou d'exploitation ordinaire sans effet économique, juridique ou sécuritaire | Proposé — ADR-0002 |
+| Publication de configuration | Manifeste immuable de valeurs approuvées destinées à prendre effet atomiquement sur un périmètre et à une date | Proposé — ADR-0002 |
+| Liaison de configuration | Référence conservée par un objet ou une opération vers la publication et les paramètres qui l'ont gouverné | Spécifié |
+| Interrupteur de sécurité | Suspension temporaire, ciblée, expirante et auditée d'une capacité, sans pouvoir de déplacer une valeur ou réécrire une preuve | Spécifié |
 | Monolithe modulaire | Application déployable comme une unité, structurée en domaines aux données et contrats strictement séparés | Proposé — ADR-0001 |
 | Source de vérité fonctionnelle | Module seul autorisé à gouverner l'état canonique d'une information déterminée | Spécifié |
 | Idempotence | Propriété garantissant que la répétition d'une même demande ne produit pas un second effet économique | Spécifié |
