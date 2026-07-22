@@ -1,6 +1,6 @@
 # Plan des lots de maquettage
 
-**Statut :** spécification proposée — UX-0003
+**Statut :** spécification adoptée — UX-0003
 
 ## 1. Cadence d'un lot
 
