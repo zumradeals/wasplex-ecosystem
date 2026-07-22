@@ -1,6 +1,6 @@
 # États, reprise et notifications
 
-**Statut :** spécification proposée — UX-0001
+**Statut :** spécification d'application — UX-0001 adopté
 
 ## Gabarit d'état
 

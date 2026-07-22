@@ -1,6 +1,6 @@
 # Registre des questions au fondateur
 
-Ce registre organise les entretiens de conception. Il ne présume pas des réponses.
+Ce registre conserve les entretiens de conception et distingue désormais les questions fondatrices résolues des portes de lancement encore ouvertes. Une question résolue par la Constitution ou une décision adoptée ne doit pas être reposée comme si elle était indécise.
 
 ## A. Wasplex — premier entretien répondu
 
@@ -36,17 +36,7 @@ Spécifications : `ecosystem/publicite/01-cycle-creation-valeur.md` et `ecosyste
 8. Ventilation ? — **50 % Wasplex / 50 % utilisateurs, règle constitutionnelle adoptée**
 9. Fonds social dans cette ventilation ? — **Non, mécanisme autonome**
 
-Questions publicitaires restantes :
-
-1. Comment les critères d'âge, pays, habitudes ou intérêts sont-ils recueillis et mis à jour ?
-2. Quels critères sont interdits ou sensibles ?
-3. L'utilisateur peut-il refuser certains ciblages tout en utilisant Wasplex ?
-4. Quelle taille minimale empêche de réidentifier un segment ?
-5. Quelles preuves sont acceptées pour chaque format publicitaire ?
-6. Comment les preuves sont-elles protégées contre bots, fermes de clics, multi-comptes et répétitions ?
-7. Quels secteurs publicitaires sont interdits ou soumis à des restrictions ?
-8. Que devient une part utilisateur non distribuée à cause des quotas ?
-9. Quelle part d'un supplément de ciblage revient spécifiquement au niveau ciblé ?
+Les questions de collecte, consentement, critères sensibles, secteurs interdits, preuves, fraude, quotas et suppléments ont été encadrées par AMD-0009, AMD-0013, ADR-0003, ADR-0006 et les spécifications `ecosystem/publicite/`. Les seuils et catalogues précis restent des configurations C1/C2 à approuver avant lancement, non des questions fondatrices.
 
 ## C. Valeur, WasPoints et Wallet — entretien répondu
 
@@ -61,14 +51,7 @@ Spécification : `ecosystem/wallet/01-nature-waspoint-et-etats-wallet.md`
 5. Expiration ? — **Aucune expiration des WP définitivement acquis par simple inactivité**
 6. Opérations envisagées ? — **Réception, retrait, dépôt, transfert, réservation, paiement et historique selon activation et réglementation**
 
-Questions critiques restantes :
-
-1. Quels fonds couvrent les WP disponibles et où sont-ils détenus ?
-2. Le retrait passe-t-il exclusivement par un prestataire agréé et qui supporte les frais ?
-3. Les dépôts, transferts P2P et paiements chez des tiers sont-ils nécessaires au lancement ou à une phase réglementaire ultérieure ?
-4. Quelles règles exactes gouvernent contestation, fraude, suspension, fermeture de compte et restitution ?
-5. Quelle procédure constitutionnelle est suffisamment « exceptionnelle » pour modifier la parité ?
-6. La qualification juridique du WP a-t-elle été confirmée par un conseil compétent dans chaque pays de lancement ?
+AMD-0011 et ADR-0003 ont résolu les principes de couverture, séparation, reconstructibilité et traitement des opérations. Restent des portes de lancement : choix des prestataires agréés, activation pays par pays des dépôts/transferts/paiements, validation juridique du WP et procédure constitutionnelle exceptionnelle de modification de la parité.
 
 ## D. Abonnements publicitaires — entretien répondu
 
@@ -169,20 +152,21 @@ Corrections expertes intégrées :
 4. La biométrie exige une décision et un cadre spécifiques.
 5. La pause utile peut suivre une cadence régulière administrable.
 
-## H. Autres modules transversaux
+## H. Cartes Wasplex — entretien et doctrine adoptés
 
-Pour les cartes :
+Les questions de nature, financement, droits, pools, abus, opérations partenaires et fermeture ont été résolues par AMD-0008 et `ecosystem/cartes/`. L'éligibilité technique repose sur `cards.acquire`, dérivée d'offres configurées par identifiant stable et jamais par nom commercial codé en dur.
 
-1. Quel problème autonome le module résout-il ?
-2. Quel lien causal a-t-il avec la publicité ?
-3. D'où vient son financement ?
-4. Quels droits reçoit l'utilisateur ?
-5. Quels abus sont possibles ?
+## I. Marque — décision adoptée
 
-## I. Marque
+Le symbole, l'écriture officielle **Wasplex**, les émotions, la palette, le langage et les interdictions d'usage du logo sont définis par DS-0001. Le slogan commercial définitif et le fichier maître vectoriel demeurent des livrables de marque, pas des inconnues constitutionnelles.
 
-1. Que symbolisent le martin-pêcheur et le poisson ?
-2. Le nom officiel s'écrit-il Wasplex ou WasPlex ?
-3. Quel slogan est officiel ?
-4. Quelles émotions la marque doit-elle inspirer ?
-5. Quelles utilisations du logo sont interdites ?
+## J. Portes de lancement transversales
+
+Avant activation réelle dans un pays, Wasplex doit encore obtenir et documenter :
+
+1. la qualification juridique des mécanismes financiers et de données ;
+2. les prestataires, contrats, comptes de cantonnement ou mécanismes de couverture requis ;
+3. les matrices nationales de publicité, KYC, conservation et droits des personnes ;
+4. les seuils C1/C2 initiaux simulés et doublement approuvés ;
+5. les responsables opérationnels, runbooks, canaux d'escalade et preuves de tests ;
+6. la procédure formelle d'amendement constitutionnel.

@@ -1,6 +1,6 @@
 # Matrice des accès sensibles
 
-**Statut :** spécification proposée — ADR-0004
+**Statut :** spécification d'application — ADR-0004 adopté
 
 ## Principe
 
@@ -19,6 +19,10 @@ Cette matrice définit des familles minimales. Les capacités exactes sont maint
 | Émettre une alerte nationale | Institution souveraine | Deux validations nominatives fortes | Wasplex seul ou sponsor |
 | Consulter un vœu social | Fonds Social habilité | Programme et finalité | Usage publicitaire |
 | Activer un partenaire Carte | Wasplex habilité | Contrat, pays, capacités | Accès Wallet implicite |
+| Soumettre un Live publicitaire | Annonceur/diffuseur habilité | Organisation vérifiée, finalité, budget, version du contenu | Diffusion directe non modérée |
+| Approuver un Live rémunéré | Modération Wasplex distincte | Dossier, simulation financière, capacité et séparation des tâches | Auto-approbation par le diffuseur |
+| Interrompre un Live | Sécurité/modération habilitée | Signal de risque, motif, portée et journal | Effacement des preuves ou des droits acquis |
+| Valider une récompense Live | Moteur Live | Événement unique, preuve, règle active et enveloppe réservée | Crédit direct du Wallet |
 | Utiliser le bris de glace | Responsable désigné | Dommage imminent, MFA, expiration, revue | Ledger, Constitution, effacement |
 
 ## Revue périodique

@@ -1,7 +1,6 @@
 # Données — Segments et accès annonceurs
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0009
 ## 1. Construction
 
 Un segment est une requête contrôlée sur des profils consentants. Il n'est ni exporté comme fichier de personnes ni exposé comme liste nominative.

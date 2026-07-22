@@ -1,6 +1,6 @@
 # Déploiement et environnements
 
-**Statut :** spécification proposée — ADR-0009
+**Statut :** spécification d'application — ADR-0009 adopté
 
 ## Composants initiaux
 

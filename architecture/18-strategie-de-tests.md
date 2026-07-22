@@ -1,6 +1,6 @@
 # Stratégie de tests
 
-**Statut :** spécification proposée — ADR-0008
+**Statut :** spécification d'application — ADR-0008 adopté
 
 ## Matrice minimale par changement
 

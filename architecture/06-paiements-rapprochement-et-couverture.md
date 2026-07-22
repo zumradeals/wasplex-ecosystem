@@ -1,6 +1,6 @@
 # Paiements, rapprochement et couverture
 
-**Statut :** spécification proposée — ADR-0003
+**Statut :** spécification d'application — ADR-0003 adopté
 
 ## Adaptateurs prestataires
 

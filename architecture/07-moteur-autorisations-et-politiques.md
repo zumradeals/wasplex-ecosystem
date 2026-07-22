@@ -1,6 +1,6 @@
 # Moteur d'autorisations et politiques
 
-**Statut :** spécification proposée — ADR-0004
+**Statut :** spécification d'application — ADR-0004 adopté
 
 ## Responsabilités
 

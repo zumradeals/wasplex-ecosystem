@@ -19,11 +19,14 @@ La Constitution, les amendements, décisions, spécifications métier, ADR, parc
 2. `GLOSSARY.md`
 3. `decisions/README.md`
 4. amendements et spécifications du domaine concerné
-5. ADR et documents `architecture/`
+5. ADR adoptés dans `decisions/`, puis leurs spécifications dans `architecture/`
 6. DS et documents `design/`
 7. décisions et documents `ux/`
+8. `CLAUDE.md` avant toute exécution avec Claude Code
 
 Une maquette, un prompt ou une implémentation ne peut contredire une règle supérieure adoptée.
+
+Les brouillons d'architecture historiques non normatifs sont isolés dans `history/architecture-drafts/`. Ils ne doivent jamais être utilisés à la place des ADR adoptés.
 
 ## Architecture officielle
 

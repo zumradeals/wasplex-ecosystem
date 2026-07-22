@@ -1,6 +1,6 @@
 # Parcours professionnels
 
-**Statut :** spécification proposée — UX-0001
+**Statut :** spécification d'application — UX-0001 adopté
 
 ## Principes
 

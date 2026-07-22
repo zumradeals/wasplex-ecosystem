@@ -308,3 +308,8 @@ Ces coûts sont acceptés afin que la vitesse de production ne détruise pas la 
 
 > Aucun écran Wasplex n'est maquetté ou commandé isolément sans identifiant, parcours parent, niveau de risque, contrat et lot. La conception avance par dépendances maîtrisées, non par accumulation de pages.
 
+## Addendum v1.5 — L12 Live
+
+AMD-0014 ajoute le lot officiel **L12 — Live** : découverte, fiche préalable, salle spectateur, interactions, progression et résultat de récompense, planification diffuseur, financement, régie, modération, interruption et rapport. L12 réutilise L00, l'identité L01/L02, le Feed L03, le Wallet L04, la priorité d'urgence L05, les capacités L06/L07 et la gouvernance L10.
+
+L12 ne peut être déclaré implémentable sans les états réseau faible, reconnexion, doublon, modération, résultat financier inconnu et interruption par alerte nationale.

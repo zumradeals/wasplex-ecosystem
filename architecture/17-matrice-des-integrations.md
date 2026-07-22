@@ -1,6 +1,6 @@
 # Matrice des intégrations
 
-**Statut :** spécification proposée — ADR-0007
+**Statut :** spécification d'application — ADR-0007 adopté
 
 | Intégration | Sens | Données maximales | Preuve requise | Interdiction principale |
 |---|---|---|---|---|
@@ -11,6 +11,7 @@
 | Institution | bidirectionnel | dossier et champs finalisés | capacité, territoire, motif | recherche générale |
 | Alerte nationale | entrant | message souverain minimal | identité forte, double validation, anti-rejeu | clé API simple |
 | Partenaire Carte | bidirectionnel | droit/opération nécessaire | contrat, consentement, rapprochement | accès au solde complet |
+| Diffusion vidéo Live | bidirectionnel | flux média, jeton de session et télémétrie minimale | session signée, horodatage, accusés | délégation de la qualification financière au fournisseur |
 | SMS/e-mail | sortant et statuts | destination et modèle minimal | référence de remise | contenu sensible excessif |
 | Stockage objet | bidirectionnel | objet chiffré et métadonnées | empreinte et autorisation | URL publique permanente |
 | Géolocalisation | requête limitée | coordonnées nécessaires | finalité et consentement/base | enrichissement publicitaire interdit |

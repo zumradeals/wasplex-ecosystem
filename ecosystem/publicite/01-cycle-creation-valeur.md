@@ -1,8 +1,8 @@
 # Cycle fondamental de création de valeur publicitaire
 
-- **Statut :** spécification métier v0.1 à valider
-- **Autorité :** normative après validation
-- **Dépend de :** Constitution, articles 1 à 10
+- **Statut :** spécification adoptée — Constitution et AMD-0002
+- **Autorité :** spécification d'application
+- **Dépend de :** Constitution v1.5, AMD-0001, AMD-0002, AMD-0009, AMD-0013
 - **Source :** `sources/2026-07-21-entretien-fondateur-02-publicite.md`
 
 ## 1. Pourquoi ce chapitre vient maintenant
@@ -15,7 +15,7 @@ La publicité constitue la source primaire de valeur économique de Wasplex. Le 
 - comment une audience est constituée ;
 - quelle somme devient distribuable.
 
-Ce chapitre définit le contrat de valeur, pas encore l'interface annonceur ni les pourcentages de redistribution.
+Ce chapitre définit le contrat de valeur. Le partage égal du net distribuable est fixé par l'article 9 et AMD-0002 ; les détails financiers sont précisés dans `02-cycle-financier-campagne.md`.
 
 ## 2. Objet économique vendu
 

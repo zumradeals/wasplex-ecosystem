@@ -1,6 +1,6 @@
 # Cycle de vie, confidentialité et stockage
 
-**Statut :** spécification proposée — ADR-0006
+**Statut :** spécification d'application — ADR-0006 adopté
 
 ## Registre des données
 

@@ -1,6 +1,6 @@
 # Signalements, sanctions et rémunération publicitaire
 
-**Statut :** spécification proposée — dépend de l'AMD-0013
+**Statut :** spécification adoptée — AMD-0013
 
 ## 1. Signalement
 

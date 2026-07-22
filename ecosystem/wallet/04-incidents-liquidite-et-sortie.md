@@ -1,6 +1,6 @@
 # Wallet — Incidents, liquidité et sortie
 
-**Statut :** spécification proposée
+**Statut :** spécification adoptée — AMD-0011
 
 ## 1. Deux crises distinctes
 

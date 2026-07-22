@@ -1,4 +1,4 @@
-# ADR-0002 — Configuration métier administrable et versionnée
+# ADR-0002 — Configuration métier administrable et versionnée — brouillon historique non normatif
 
 - **État :** proposé
 - **Date :** 2026-07-21

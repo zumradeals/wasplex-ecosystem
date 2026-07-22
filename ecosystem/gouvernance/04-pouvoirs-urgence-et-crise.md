@@ -1,7 +1,6 @@
 # Gouvernance — Pouvoirs d'urgence et crise
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0012
 ## 1. Niveaux
 
 - localisé : compte, campagne, PSP ou fonction ;

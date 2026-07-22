@@ -1,6 +1,6 @@
 # Monolithe modulaire et frontières fonctionnelles
 
-**Statut :** spécification proposée — ADR-0001
+**Statut :** spécification d'application — ADR-0001 adopté
 
 ## Forme initiale
 
@@ -19,6 +19,7 @@ Cette forme réduit coûts, exploitation distribuée et pannes réseau internes.
 - **Alertes et Restitutions** : déclarations, SOS, diffusion, correspondances, récompenses et clôtures.
 - **Institutions** : affiliations, représentants, capacités, territoires et actions probantes.
 - **Cartes Wasplex** : cartes, éligibilité, partenaires agréés, opérations et pools.
+- **Live** : sessions bornées, diffuseurs autorisés, présence, interactions, preuves, modération et instructions de récompense.
 - **Administration et Gouvernance** : configurations versionnées, approbations, bris de glace et audit des décisions.
 
 Médias, notifications, recherche, antifraude, conformité et connecteurs externes sont des services transversaux gouvernés ; ils ne possèdent aucun droit implicite sur tous les domaines.
@@ -40,6 +41,8 @@ Un échec est rejouable sans doubler débit, crédit, récompense, publicité ou
 - Publicité ne crédite pas le Wallet ; elle émet une instruction financée après qualification.
 - Fonds Social ne prélève pas ; il sollicite une réservation ou un débit conforme au mandat.
 - Cartes ne créent pas de valeur et ne contournent jamais le Wallet.
+- Live ne crédite pas le Wallet ; il qualifie des événements préfinancés et émet des instructions idempotentes.
+- Live ne devient jamais une voie de contournement de la modération publicitaire, des alertes nationales ou des consentements.
 - Alertes ne nourrissent jamais le profil publicitaire.
 - Institutions n'obtiennent aucun accès transversal.
 - Administration ne réécrit ni ledger ni preuves.

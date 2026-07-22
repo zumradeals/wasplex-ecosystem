@@ -1,6 +1,6 @@
 # Les Cartes Wasplex — Partenaires et opérations
 
-**Statut :** spécification proposée  
+**Statut :** spécification adoptée — AMD-0008
 **Dépendances :** Institutions affiliées, annonceurs, Wallet, Cartes Wasplex
 
 ## 1. Statut du partenaire agréé

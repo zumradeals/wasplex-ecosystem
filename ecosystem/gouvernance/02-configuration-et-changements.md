@@ -1,7 +1,6 @@
 # Gouvernance — Configurations et changements
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0012
 ## 1. Objet versionné
 
 Une configuration possède identifiant, version, schéma, ancienne et nouvelle représentation sûres, motif, auteur, approbateurs, impact, dates, territoire, modules et statut.

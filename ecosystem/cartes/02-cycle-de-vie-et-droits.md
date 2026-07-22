@@ -1,6 +1,6 @@
 # Les Cartes Wasplex — Cycle de vie et droits
 
-**Statut :** spécification proposée  
+**Statut :** spécification adoptée — AMD-0008
 **Dépendances :** modèle économique, Wallet, KYC, abonnements
 
 ## 1. Conditions d'acquisition
@@ -8,13 +8,13 @@
 L'acquisition exige :
 
 - un compte Wasplex actif ;
-- un abonnement Premium, Élite ou Master éligible ;
+- la capacité `cards.acquire`, dérivée d'un abonnement actif appartenant à la configuration versionnée `cards.eligible_subscription_offer_ids` ;
 - le niveau de vérification d'identité requis ;
 - l'acceptation de la version de l'offre et de son règlement ;
 - un paiement confirmé ;
 - l'absence d'incompatibilité territoriale ou réglementaire.
 
-L'administration peut configurer les niveaux admissibles sans rendre la protection du compte ou des gains conditionnelle à une carte.
+L'administration configure les identifiants stables des offres admissibles ; elle ne configure jamais l'autorisation à partir de leurs noms affichés. La protection du compte et des gains ne dépend pas d'une carte.
 
 ## 2. Activation
 

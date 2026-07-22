@@ -1,7 +1,6 @@
 # Données — Consentements, droits et preuves
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0009
 ## 1. Bases distinctes
 
 Chaque traitement identifie sa base : contrat, consentement, obligation légale, intérêt vital, mission autorisée, sécurité ou autre base admise par la juridiction.

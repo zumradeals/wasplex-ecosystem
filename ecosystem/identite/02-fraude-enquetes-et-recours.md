@@ -1,7 +1,6 @@
 # Identité — Fraude, enquêtes et recours
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0010
 ## 1. Niveaux
 
 ### Anomalie

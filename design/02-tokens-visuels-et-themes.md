@@ -1,6 +1,6 @@
 # Tokens visuels et thèmes
 
-**Statut :** spécification proposée — DS-0001
+**Statut :** spécification d'application — DS-0001 adopté
 
 ## Niveaux de tokens
 

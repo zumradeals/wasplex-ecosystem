@@ -1,6 +1,6 @@
 # Wallet — Retraits et finalité
 
-**Statut :** spécification proposée
+**Statut :** spécification adoptée — AMD-0011
 
 ## 1. Configuration d'un canal
 

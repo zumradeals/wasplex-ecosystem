@@ -1,6 +1,6 @@
 # Outbox, inbox, sagas et compensations
 
-**Statut :** spécification proposée — ADR-0005
+**Statut :** spécification d'application — ADR-0005 adopté
 
 ## Outbox
 

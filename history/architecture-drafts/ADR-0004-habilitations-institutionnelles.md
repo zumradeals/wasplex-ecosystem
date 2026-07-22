@@ -1,4 +1,4 @@
-# ADR-0004 — Habilitations institutionnelles par capacités et portées
+# ADR-0004 — Habilitations institutionnelles par capacités et portées — brouillon historique non normatif
 
 **État :** proposé  
 **Date :** 2026-07-21

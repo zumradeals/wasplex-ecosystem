@@ -1,8 +1,8 @@
 # Les Cartes Wasplex — Orientation fondatrice
 
-**Statut :** doctrine approuvée, cycle détaillé à instruire  
-**Source :** `sources/2026-07-21-entretien-fondateur-12-cartes-wasplex.md`  
-**Dépendances :** Constitution v0.8, Wallet, abonnements publicitaires, partenaires agréés
+**Statut :** spécification adoptée — AMD-0008
+**Source :** `sources/2026-07-21-entretien-fondateur-12-cartes-wasplex.md`
+**Dépendances :** Constitution v1.5, AMD-0008, Wallet, abonnements publicitaires, partenaires agréés
 
 ## 1. Nature
 
@@ -18,7 +18,9 @@ Une carte physique pourra être produite ultérieurement contre paiement. Le sup
 
 ## 3. Accès
 
-L'accès initial est conditionné à un abonnement Premium, Élite ou Master actif. Les effets d'une expiration d'abonnement sur une carte déjà payée devront être définis explicitement afin d'éviter toute confiscation ou rétroactivité.
+L'acquisition exige la capacité stable `cards.acquire`. Cette capacité dépend d'une liste versionnée d'offres d'abonnement éligibles et des autres conditions applicables. Aucun libellé commercial d'abonnement n'est une clé d'autorisation codée en dur.
+
+L'expiration ultérieure de l'abonnement ne confisque ni la carte déjà payée ni les gains définitivement acquis ; elle peut suspendre les nouvelles opérations dépendantes de l'éligibilité selon les règles publiées.
 
 ## 4. Usage partenaire
 
@@ -38,14 +40,14 @@ Seuls des revenus externes, encaissés, validés et affectés au programme peuve
 
 La vente de nouvelles cartes ne constitue pas la source ordinaire des versements aux anciens détenteurs.
 
-## 6. Principe 50/50 envisagé
+## 6. Principe 50/50 adopté
 
-Après taxes, frais externes imputables, annulations et remboursements, le revenu net partageable serait réparti à parts égales :
+Après taxes, frais externes imputables, annulations et remboursements, le revenu net partageable est réparti à parts égales :
 
 - 50 % Wasplex ;
 - 50 % pool éligible.
 
-Ce ratio est une orientation approuvée pour le futur chapitre, pas encore un article constitutionnel. Son assiette, ses exceptions et son articulation avec le partage publicitaire doivent être définies avant adoption.
+Ce ratio est adopté par l'article 15 de la Constitution et AMD-0008. Il ne peut être modifié par une configuration administrative.
 
 ## 7. Comptabilité minimale
 
@@ -60,9 +62,6 @@ Les comptes suivants restent séparés :
 - montant distribuable ;
 - montants individuels provisoires, disponibles ou annulés.
 
-## 8. Questions restant à instruire
+## 8. Spécifications complémentaires
 
-1. Que comprend exactement le prix de chaque Carte Wasplex ?
-2. Quel événement partenaire crée un revenu partageable et à quelle date devient-il définitif ?
-3. Qui appartient à un pool, avec quel coefficient, pendant quelle période et selon quelle règle de prorata ?
-4. Que deviennent la carte et les droits en cas d'expiration d'abonnement, remboursement, fraude, décès, changement de pays ou fermeture du programme ?
+Le modèle économique, le cycle de vie, les droits et les opérations partenaires sont détaillés dans les fichiers `01-` à `03-` de ce dossier. Les valeurs commerciales demeurent configurables, versionnées et auditables.

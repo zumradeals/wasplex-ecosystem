@@ -1,6 +1,6 @@
 # Données — Catalogue, finalités et séparation
 
-**Statut :** spécification proposée  
+**Statut :** spécification adoptée — AMD-0009
 **Source :** `sources/2026-07-21-entretien-fondateur-13-donnees-consentement-profilage.md`
 
 ## 1. Registre obligatoire

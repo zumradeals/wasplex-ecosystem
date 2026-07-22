@@ -1,6 +1,6 @@
 # Identité — Niveaux et preuves
 
-**Statut :** spécification proposée  
+**Statut :** spécification adoptée — AMD-0010
 **Source :** `sources/2026-07-21-entretien-fondateur-14-identite-kyc-antifraude.md`
 
 ## 1. Axes séparés

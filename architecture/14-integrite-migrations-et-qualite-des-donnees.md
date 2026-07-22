@@ -1,6 +1,6 @@
 # Intégrité, migrations et qualité des données
 
-**Statut :** spécification proposée — ADR-0006
+**Statut :** spécification d'application — ADR-0006 adopté
 
 ## Invariants
 

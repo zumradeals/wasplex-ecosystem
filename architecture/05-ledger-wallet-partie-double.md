@@ -1,6 +1,6 @@
 # Ledger Wallet en partie double
 
-**Statut :** spécification proposée — ADR-0003
+**Statut :** spécification d'application — ADR-0003 adopté
 
 ## Règles structurelles
 

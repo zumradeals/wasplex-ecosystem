@@ -1,6 +1,6 @@
 # Matrice de tests critiques
 
-**Statut :** spécification proposée — ADR-0008
+**Statut :** spécification d'application — ADR-0008 adopté
 
 ## Publicité
 
@@ -73,6 +73,21 @@
 - période nulle ;
 - séparation Wallet ;
 - fermeture.
+
+## Live
+
+- diffuseur autorisé et modération préalable ;
+- préfinancement complet avant ouverture d'une récompense ;
+- intervalle qualifié, plafond et clé idempotente ;
+- interaction annoncée et non rejouable ;
+- présence sans attention suffisante non rémunérée ;
+- perte réseau, reprise et absence de double crédit ;
+- appareil modeste et consommation de données annoncée ;
+- modération en direct, interruption et conservation des preuves ;
+- priorité absolue d'une alerte nationale sur le Live ;
+- mineur, signalement et recours ;
+- résultat financier inconnu jusqu'au rapprochement ;
+- session sans récompense clairement présentée.
 
 ## Identité et données
 

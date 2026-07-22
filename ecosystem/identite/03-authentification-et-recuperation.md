@@ -1,7 +1,6 @@
 # Identité — Authentification et récupération
 
-**Statut :** spécification proposée
-
+**Statut :** spécification adoptée — AMD-0010
 ## 1. Facteurs
 
 - connaissance : mot de passe ou PIN ;
