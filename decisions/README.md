@@ -20,7 +20,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0013 | Publicité compatible avec la dignité et la sécurité | Adopté et intégré à la v1.4 |
 | ADR-0001 | Architecture initiale : monolithe modulaire Laravel/PostgreSQL/React/Inertia | Adopté |
 | ADR-0002 | Moteur de configuration métier typé, administrable et versionné | Adopté |
-| ADR-0003 | Registre comptable immuable du Wallet | Proposé |
+| ADR-0003 | Ledger Wallet en partie double, immuable et rapprochable | Proposé |
 | ADR-0004 | Habilitations institutionnelles par capacités et portées | Proposé |
 
 Une décision ou un amendement n'est « adopté » qu'après validation explicite du fondateur.
