@@ -7,7 +7,7 @@ La Constitution, les amendements, décisions, spécifications métier, ADR, parc
 ## État de référence
 
 - Constitution v1.5 adoptée ;
-- AMD-0001 à AMD-0014 adoptés ;
+- AMD-0001 à AMD-0015 adoptés ; AMD-0015 attend sa consolidation dans la Constitution v1.6 ;
 - ADR-0001 à ADR-0009 adoptés ;
 - DS-0001 adopté ;
 - UX-0001 à UX-0003 adoptés ;
