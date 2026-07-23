@@ -95,7 +95,10 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'search_path' => 'public',
+            // 'identity' est inclus pour que les outils de schéma (migrate:fresh,
+            // introspection) couvrent aussi ce schéma fonctionnel (ADR-0006 §3).
+            // Les migrations qualifient toujours explicitement leurs tables.
+            'search_path' => 'public,identity',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
