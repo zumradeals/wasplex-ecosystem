@@ -19,6 +19,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0012 | Gouvernance limitée, configuration versionnée et audit | Adopté et intégré à la v1.3 |
 | AMD-0013 | Publicité compatible avec la dignité et la sécurité | Adopté et intégré à la v1.4 |
 | AMD-0014 | Live volontaire, qualifié et prioritairement sûr | Adopté et intégré à la v1.5 |
+| AMD-0015 | Fonds Social : prélèvement composite et pérennité partagée | Adopté — intégration proposée à la v1.6 |
 | ADR-0001 | Architecture initiale : monolithe modulaire Laravel/PostgreSQL/React/Inertia | Adopté |
 | ADR-0002 | Moteur de configuration métier typé, administrable et versionné | Adopté |
 | ADR-0003 | Ledger Wallet en partie double, immuable et rapprochable | Adopté |
