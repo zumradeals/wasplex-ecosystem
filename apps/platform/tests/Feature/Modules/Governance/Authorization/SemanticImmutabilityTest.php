@@ -4,7 +4,9 @@ namespace Tests\Feature\Modules\Governance\Authorization;
 
 use App\Modules\Governance\Authorization\Enums\CapabilityState;
 use App\Modules\Governance\Authorization\Enums\PolicyState;
+use App\Modules\Governance\Authorization\Enums\PurposeState;
 use App\Modules\Governance\Authorization\Enums\RoleTemplateState;
+use App\Modules\Governance\Authorization\Models\CapabilityPurpose;
 use App\Modules\Governance\Authorization\Models\RoleTemplate;
 use App\Modules\Governance\Authorization\Models\RoleTemplateCapability;
 use Illuminate\Database\QueryException;
@@ -219,5 +221,144 @@ class SemanticImmutabilityTest extends AuthorizationTestCase
         $this->expectException(QueryException::class);
 
         DB::table('governance.role_templates')->where('id', $roleTemplate->id)->delete();
+    }
+
+    /**
+     * TD-0001-C : un déplacement de liaison depuis un parent actif vers un
+     * autre parent devait auparavant contourner la protection, le
+     * déclencheur ne vérifiant que le nouveau parent sur UPDATE.
+     */
+    public function test_role_template_capabilities_move_from_an_active_parent_is_refused(): void
+    {
+        $capability = $this->makeCapability('sample.td_c_role_move');
+
+        $activeRoleTemplate = RoleTemplate::create([
+            'stable_key' => 'td_c_active_source_role',
+            'version' => 1,
+            'label' => 'Rôle source actif',
+            'description' => 'Description.',
+            'state' => RoleTemplateState::Draft,
+        ]);
+        $link = RoleTemplateCapability::create([
+            'role_template_id' => $activeRoleTemplate->id,
+            'capability_definition_id' => $capability->id,
+        ]);
+        $activeRoleTemplate->update(['state' => RoleTemplateState::Active]);
+
+        $destinationRoleTemplate = RoleTemplate::create([
+            'stable_key' => 'td_c_destination_role',
+            'version' => 1,
+            'label' => 'Rôle destination',
+            'description' => 'Description.',
+            'state' => RoleTemplateState::Draft,
+        ]);
+
+        $this->expectException(QueryException::class);
+
+        // Le nouveau parent (draft) serait accepté seul ; c'est l'ancien
+        // parent actif qui doit refuser ce déplacement.
+        DB::table('governance.role_template_capabilities')
+            ->where('id', $link->id)
+            ->update(['role_template_id' => $destinationRoleTemplate->id]);
+    }
+
+    /**
+     * TD-0001-C : même correction, pour capability_purposes.
+     */
+    public function test_capability_purposes_move_from_an_active_capability_is_refused(): void
+    {
+        $activeCapability = $this->makeCapability('sample.td_c_capability_move_source');
+        $destinationCapability = $this->makeCapability('sample.td_c_capability_move_destination', state: CapabilityState::Draft);
+        $purpose = $this->makePurpose('td_c_capability_move_purpose');
+
+        $activeCapability->forceFill(['state' => CapabilityState::Draft])->save();
+        $link = CapabilityPurpose::create([
+            'capability_definition_id' => $activeCapability->id,
+            'purpose_definition_id' => $purpose->id,
+        ]);
+        $activeCapability->forceFill(['state' => CapabilityState::Active])->save();
+
+        $this->expectException(QueryException::class);
+
+        DB::table('governance.capability_purposes')
+            ->where('id', $link->id)
+            ->update(['capability_definition_id' => $destinationCapability->id]);
+    }
+
+    /**
+     * TD-0001-D : déclencheur manquant, ajouté symétriquement à celui de
+     * capability_definitions.
+     */
+    public function test_active_purpose_definition_refuses_semantic_field_update(): void
+    {
+        $purpose = $this->makePurpose('td_d_immutable_purpose');
+
+        $this->expectException(QueryException::class);
+
+        $purpose->forceFill(['description' => 'Description modifiée après activation.'])->save();
+    }
+
+    /**
+     * TD-0001-D : la règle d'immutabilité s'étend désormais à l'état
+     * retired, sur les quatre tables — un seul test par table.
+     */
+    public function test_retired_capability_definition_refuses_semantic_field_update(): void
+    {
+        $capability = $this->makeCapability('sample.td_d_retired_capability');
+        $capability->forceFill(['state' => CapabilityState::Retired])->save();
+
+        $this->expectException(QueryException::class);
+
+        $capability->fresh()->forceFill(['description' => 'Description modifiée après retrait.'])->save();
+    }
+
+    public function test_retired_policy_version_refuses_semantic_field_update(): void
+    {
+        $policy = $this->makePolicy('td_d_retired_policy');
+        $policy->forceFill(['state' => PolicyState::Retired])->save();
+
+        $this->expectException(QueryException::class);
+
+        $policy->fresh()->forceFill(['checksum' => hash('sha256', 'contenu-modifie-apres-retrait')])->save();
+    }
+
+    public function test_retired_role_template_refuses_semantic_field_update(): void
+    {
+        $roleTemplate = RoleTemplate::create([
+            'stable_key' => 'td_d_retired_role',
+            'version' => 1,
+            'label' => 'Rôle retiré',
+            'description' => 'Description.',
+            'state' => RoleTemplateState::Active,
+        ]);
+        $roleTemplate->forceFill(['state' => RoleTemplateState::Retired])->save();
+
+        $this->expectException(QueryException::class);
+
+        $roleTemplate->fresh()->forceFill(['label' => 'Nouveau libellé après retrait'])->save();
+    }
+
+    public function test_retired_purpose_definition_refuses_semantic_field_update(): void
+    {
+        $purpose = $this->makePurpose('td_d_retired_purpose');
+        $purpose->forceFill(['state' => PurposeState::Retired])->save();
+
+        $this->expectException(QueryException::class);
+
+        $purpose->fresh()->forceFill(['description' => 'Description modifiée après retrait.'])->save();
+    }
+
+    /**
+     * Seule exception documentée : une clôture de période reste permise
+     * sur une ligne retired, y compris après l'extension TD-0001-D.
+     */
+    public function test_retired_capability_definition_still_allows_closing_its_period(): void
+    {
+        $capability = $this->makeCapability('sample.td_d_retired_period_closure');
+        $capability->forceFill(['state' => CapabilityState::Retired])->save();
+
+        $capability->fresh()->forceFill(['effective_to' => now()->addDay()])->save();
+
+        $this->assertNotNull($capability->fresh()->effective_to);
     }
 }

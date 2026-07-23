@@ -166,9 +166,11 @@ class AuthorizationEngine
             return [...$empty, 'result' => $this->denied($request, 'no_active_grant', 'Aucun droit actif ne couvre cette capacité.')];
         }
 
-        $sawStepUpCandidate = false;
-        $lastPolicyKey = null;
-        $lastPolicyVersion = null;
+        /** @var list<array{grant: Grant, policy: PolicyVersion}> $stepUpCandidates */
+        $stepUpCandidates = [];
+
+        /** @var list<array{grant: Grant, policy: PolicyVersion}> $approvalCandidates */
+        $approvalCandidates = [];
 
         /** @var list<array{grant: Grant, policy: PolicyVersion, result: AuthorizationResult}> $qualifying */
         $qualifying = [];
@@ -185,9 +187,6 @@ class AuthorizationEngine
             if (! $this->isWithinPeriod($policy->effective_from, $policy->effective_to, $request->evaluatedAt)) {
                 continue;
             }
-
-            $lastPolicyKey = $policy->stable_key;
-            $lastPolicyVersion = $policy->version;
 
             // 7. Finalité : état, période, et actualité de la liaison
             // capability_purposes (une capacité active peut avoir vu son
@@ -284,7 +283,13 @@ class AuthorizationEngine
 
             if (! $conditionsResult->satisfied) {
                 if ($conditionsResult->onlySessionAssuranceInsufficient) {
-                    $sawStepUpCandidate = true;
+                    // Toutes les autres vérifications ont déjà réussi pour
+                    // ce grant précis ; seule la session manque. Collecté
+                    // plutôt que retourné immédiatement : la provenance
+                    // doit rester déterministe même avec plusieurs
+                    // candidats (TD-0001-B), jamais dépendante de l'ordre
+                    // d'itération.
+                    $stepUpCandidates[] = ['grant' => $grant, 'policy' => $policy];
                 }
 
                 continue;
@@ -295,22 +300,15 @@ class AuthorizationEngine
             // session, sont déjà satisfaites — jamais au profit d'une
             // identité insuffisamment qualifiée ou d'une session faible
             // (P003-B1.3a §priorité). P003-B1 ne possède pas encore de
-            // preuve d'approbation, donc jamais "allowed" ici.
+            // preuve d'approbation, donc jamais "allowed" ici. `approval_required`
+            // est une propriété de la capacité, identique pour tout grant
+            // qualifiant ; collecté plutôt que retourné immédiatement pour
+            // que la provenance (grant/politique cités) reste déterministe
+            // en présence de plusieurs candidats (TD-0001-B).
             if ($capability->approval_required) {
-                return [
-                    ...$empty,
-                    'policyVersion' => $policy->version,
-                    'result' => AuthorizationResult::make(
-                        AuthorizationDecision::ApprovalRequired,
-                        'approval_required',
-                        'Cette action exige une approbation distincte avant exécution.',
-                        $request->correlationId,
-                        $policy->stable_key,
-                        $policy->version,
-                        capabilityKey: $capability->stable_key,
-                        capabilityVersion: $capability->version,
-                    ),
-                ];
+                $approvalCandidates[] = ['grant' => $grant, 'policy' => $policy];
+
+                continue;
             }
 
             $qualifying[] = [
@@ -320,25 +318,54 @@ class AuthorizationEngine
             ];
         }
 
+        // Approbation obligatoire : prioritaire sur toute autre issue
+        // puisqu'elle porte sur la capacité entière — dès qu'un candidat
+        // l'atteint, aucun grant ne peut jamais qualifier normalement pour
+        // cette capacité (TD-0001-B, P003-B1.3a §priorité). Le grant et la
+        // politique cités dans le résultat et l'audit sont choisis par une
+        // règle déterministe unique, documentée sur {@see chooseDeterministicCandidate()}.
+        if ($approvalCandidates !== []) {
+            $chosen = $this->chooseDeterministicCandidate($approvalCandidates);
+
+            return [
+                ...$empty,
+                'policyVersion' => $chosen['policy']->version,
+                'result' => AuthorizationResult::make(
+                    AuthorizationDecision::ApprovalRequired,
+                    'approval_required',
+                    'Cette action exige une approbation distincte avant exécution.',
+                    $request->correlationId,
+                    $chosen['policy']->stable_key,
+                    $chosen['policy']->version,
+                    capabilityKey: $capability->stable_key,
+                    capabilityVersion: $capability->version,
+                    obligations: [new AuthorizationObligation('matched_grant', ['grant_id' => $chosen['grant']->id])],
+                ),
+            ];
+        }
+
         if ($qualifying === []) {
-            if ($sawStepUpCandidate) {
+            if ($stepUpCandidates !== []) {
+                $chosen = $this->chooseDeterministicCandidate($stepUpCandidates);
+
                 return [
                     ...$empty,
-                    'policyVersion' => $lastPolicyVersion,
+                    'policyVersion' => $chosen['policy']->version,
                     'result' => AuthorizationResult::make(
                         AuthorizationDecision::StepUpRequired,
                         'session_assurance_insufficient',
                         'Une authentification plus forte est requise pour cette action.',
                         $request->correlationId,
-                        $lastPolicyKey,
-                        $lastPolicyVersion,
+                        $chosen['policy']->stable_key,
+                        $chosen['policy']->version,
                         capabilityKey: $capability->stable_key,
                         capabilityVersion: $capability->version,
+                        obligations: [new AuthorizationObligation('matched_grant', ['grant_id' => $chosen['grant']->id])],
                     ),
                 ];
             }
 
-            return [...$empty, 'policyVersion' => $lastPolicyVersion, 'result' => $this->denied($request, 'no_matching_grant', 'Aucun droit actif ne correspond à cette demande.', $capability)];
+            return [...$empty, 'result' => $this->denied($request, 'no_matching_grant', 'Aucun droit actif ne correspond à cette demande.', $capability)];
         }
 
         // Résolution déterministe, indépendante de l'ordre PostgreSQL, de
@@ -354,7 +381,6 @@ class AuthorizationEngine
 
             return [
                 ...$empty,
-                'policyVersion' => $lastPolicyVersion,
                 'result' => AuthorizationResult::make(
                     AuthorizationDecision::Denied,
                     'ambiguous_grants',
@@ -392,6 +418,27 @@ class AuthorizationEngine
                 capabilityVersion: $chosenResult->capabilityVersion,
             ),
         ];
+    }
+
+    /**
+     * Règle déterministe unique de sélection d'un grant parmi plusieurs
+     * candidats équivalents, réutilisée pour toute famille de décision
+     * (`allowed`/`allowed_masked`/`allowed_read_only`, `step_up_required`,
+     * `approval_required`) : le grant retenu est toujours celui dont l'UUID
+     * est le plus petit. Les identifiants de grant sont des UUID v7,
+     * temporellement ordonnés à la création ; ce choix revient donc
+     * toujours au candidat le plus anciennement créé, jamais à l'ordre de
+     * retour SQL non trié (TD-0001-B). C'est la même règle que celle déjà
+     * appliquée à la résolution multi-grants ordinaire ci-dessus.
+     *
+     * @param  list<array{grant: Grant, policy: PolicyVersion}>  $candidates
+     * @return array{grant: Grant, policy: PolicyVersion}
+     */
+    private function chooseDeterministicCandidate(array $candidates): array
+    {
+        usort($candidates, fn (array $a, array $b): int => $a['grant']->id <=> $b['grant']->id);
+
+        return $candidates[0];
     }
 
     private function isWithinPeriod(CarbonInterface $effectiveFrom, ?CarbonInterface $effectiveTo, CarbonInterface $evaluatedAt): bool

@@ -16,6 +16,7 @@ use App\Modules\Governance\Authorization\Models\Grant;
 use App\Modules\Governance\Authorization\Models\PolicyVersion;
 use App\Modules\Governance\Authorization\Models\PurposeDefinition;
 use App\Modules\Governance\Authorization\Models\RoleTemplate;
+use App\Modules\Governance\Authorization\Services\Exceptions\AuthorSubstitutionRefusedException;
 use App\Modules\Governance\Authorization\Services\Exceptions\CapabilityNotAvailableException;
 use App\Modules\Governance\Authorization\Services\Exceptions\GrantNotProposedException;
 use App\Modules\Governance\Authorization\Services\Exceptions\PolicyNotAvailableException;
@@ -98,15 +99,40 @@ class GrantManager
     }
 
     /**
+     * Matrice complète des relations interdites entre sujet, auteur et
+     * approbateur (TD-0001-A) :
+     *
+     *  - l'auteur transmis ici doit être exactement celui enregistré à la
+     *    proposition ({@see propose()}) : aucune substitution d'auteur
+     *    n'est jamais possible entre les deux appels ;
+     *  - sujet = auteur, sans approbateur distinct : refusé
+     *    (auto-habilitation) ;
+     *  - approbateur = auteur : refusé, y compris lorsque le sujet diffère
+     *    de l'auteur (délégation) ;
+     *  - approbateur = sujet : refusé, y compris lorsque l'auteur diffère
+     *    du sujet (délégation) ;
+     *  - capacité sensitive ou critical sans approbateur : refusé.
+     *
+     * Aucun acteur n'est donc jamais l'unique contrôleur de sa propre
+     * habilitation, quelle que soit la combinaison sujet/auteur envisagée
+     * (Constitution art. 18 §9, §19).
+     *
+     * @throws AuthorSubstitutionRefusedException L'auteur transmis diffère de celui enregistré à la proposition.
      * @throws GrantNotProposedException Le grant n'est plus au stade `proposed` (aucune réactivation ni activation répétée).
      * @throws SelfAuthorizationRefusedException Auteur = sujet sans approbateur distinct.
-     * @throws SeparationOfDutiesViolationException Approbateur requis (sensitive/critical) ou identique à l'auteur.
+     * @throws SeparationOfDutiesViolationException Approbateur requis (sensitive/critical), identique à l'auteur, ou identique au sujet.
      */
     public function activate(Grant $grant, PersonAccountLink $author, ?PersonAccountLink $approver, string $correlationId): Grant
     {
         if ($grant->state !== GrantState::Proposed) {
             throw new GrantNotProposedException(
                 "seul un grant à l'état proposed peut être activé ; état actuel : {$grant->state->value}"
+            );
+        }
+
+        if ($grant->author_person_account_link_id !== $author->id) {
+            throw new AuthorSubstitutionRefusedException(
+                "l'auteur transmis à l'activation ne correspond pas à l'auteur enregistré à la proposition"
             );
         }
 
@@ -134,6 +160,12 @@ class GrantManager
         if ($approver !== null && $approver->person_id === $authorPersonId) {
             throw new SeparationOfDutiesViolationException(
                 "l'auteur ne peut être son propre approbateur"
+            );
+        }
+
+        if ($approver !== null && $approver->person_id === $subjectPersonId) {
+            throw new SeparationOfDutiesViolationException(
+                "l'approbateur ne peut être le sujet de l'habilitation"
             );
         }
 
