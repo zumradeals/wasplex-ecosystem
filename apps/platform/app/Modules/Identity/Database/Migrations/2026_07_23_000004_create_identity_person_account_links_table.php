@@ -1,7 +1,5 @@
 <?php
 
-use App\Modules\Identity\Enums\LinkOrigin;
-use App\Modules\Identity\Enums\LinkStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -12,9 +10,24 @@ use Illuminate\Support\Facades\Schema;
  *
  * Un compte ne possède jamais simultanément plusieurs liaisons actives
  * contradictoires : garanti par un index unique partiel PostgreSQL.
+ *
+ * Historique figé localement : les valeurs ci-dessous ne doivent jamais être
+ * remplacées par une référence aux enums applicatifs LinkStatus/LinkOrigin,
+ * afin qu'une évolution future de ces enums ne modifie pas le comportement
+ * de cette migration déjà exécutée (revue SIRR P003-A.2 §3).
  */
 return new class extends Migration
 {
+    /**
+     * @var list<string>
+     */
+    private const STATUS_VALUES = ['active', 'superseded', 'disputed'];
+
+    /**
+     * @var list<string>
+     */
+    private const ORIGIN_VALUES = ['registration', 'migration', 'support_review'];
+
     public function up(): void
     {
         Schema::create('identity.person_account_links', function (Blueprint $table): void {
@@ -33,12 +46,12 @@ return new class extends Migration
 
         $status = implode(',', array_map(
             fn (string $value): string => "'{$value}'",
-            LinkStatus::values(),
+            self::STATUS_VALUES,
         ));
 
         $origin = implode(',', array_map(
             fn (string $value): string => "'{$value}'",
-            LinkOrigin::values(),
+            self::ORIGIN_VALUES,
         ));
 
         DB::statement(

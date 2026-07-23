@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -13,6 +13,10 @@ use Illuminate\Support\Str;
  *
  * Additive et non destructive : la table `users` n'est ni renommée ni
  * déplacée pendant P003-A (P003-A §5).
+ *
+ * Utilise Query Builder plutôt que le modèle Eloquent App\Models\User : une
+ * migration déjà exécutée ne doit dépendre d'aucun scope, événement ou
+ * comportement futur d'un modèle applicatif (revue SIRR P003-A.2 §3).
  */
 return new class extends Migration
 {
@@ -22,13 +26,14 @@ return new class extends Migration
             $table->uuid('public_id')->nullable()->after('id');
         });
 
-        User::query()
+        DB::table('users')
             ->whereNull('public_id')
             ->orderBy('id')
+            ->select('id')
             ->chunkById(500, function ($users): void {
                 foreach ($users as $user) {
-                    $user->newQuery()
-                        ->whereKey($user->getKey())
+                    DB::table('users')
+                        ->where('id', $user->id)
                         ->update(['public_id' => (string) Str::uuid7()]);
                 }
             });

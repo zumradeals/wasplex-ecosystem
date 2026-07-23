@@ -2,7 +2,6 @@
 
 namespace App\Modules\Identity\Models;
 
-use App\Models\User;
 use App\Modules\Identity\Enums\MembershipStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,14 +11,18 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * Appartenance nominative reliant une personne, un compte et une organisation.
+ * Appartenance nominative reliant une organisation à une liaison
+ * personne-compte existante.
+ *
+ * Référence `person_account_link_id` plutôt que `person_id` et `user_id`
+ * séparément, afin qu'une appartenance ne puisse jamais associer le compte
+ * d'une personne à l'identité d'une autre (revue SIRR P003-A.2 §1).
  *
  * N'accorde par elle-même aucune capacité d'autorisation (ADR-0004 §5, §22) :
  * le moteur complet de rôles, grants et permissions fait l'objet de P003-B.
  *
  * @property string $id
- * @property string $person_id
- * @property int $user_id
+ * @property string $person_account_link_id
  * @property string $organization_id
  * @property MembershipStatus $status
  * @property string|null $title
@@ -56,19 +59,11 @@ class Membership extends Model
     }
 
     /**
-     * @return BelongsTo<Person, $this>
+     * @return BelongsTo<PersonAccountLink, $this>
      */
-    public function person(): BelongsTo
+    public function personAccountLink(): BelongsTo
     {
-        return $this->belongsTo(Person::class, 'person_id');
-    }
-
-    /**
-     * @return BelongsTo<User, $this>
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(PersonAccountLink::class, 'person_account_link_id');
     }
 
     /**
@@ -80,9 +75,14 @@ class Membership extends Model
     }
 
     /**
-     * Seul point d'accès aux appartenances d'une organisation fourni par le
-     * module : garantit qu'une organisation ne voit jamais les appartenances
-     * d'une autre organisation par un accès non filtré (ADR-0006 §4, ADR-0004 §7).
+     * Filtre de requête pratique restreignant aux appartenances d'une
+     * organisation donnée.
+     *
+     * Ce n'est PAS une frontière d'autorisation : `Membership::query()` sans
+     * ce scope reste une lecture non filtrée, techniquement possible depuis
+     * ce module. L'isolation effective côté serveur entre organisations sera
+     * imposée par le moteur d'autorisations de P003-B (ADR-0004), pas par ce
+     * scope Eloquent.
      *
      * @param  Builder<Membership>  $query
      * @return Builder<Membership>

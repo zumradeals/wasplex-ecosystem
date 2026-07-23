@@ -14,7 +14,9 @@ use App\Modules\Identity\Models\Membership;
 use App\Modules\Identity\Models\PersonAccountLink;
 use App\Modules\Identity\Services\RegistersUserIdentity;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Tests\TestCase;
 
@@ -114,7 +116,12 @@ class RegistrationCreatesIdentityFoundationTest extends TestCase
         $assurance = AssuranceState::query()->where('user_id', $user->id)->firstOrFail();
 
         $this->assertSame(OrganizationStatus::None, $assurance->organization_status);
-        $this->assertSame(0, Membership::query()->where('user_id', $user->id)->count());
+
+        $membershipCount = Membership::query()
+            ->whereHas('personAccountLink', fn ($query) => $query->where('user_id', $user->id))
+            ->count();
+
+        $this->assertSame(0, $membershipCount);
     }
 
     public function test_registration_is_transactional_and_leaves_no_partial_account_on_failure(): void
@@ -129,10 +136,42 @@ class RegistrationCreatesIdentityFoundationTest extends TestCase
             ]);
             $this->fail('An exception was expected for a null email.');
         } catch (\Throwable) {
-            // attendu
+            // attendu : violation NOT NULL sur users.email avant même la
+            // création d'une personne.
         }
 
         $this->assertSame(0, User::query()->where('name', 'Compte invalide')->count());
+        $this->assertSame(0, PersonAccountLink::query()->count());
+        $this->assertSame(0, AssuranceState::query()->count());
+    }
+
+    public function test_registration_rolls_back_the_already_inserted_user_when_a_later_step_fails(): void
+    {
+        // Contrainte PostgreSQL temporaire, propre à ce test, forçant l'échec
+        // de toute insertion dans identity.people après que le compte a déjà
+        // été inséré : démontre le rollback d'une étape intermédiaire de la
+        // transaction (revue SIRR P003-A.2 §5). Rien de comparable n'existe
+        // dans le code de production : la contrainte est ajoutée puis retirée
+        // exclusivement depuis ce test, sur wasplex_test.
+        DB::statement('ALTER TABLE identity.people ADD CONSTRAINT people_test_forced_failure CHECK (false)');
+
+        try {
+            try {
+                app(RegistersUserIdentity::class)->register([
+                    'name' => 'Rollback Intermédiaire',
+                    'email' => 'rollback-intermediaire@example.com',
+                    'password' => 'password',
+                ]);
+
+                $this->fail('A QueryException was expected when inserting into identity.people.');
+            } catch (QueryException) {
+                // attendu : la contrainte de test force l'échec après l'insertion du User.
+            }
+        } finally {
+            DB::statement('ALTER TABLE identity.people DROP CONSTRAINT IF EXISTS people_test_forced_failure');
+        }
+
+        $this->assertSame(0, User::query()->where('email', 'rollback-intermediaire@example.com')->count());
         $this->assertSame(0, PersonAccountLink::query()->count());
         $this->assertSame(0, AssuranceState::query()->count());
     }

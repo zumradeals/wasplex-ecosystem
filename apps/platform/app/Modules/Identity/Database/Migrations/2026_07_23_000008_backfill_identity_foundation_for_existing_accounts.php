@@ -1,13 +1,5 @@
 <?php
 
-use App\Models\User;
-use App\Modules\Identity\Enums\AccountState;
-use App\Modules\Identity\Enums\ContactAssurance;
-use App\Modules\Identity\Enums\IdentityAssurance;
-use App\Modules\Identity\Enums\LinkOrigin;
-use App\Modules\Identity\Enums\LinkStatus;
-use App\Modules\Identity\Enums\OrganizationStatus;
-use App\Modules\Identity\Enums\UniquenessAssurance;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -15,59 +7,29 @@ use Illuminate\Support\Str;
 /**
  * Fondation Identité additive pour les comptes existants (P003-A §8).
  *
- * Idempotente : un compte déjà doté d'une liaison active est ignoré, et les
- * insertions utilisent ON CONFLICT DO NOTHING pour rester rejouables sans
- * doublon en cas de reprise. Aucune donnée existante n'est supprimée ni
- * modifiée en dehors de la fondation Identité elle-même.
+ * Traite indépendamment la liaison active personne-compte et l'état
+ * d'assurance : un compte qui possède déjà une liaison mais dont l'assurance
+ * a été perdue (état partiel) est réparé sans recréer de personne ni de
+ * liaison surnuméraire (revue SIRR P003-A.2 §2).
+ *
+ * N'utilise pas insertOrIgnore : une violation inattendue doit échouer
+ * explicitement et provoquer le rollback de la migration plutôt que d'être
+ * masquée. La transaction de migration (Postgres) garantit qu'aucune
+ * personne orpheline ne peut subsister si l'insertion de sa liaison échoue.
+ *
+ * Historique figé localement, sans référence aux enums applicatifs ni au
+ * modèle Eloquent App\Models\User (revue SIRR P003-A.2 §3).
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        User::query()
-            ->whereNotIn('id', function ($query): void {
-                $query->select('user_id')
-                    ->from('identity.person_account_links')
-                    ->where('status', LinkStatus::Active->value);
-            })
+        DB::table('users')
             ->orderBy('id')
+            ->select('id', 'email_verified_at')
             ->chunkById(500, function ($users): void {
-                $now = now();
-
                 foreach ($users as $user) {
-                    $personId = (string) Str::uuid7();
-
-                    DB::table('identity.people')->insertOrIgnore([
-                        'id' => $personId,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-
-                    DB::table('identity.person_account_links')->insertOrIgnore([
-                        'id' => (string) Str::uuid7(),
-                        'person_id' => $personId,
-                        'user_id' => $user->id,
-                        'status' => LinkStatus::Active->value,
-                        'origin' => LinkOrigin::Migration->value,
-                        'effective_from' => $now,
-                        'effective_to' => null,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-
-                    DB::table('identity.assurance_states')->insertOrIgnore([
-                        'id' => (string) Str::uuid7(),
-                        'user_id' => $user->id,
-                        'account_state' => AccountState::Active->value,
-                        'contact_assurance' => $user->email_verified_at !== null
-                            ? ContactAssurance::Confirmed->value
-                            : ContactAssurance::Unconfirmed->value,
-                        'identity_assurance' => IdentityAssurance::Undeclared->value,
-                        'uniqueness_assurance' => UniquenessAssurance::Unknown->value,
-                        'organization_status' => OrganizationStatus::None->value,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
+                    $this->repairAccount($user->id, $user->email_verified_at !== null);
                 }
             });
     }
@@ -76,5 +38,55 @@ return new class extends Migration
     {
         // Migration additive et de reprise : aucune suppression de données
         // existantes n'est effectuée par la migration inverse (ADR-0006 §11).
+    }
+
+    private function repairAccount(int $userId, bool $emailVerified): void
+    {
+        $now = now();
+
+        $activeLink = DB::table('identity.person_account_links')
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->first(['id']);
+
+        if ($activeLink === null) {
+            $personId = (string) Str::uuid7();
+
+            DB::table('identity.people')->insert([
+                'id' => $personId,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+            DB::table('identity.person_account_links')->insert([
+                'id' => (string) Str::uuid7(),
+                'person_id' => $personId,
+                'user_id' => $userId,
+                'status' => 'active',
+                'origin' => 'migration',
+                'effective_from' => $now,
+                'effective_to' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
+        $hasAssurance = DB::table('identity.assurance_states')
+            ->where('user_id', $userId)
+            ->exists();
+
+        if (! $hasAssurance) {
+            DB::table('identity.assurance_states')->insert([
+                'id' => (string) Str::uuid7(),
+                'user_id' => $userId,
+                'account_state' => 'active',
+                'contact_assurance' => $emailVerified ? 'confirmed' : 'unconfirmed',
+                'identity_assurance' => 'undeclared',
+                'uniqueness_assurance' => 'unknown',
+                'organization_status' => 'none',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
     }
 };

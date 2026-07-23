@@ -1,10 +1,5 @@
 <?php
 
-use App\Modules\Identity\Enums\AccountState;
-use App\Modules\Identity\Enums\ContactAssurance;
-use App\Modules\Identity\Enums\IdentityAssurance;
-use App\Modules\Identity\Enums\OrganizationStatus;
-use App\Modules\Identity\Enums\UniquenessAssurance;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +11,26 @@ use Illuminate\Support\Facades\Schema;
  *
  * `session_assurance` n'est volontairement pas une colonne de cette table :
  * il appartient au contexte de session, pas à un état permanent (P003-A §6).
+ *
+ * Historique figé localement : les valeurs ci-dessous ne doivent jamais être
+ * remplacées par une référence aux enums applicatifs (AccountState,
+ * ContactAssurance, IdentityAssurance, UniquenessAssurance,
+ * OrganizationStatus), afin qu'une évolution future de ces enums ne modifie
+ * pas le comportement de cette migration déjà exécutée (revue SIRR P003-A.2 §3).
  */
 return new class extends Migration
 {
+    /**
+     * @var array<string, list<string>>
+     */
+    private const ENUM_VALUES = [
+        'account_state' => ['invited', 'active', 'suspended', 'closed'],
+        'contact_assurance' => ['unconfirmed', 'confirmed'],
+        'identity_assurance' => ['undeclared', 'declared', 'verified', 'reinforced'],
+        'uniqueness_assurance' => ['unknown', 'probable', 'sufficient', 'disputed'],
+        'organization_status' => ['none', 'representative_pending', 'authorized', 'suspended'],
+    ];
+
     public function up(): void
     {
         Schema::create('identity.assurance_states', function (Blueprint $table): void {
@@ -32,11 +44,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        $this->addEnumCheck('account_state', AccountState::values());
-        $this->addEnumCheck('contact_assurance', ContactAssurance::values());
-        $this->addEnumCheck('identity_assurance', IdentityAssurance::values());
-        $this->addEnumCheck('uniqueness_assurance', UniquenessAssurance::values());
-        $this->addEnumCheck('organization_status', OrganizationStatus::values());
+        foreach (self::ENUM_VALUES as $column => $values) {
+            $this->addEnumCheck($column, $values);
+        }
     }
 
     public function down(): void

@@ -1,7 +1,5 @@
 <?php
 
-use App\Modules\Identity\Enums\OrganizationCategory;
-use App\Modules\Identity\Enums\OrganizationState;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -13,9 +11,25 @@ use Illuminate\Support\Facades\Schema;
  *
  * L'affiliation institutionnelle complète, les campagnes et les contrats
  * commerciaux ne sont pas construits ici (hors périmètre P003-A).
+ *
+ * Historique figé localement : les valeurs ci-dessous ne doivent jamais être
+ * remplacées par une référence aux enums applicatifs
+ * OrganizationCategory/OrganizationState, afin qu'une évolution future de
+ * ces enums ne modifie pas le comportement de cette migration déjà exécutée
+ * (revue SIRR P003-A.2 §3).
  */
 return new class extends Migration
 {
+    /**
+     * @var list<string>
+     */
+    private const CATEGORY_VALUES = ['wasplex', 'advertiser', 'institution'];
+
+    /**
+     * @var list<string>
+     */
+    private const STATE_VALUES = ['draft', 'active', 'suspended', 'closed'];
+
     public function up(): void
     {
         Schema::create('identity.organizations', function (Blueprint $table): void {
@@ -34,12 +48,12 @@ return new class extends Migration
 
         $category = implode(',', array_map(
             fn (string $value): string => "'{$value}'",
-            OrganizationCategory::values(),
+            self::CATEGORY_VALUES,
         ));
 
         $state = implode(',', array_map(
             fn (string $value): string => "'{$value}'",
-            OrganizationState::values(),
+            self::STATE_VALUES,
         ));
 
         DB::statement(
