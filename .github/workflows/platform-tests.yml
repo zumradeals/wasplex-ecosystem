@@ -84,6 +84,9 @@ jobs:
       - name: Run database migrations
         run: php artisan migrate --force
 
+      - name: Generate Wayfinder routes and actions
+        run: php artisan wayfinder:generate
+
       - name: Validate composer.json
         run: composer validate --strict
 
