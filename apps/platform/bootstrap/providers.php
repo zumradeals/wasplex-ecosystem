@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Governance\Authorization\AuthorizationServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\FortifyServiceProvider;
@@ -8,4 +9,5 @@ return [
     AppServiceProvider::class,
     FortifyServiceProvider::class,
     IdentityServiceProvider::class,
+    AuthorizationServiceProvider::class,
 ];

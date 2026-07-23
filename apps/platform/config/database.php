@@ -95,10 +95,13 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            // 'identity' est inclus pour que les outils de schéma (migrate:fresh,
-            // introspection) couvrent aussi ce schéma fonctionnel (ADR-0006 §3).
-            // Les migrations qualifient toujours explicitement leurs tables.
-            'search_path' => 'public,identity',
+            // 'identity' et 'governance' sont inclus pour que les outils de
+            // schéma (migrate:fresh, introspection) couvrent aussi ces
+            // schémas fonctionnels (ADR-0006 §3). Les migrations qualifient
+            // toujours explicitement leurs tables. Le search_path ne
+            // constitue jamais une autorisation : il ne fait que déterminer
+            // la résolution des noms non qualifiés (P003-B1 §4).
+            'search_path' => 'public,identity,governance',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
