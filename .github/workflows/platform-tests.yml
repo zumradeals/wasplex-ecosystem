@@ -1,0 +1,97 @@
+name: platform-tests
+
+on:
+  pull_request:
+    paths:
+      - 'apps/platform/**'
+      - '.github/workflows/platform-tests.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/platform/**'
+      - '.github/workflows/platform-tests.yml'
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: apps/platform
+
+env:
+  # Identifiants PostgreSQL jetables réservés à cette exécution CI.
+  # Ne correspondent à aucun secret ni identifiant du VPS Wasplex.
+  DB_CONNECTION: pgsql
+  DB_HOST: 127.0.0.1
+  DB_PORT: 5432
+  DB_DATABASE: wasplex_test
+  DB_USERNAME: wasplex_ci
+  DB_PASSWORD: wasplex_ci_ephemeral
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: wasplex_test
+          POSTGRES_USER: wasplex_ci
+          POSTGRES_PASSWORD: wasplex_ci_ephemeral
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_pgsql, pgsql
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '24.18.0'
+          cache: npm
+          cache-dependency-path: apps/platform/package-lock.json
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Prepare environment file
+        run: cp .env.example .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run database migrations
+        run: php artisan migrate --force
+
+      - name: Generate Wayfinder routes and actions
+        run: php artisan wayfinder:generate --with-form
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Run CI checks
+        run: composer ci:check
