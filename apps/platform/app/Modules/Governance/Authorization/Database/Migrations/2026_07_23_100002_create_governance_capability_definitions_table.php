@@ -28,6 +28,11 @@ return new class extends Migration
     /**
      * @var list<string>
      */
+    private const OPERATION_VALUES = ['read', 'write', 'export'];
+
+    /**
+     * @var list<string>
+     */
     private const STATE_VALUES = ['draft', 'active', 'retired'];
 
     /**
@@ -44,6 +49,7 @@ return new class extends Migration
             $table->string('domain');
             $table->string('action');
             $table->text('description');
+            $table->string('operation');
             $table->string('risk_class');
             $table->boolean('purpose_required');
             $table->boolean('approval_required');
@@ -61,6 +67,11 @@ return new class extends Migration
         $sessionAssurance = $this->quotedList(self::SESSION_ASSURANCE_VALUES);
         $state = $this->quotedList(self::STATE_VALUES);
         $forbidden = $this->quotedList(self::FORBIDDEN_SEGMENTS);
+        $operation = $this->quotedList(self::OPERATION_VALUES);
+
+        DB::statement(
+            "ALTER TABLE governance.capability_definitions ADD CONSTRAINT capability_definitions_operation_check CHECK (operation IN ({$operation}))"
+        );
 
         DB::statement(
             "ALTER TABLE governance.capability_definitions ADD CONSTRAINT capability_definitions_risk_class_check CHECK (risk_class IN ({$riskClass}))"

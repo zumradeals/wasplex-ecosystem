@@ -116,9 +116,18 @@ class DefaultDenialTest extends AuthorizationTestCase
         $link = $this->activeLinkFor($user);
         $policy = $this->makePolicy();
 
-        $grant = $this->proposeAndActivateGrant($link, $capability, $policy, $this->makeAuthor());
-        // L'état reste "active" en base ; seule l'échéance a expiré.
-        $grant->forceFill(['valid_from' => now()->subMinutes(2), 'valid_until' => now()->subMinute()])->save();
+        // Les dates de validité sont désormais figées après création
+        // (P003-B1.3 §4) : l'échéance déjà expirée est posée dès la
+        // proposition plutôt que mutée après coup. L'état stocké reste
+        // "active" en base ; seule l'échéance a expiré.
+        $this->proposeAndActivateGrant(
+            $link,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            validFrom: now()->subMinutes(2),
+            validUntil: now()->subMinute(),
+        );
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest($user, 'sample.read'));
 
@@ -183,9 +192,11 @@ class DefaultDenialTest extends AuthorizationTestCase
         $link = $this->activeLinkFor($user);
         $policy = $this->makePolicy();
 
-        $grant = $this->proposeAndActivateGrant($link, $capability, $policy, $this->makeAuthor());
-        // Version de schéma inconnue simulée directement en base.
-        $grant->forceFill(['scope_schema_version' => 99])->save();
+        $author = $this->makeAuthor();
+        // Version de schéma inconnue : un grant sémantiquement figé après
+        // création (P003-B1.3 §4) ne peut plus être muté pour simuler ce
+        // cas, il est donc directement inséré ainsi.
+        $this->insertRawGrant($link, $capability, $policy, $author, ['scope_schema_version' => 99]);
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest($user, 'sample.read'));
 
@@ -199,8 +210,8 @@ class DefaultDenialTest extends AuthorizationTestCase
         $link = $this->activeLinkFor($user);
         $policy = $this->makePolicy();
 
-        $grant = $this->proposeAndActivateGrant($link, $capability, $policy, $this->makeAuthor());
-        $grant->forceFill(['conditions_schema_version' => 99])->save();
+        $author = $this->makeAuthor();
+        $this->insertRawGrant($link, $capability, $policy, $author, ['conditions_schema_version' => 99]);
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest($user, 'sample.read'));
 

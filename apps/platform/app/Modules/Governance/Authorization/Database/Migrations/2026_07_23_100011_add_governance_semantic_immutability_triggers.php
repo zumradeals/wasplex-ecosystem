@@ -32,6 +32,7 @@ return new class extends Migration
                     NEW.domain IS DISTINCT FROM OLD.domain OR
                     NEW.action IS DISTINCT FROM OLD.action OR
                     NEW.description IS DISTINCT FROM OLD.description OR
+                    NEW.operation IS DISTINCT FROM OLD.operation OR
                     NEW.risk_class IS DISTINCT FROM OLD.risk_class OR
                     NEW.purpose_required IS DISTINCT FROM OLD.purpose_required OR
                     NEW.approval_required IS DISTINCT FROM OLD.approval_required OR
@@ -119,10 +120,41 @@ return new class extends Migration
             .'BEFORE INSERT OR UPDATE OR DELETE ON governance.role_template_capabilities '
             .'FOR EACH ROW EXECUTE FUNCTION governance.prevent_active_role_template_capabilities_mutation()'
         );
+
+        // Le catalogue des finalités autorisées d'une capacité active est
+        // figé au même titre que celui d'un role_templates actif : toute
+        // évolution exige une nouvelle version de la capacité (P003-B1.3 §5).
+        DB::statement(<<<'SQL'
+            CREATE OR REPLACE FUNCTION governance.prevent_active_capability_purposes_mutation()
+            RETURNS trigger AS $$
+            DECLARE
+                capability_state text;
+            BEGIN
+                SELECT state INTO capability_state
+                FROM governance.capability_definitions
+                WHERE id = COALESCE(NEW.capability_definition_id, OLD.capability_definition_id);
+
+                IF capability_state = 'active' THEN
+                    RAISE EXCEPTION 'governance: le catalogue de finalités d''une capability_definitions active ne peut pas être modifié ; créez une nouvelle version (P003-B1.3 §5)';
+                END IF;
+
+                RETURN COALESCE(NEW, OLD);
+            END;
+            $$ LANGUAGE plpgsql;
+        SQL);
+
+        DB::statement(
+            'CREATE TRIGGER capability_purposes_prevent_active_mutation '
+            .'BEFORE INSERT OR UPDATE OR DELETE ON governance.capability_purposes '
+            .'FOR EACH ROW EXECUTE FUNCTION governance.prevent_active_capability_purposes_mutation()'
+        );
     }
 
     public function down(): void
     {
+        DB::statement('DROP TRIGGER IF EXISTS capability_purposes_prevent_active_mutation ON governance.capability_purposes');
+        DB::statement('DROP FUNCTION IF EXISTS governance.prevent_active_capability_purposes_mutation()');
+
         DB::statement('DROP TRIGGER IF EXISTS role_template_capabilities_prevent_active_mutation ON governance.role_template_capabilities');
         DB::statement('DROP FUNCTION IF EXISTS governance.prevent_active_role_template_capabilities_mutation()');
 

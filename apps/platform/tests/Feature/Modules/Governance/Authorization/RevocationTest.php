@@ -40,8 +40,16 @@ class RevocationTest extends AuthorizationTestCase
         $link = $this->activeLinkFor($user);
         $policy = $this->makePolicy();
 
-        $grant = $this->proposeAndActivateGrant($link, $capability, $policy, $this->makeAuthor());
-        $grant->forceFill(['valid_from' => now()->subMinutes(2), 'valid_until' => now()->subMinute()])->save();
+        // Les dates de validité sont figées après création (P003-B1.3 §4) :
+        // l'échéance déjà expirée est posée dès la proposition.
+        $grant = $this->proposeAndActivateGrant(
+            $link,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            validFrom: now()->subMinutes(2),
+            validUntil: now()->subMinute(),
+        );
 
         // L'état stocké reste "active" : aucune tâche planifiée n'est intervenue.
         $this->assertSame(GrantState::Active, $grant->fresh()->state);

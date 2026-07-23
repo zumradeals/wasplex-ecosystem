@@ -48,13 +48,19 @@ class AuthorizationGrantsTest extends AuthorizationTestCase
         $organization = $this->makeOrganization();
         $membership = $this->makeActiveMembership($user, $organization);
 
-        $this->proposeAndActivateGrant($membership, $capability, $policy, $this->makeAuthor());
+        $this->proposeAndActivateGrant(
+            $membership,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            scope: ScopePayload::fromArray(['organization_id' => $organization->id]),
+        );
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
             $user,
             'sample.read',
             membershipId: $membership->id,
-            resource: $this->makeResourceContext(ownerPersonId: $link->person_id),
+            resource: $this->makeResourceContext(ownerPersonId: $link->person_id, organizationId: $organization->id),
         ));
 
         $this->assertSame(AuthorizationDecision::Allowed, $result->decision);

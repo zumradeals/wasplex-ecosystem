@@ -81,6 +81,11 @@ final readonly class ScopePayload
         }
 
         $self = self::readBool($payload, 'self');
+
+        if ($self === false) {
+            throw new InvalidScopePayloadException('scope payload "self" must not be false; a non-restriction must never be expressed explicitly, omit the key instead');
+        }
+
         $organizationId = self::readString($payload, 'organization_id');
         $resourceType = self::readString($payload, 'resource_type');
         $resourceIds = self::readList($payload, 'resource_ids');
@@ -100,6 +105,21 @@ final readonly class ScopePayload
             if ($environment === null) {
                 throw new InvalidScopePayloadException('scope payload "environment" is not a known value');
             }
+        }
+
+        // "fields" seul ne constitue jamais une restriction : il qualifie un
+        // effet masked appliqué à une autre dimension déjà restrictive
+        // (P003-B1.3 §1). Au moins une des dimensions ci-dessous doit être
+        // explicitement posée.
+        if ($self !== true
+            && $organizationId === null
+            && $resourceType === null
+            && $resourceIds === null
+            && $countryCode === null
+            && $territoryCodes === null
+            && $environment === null
+        ) {
+            throw new InvalidScopePayloadException('scope payload requires at least one effective restriction (fields alone never qualifies as a restriction)');
         }
 
         return new self(

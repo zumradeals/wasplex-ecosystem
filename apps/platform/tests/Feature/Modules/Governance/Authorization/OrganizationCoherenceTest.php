@@ -5,6 +5,7 @@ namespace Tests\Feature\Modules\Governance\Authorization;
 use App\Modules\Governance\Authorization\Enums\AuthorizationDecision;
 use App\Modules\Governance\Authorization\Enums\GrantEffect;
 use App\Modules\Governance\Authorization\Enums\GrantSource;
+use App\Modules\Governance\Authorization\Enums\GrantState;
 use App\Modules\Governance\Authorization\Services\AuthorizationEngine;
 use App\Modules\Governance\Authorization\Services\Exceptions\SubjectOrganizationMismatchException;
 use App\Modules\Governance\Authorization\Services\GrantManager;
@@ -13,6 +14,7 @@ use App\Modules\Governance\Authorization\Support\ScopePayload;
 use App\Modules\Identity\Enums\OrganizationState;
 use App\Modules\Identity\Models\PersonAccountLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -144,7 +146,13 @@ class OrganizationCoherenceTest extends AuthorizationTestCase
         $organization = $this->makeOrganization('Organisation Cohérence 4A');
         $membership = $this->makeActiveMembership($user, $organization);
 
-        $this->proposeAndActivateGrant($membership, $capability, $policy, $this->makeAuthor());
+        $this->proposeAndActivateGrant(
+            $membership,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            scope: ScopePayload::fromArray(['organization_id' => $organization->id]),
+        );
         $membership->update(['status' => 'suspended']);
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
@@ -167,7 +175,13 @@ class OrganizationCoherenceTest extends AuthorizationTestCase
         $organization = $this->makeOrganization('Organisation Cohérence 4B');
         $membership = $this->makeActiveMembership($user, $organization);
 
-        $this->proposeAndActivateGrant($membership, $capability, $policy, $this->makeAuthor());
+        $this->proposeAndActivateGrant(
+            $membership,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            scope: ScopePayload::fromArray(['organization_id' => $organization->id]),
+        );
         $membership->update(['status' => 'revoked']);
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
@@ -190,7 +204,13 @@ class OrganizationCoherenceTest extends AuthorizationTestCase
         $organization = $this->makeOrganization('Organisation Cohérence 5A');
         $membership = $this->makeActiveMembership($user, $organization);
 
-        $this->proposeAndActivateGrant($membership, $capability, $policy, $this->makeAuthor());
+        $this->proposeAndActivateGrant(
+            $membership,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            scope: ScopePayload::fromArray(['organization_id' => $organization->id]),
+        );
         $organization->update(['state' => OrganizationState::Closed]);
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
@@ -213,7 +233,13 @@ class OrganizationCoherenceTest extends AuthorizationTestCase
         $organization = $this->makeOrganization('Organisation Cohérence 5B');
         $membership = $this->makeActiveMembership($user, $organization);
 
-        $this->proposeAndActivateGrant($membership, $capability, $policy, $this->makeAuthor());
+        $this->proposeAndActivateGrant(
+            $membership,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            scope: ScopePayload::fromArray(['organization_id' => $organization->id]),
+        );
         $organization->update(['state' => OrganizationState::Suspended]);
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
@@ -252,5 +278,134 @@ class OrganizationCoherenceTest extends AuthorizationTestCase
         ));
 
         $this->assertSame(AuthorizationDecision::Allowed, $result->decision);
+    }
+
+    public function test_membership_subject_without_organization_scope_is_refused_at_proposal(): void
+    {
+        $user = $this->makeUser('coherence-7@example.com');
+        $capability = $this->makeCapability('sample.read');
+        $policy = $this->makePolicy();
+        $organization = $this->makeOrganization('Organisation Cohérence 7');
+        $membership = $this->makeActiveMembership($user, $organization);
+
+        $this->expectException(SubjectOrganizationMismatchException::class);
+
+        app(GrantManager::class)->propose(
+            subject: $membership,
+            capability: $capability,
+            policy: $policy,
+            // "self" seul n'est jamais une restriction organisationnelle :
+            // un sujet porté par une appartenance exige toujours
+            // organization_id (P003-B1.3 §2).
+            scope: ScopePayload::fromArray(['self' => true]),
+            conditions: ConditionsPayload::fromArray([]),
+            effect: GrantEffect::Allow,
+            source: GrantSource::Direct,
+            author: $this->makeAuthor(),
+            purpose: null,
+            roleTemplate: null,
+            sourceReference: null,
+            validFrom: now(),
+            validUntil: null,
+            correlationId: (string) Str::uuid(),
+        );
+    }
+
+    /**
+     * Défense en profondeur (P003-B1.3 §2) : même un grant malformé injecté
+     * directement en base (donc jamais passé par GrantManager) doit être
+     * refusé par le moteur, jamais silencieusement accepté.
+     */
+    public function test_a_malformed_membership_grant_injected_directly_in_database_is_refused(): void
+    {
+        $user = $this->makeUser('coherence-8@example.com');
+        $capability = $this->makeCapability('sample.read');
+        $policy = $this->makePolicy();
+        $organization = $this->makeOrganization('Organisation Cohérence 8');
+        $membership = $this->makeActiveMembership($user, $organization);
+        $author = $this->makeAuthor();
+
+        DB::table('governance.grants')->insert([
+            'id' => (string) Str::uuid(),
+            'membership_id' => $membership->id,
+            'capability_definition_id' => $capability->id,
+            'policy_version_id' => $policy->id,
+            'scope_schema_version' => ScopePayload::SCHEMA_VERSION,
+            // Portée valide en elle-même, mais sans organization_id : une
+            // habilitation organisationnelle sans cette restriction ne
+            // devrait jamais exister, mais le moteur doit s'en protéger même
+            // si elle apparaît malgré tout (P003-B1.3 §2).
+            'scope_payload' => json_encode(['self' => true], JSON_FORCE_OBJECT),
+            'conditions_schema_version' => ConditionsPayload::SCHEMA_VERSION,
+            'conditions_payload' => json_encode([], JSON_FORCE_OBJECT),
+            'effect' => GrantEffect::Allow->value,
+            'state' => GrantState::Active->value,
+            'source' => GrantSource::Direct->value,
+            'valid_from' => now(),
+            'author_person_account_link_id' => $author->id,
+            'activated_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
+            $user,
+            'sample.read',
+            membershipId: $membership->id,
+            resource: $this->makeResourceContext(organizationId: $organization->id),
+        ));
+
+        $this->assertSame(AuthorizationDecision::Denied, $result->decision);
+    }
+
+    public function test_membership_a_with_resource_b_is_refused(): void
+    {
+        $user = $this->makeUser('coherence-9@example.com');
+        $capability = $this->makeCapability('sample.read');
+        $policy = $this->makePolicy();
+        $organizationA = $this->makeOrganization('Organisation Cohérence 9A');
+        $organizationB = $this->makeOrganization('Organisation Cohérence 9B');
+        $membership = $this->makeActiveMembership($user, $organizationA);
+
+        $this->proposeAndActivateGrant(
+            $membership,
+            $capability,
+            $policy,
+            $this->makeAuthor(),
+            scope: ScopePayload::fromArray(['organization_id' => $organizationA->id]),
+        );
+
+        $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
+            $user,
+            'sample.read',
+            membershipId: $membership->id,
+            resource: $this->makeResourceContext(organizationId: $organizationB->id),
+        ));
+
+        $this->assertSame(AuthorizationDecision::Denied, $result->decision);
+    }
+
+    /**
+     * Une ressource organisationnelle ne peut jamais être autorisée par un
+     * grant strictement individuel, même si sa portée ne déclare aucune
+     * restriction d'organisation (P003-B1.3 §2).
+     */
+    public function test_individual_grant_never_authorizes_an_organizational_resource(): void
+    {
+        $user = $this->makeUser('coherence-10@example.com');
+        $capability = $this->makeCapability('sample.read');
+        $link = $this->activeLinkFor($user);
+        $policy = $this->makePolicy();
+        $organization = $this->makeOrganization('Organisation Cohérence 10');
+
+        $this->proposeAndActivateGrant($link, $capability, $policy, $this->makeAuthor());
+
+        $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
+            $user,
+            'sample.read',
+            resource: $this->makeResourceContext(ownerPersonId: $link->person_id, organizationId: $organization->id),
+        ));
+
+        $this->assertSame(AuthorizationDecision::Denied, $result->decision);
     }
 }

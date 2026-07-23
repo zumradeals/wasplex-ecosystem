@@ -13,7 +13,9 @@ use App\Modules\Governance\Authorization\Enums\Operation;
 use App\Modules\Governance\Authorization\Enums\PolicyState;
 use App\Modules\Governance\Authorization\Enums\PurposeState;
 use App\Modules\Governance\Authorization\Models\CapabilityDefinition;
+use App\Modules\Governance\Authorization\Models\CapabilityPurpose;
 use App\Modules\Governance\Authorization\Models\Grant;
+use App\Modules\Governance\Authorization\Models\PolicyVersion;
 use App\Modules\Governance\Authorization\Support\ConditionsMatcher;
 use App\Modules\Governance\Authorization\Support\InvalidConditionsPayloadException;
 use App\Modules\Governance\Authorization\Support\InvalidScopePayloadException;
@@ -25,6 +27,7 @@ use App\Modules\Identity\Enums\MembershipStatus;
 use App\Modules\Identity\Enums\OrganizationState;
 use App\Modules\Identity\Models\Membership;
 use App\Modules\Identity\Models\PersonAccountLink;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -80,17 +83,32 @@ class AuthorizationEngine
     {
         $empty = ['membershipId' => null, 'organizationId' => null, 'capabilityVersion' => null, 'policyVersion' => null];
 
-        // 1. Capacité inconnue ou inactive.
+        // 1. Capacité inconnue, inactive ou hors période d'effet. Une
+        // capacité active mais future ou échue est refusée au même titre
+        // qu'une capacité inconnue (P003-B1.3 §5).
         $capability = CapabilityDefinition::query()
             ->where('stable_key', $request->capabilityKey)
             ->where('state', CapabilityState::Active->value)
+            ->where('effective_from', '<=', $request->evaluatedAt)
+            ->where(function ($query) use ($request): void {
+                $query->whereNull('effective_to')->orWhere('effective_to', '>', $request->evaluatedAt);
+            })
             ->first();
 
         if ($capability === null) {
-            return [...$empty, 'result' => $this->denied($request, 'unknown_or_inactive_capability', "Cette capacité n'existe pas ou n'est plus active.")];
+            return [...$empty, 'result' => $this->denied($request, 'unknown_or_inactive_capability', "Cette capacité n'existe pas, n'est plus active, ou n'est pas en période d'effet.")];
         }
 
         $empty['capabilityVersion'] = $capability->version;
+
+        // 2. Opération atomique de la capacité : une capacité de lecture ne
+        // peut jamais autoriser une écriture, et réciproquement ; un export
+        // exige une capacité dédiée. Vérifié avant tout effet de grant, quel
+        // qu'il soit — aucun effet `allow` ne contourne cette barrière
+        // (P003-B1.3 §3).
+        if ($request->operation !== $capability->operation) {
+            return [...$empty, 'result' => $this->denied($request, 'operation_mismatch', "Cette capacité ne couvre pas l'opération demandée.", $capability)];
+        }
 
         // 3. Compte, liaison active et assurances.
         if ($request->assurance->accountState !== AccountState::Active) {
@@ -149,22 +167,32 @@ class AuthorizationEngine
         }
 
         $sawStepUpCandidate = false;
+        $lastPolicyKey = null;
         $lastPolicyVersion = null;
 
-        /** @var list<array{grant: Grant, result: AuthorizationResult}> $qualifying */
+        /** @var list<array{grant: Grant, policy: PolicyVersion, result: AuthorizationResult}> $qualifying */
         $qualifying = [];
 
         foreach ($candidates as $grant) {
-            // 2. Politique absente, inactive ou hors période, propre à ce grant.
+            // 2 (grant). Politique absente, inactive ou hors période, propre
+            // à ce grant.
             $policy = $grant->policyVersion;
 
             if ($policy === null || $policy->state !== PolicyState::Active) {
                 continue;
             }
 
+            if (! $this->isWithinPeriod($policy->effective_from, $policy->effective_to, $request->evaluatedAt)) {
+                continue;
+            }
+
+            $lastPolicyKey = $policy->stable_key;
             $lastPolicyVersion = $policy->version;
 
-            // 7. Finalité.
+            // 7. Finalité : état, période, et actualité de la liaison
+            // capability_purposes (une capacité active peut avoir vu son
+            // catalogue de finalités évoluer depuis la proposition du grant,
+            // P003-B1.3 §5).
             if ($capability->purpose_required) {
                 if ($request->purposeKey === null || $grant->purposeDefinition === null) {
                     continue;
@@ -173,6 +201,19 @@ class AuthorizationEngine
                 $purpose = $grant->purposeDefinition;
 
                 if ($purpose->stable_key !== $request->purposeKey || $purpose->state !== PurposeState::Active) {
+                    continue;
+                }
+
+                if (! $this->isWithinPeriod($purpose->effective_from, $purpose->effective_to, $request->evaluatedAt)) {
+                    continue;
+                }
+
+                $purposeCurrentlyLinked = CapabilityPurpose::query()
+                    ->where('capability_definition_id', $capability->id)
+                    ->where('purpose_definition_id', $purpose->id)
+                    ->exists();
+
+                if (! $purposeCurrentlyLinked) {
                     continue;
                 }
             }
@@ -186,14 +227,49 @@ class AuthorizationEngine
                 continue;
             }
 
+            // Isolation organisationnelle, défense en profondeur (P003-B1.3
+            // §2) : un grant porté par une appartenance sans organization_id
+            // de portée est invalide et refusé ; l'organisation du grant et
+            // celle de l'appartenance active résolue doivent coïncider
+            // exactement. Une ressource organisationnelle n'est par ailleurs
+            // jamais couverte par un grant strictement individuel.
+            if ($grant->membership_id !== null) {
+                if ($scope->organizationId === null) {
+                    continue;
+                }
+
+                if ($organization === null || $scope->organizationId !== $organization->id) {
+                    continue;
+                }
+            }
+
+            if ($request->resource->organizationId !== null && $grant->membership_id === null) {
+                continue;
+            }
+
             $subjectPersonId = $membership !== null ? $membership->personAccountLink->person_id : $link->person_id;
 
             if (! $this->scopeMatcher->matches($scope, $request->resource, $subjectPersonId)) {
                 continue;
             }
 
-            // 9-10. Conditions d'assurance, plancher de session de la
-            // capacité inclus : un grant ne peut jamais l'abaisser (P003-B1.1 §1).
+            // 9. Compatibilité entre l'effet du grant et l'opération
+            // demandée, vérifiée AVANT les conditions de session : un grant
+            // dont l'effet ne pourrait de toute façon jamais couvrir cette
+            // opération ne doit jamais être signalé comme candidat de
+            // renforcement de session (P003-B1.3 §6).
+            if (! $this->effectIsCompatibleWithOperation($grant->effect, $request->operation)) {
+                continue;
+            }
+
+            // 10. Conditions d'assurance (contact, identité, unicité, statut
+            // organisationnel, puis session en dernier), plancher de session
+            // de la capacité inclus : un grant ne peut jamais l'abaisser
+            // (P003-B1.1 §1). À ce stade, portée, organisation, finalité,
+            // période et compatibilité d'opération sont déjà acquises pour
+            // ce grant : une insuffisance non liée à la session est un refus
+            // définitif ; une insuffisance isolée de session est un
+            // candidat de renforcement légitime (P003-B1.3a §priorité).
             try {
                 $conditions = $grant->conditions();
             } catch (InvalidConditionsPayloadException) {
@@ -214,10 +290,12 @@ class AuthorizationEngine
                 continue;
             }
 
-            // 11. Approbation d'action obligatoire : P003-B1 ne possède pas
-            // encore de preuve d'approbation, donc jamais "allowed" ici.
-            // Ce contrôle porte sur la capacité, identique pour tout grant
-            // qualifiant : aucune ambiguïté multi-grants n'est possible ici.
+            // 11. Approbation d'action obligatoire : retournée seulement
+            // lorsque toutes les autres conditions, y compris le niveau de
+            // session, sont déjà satisfaites — jamais au profit d'une
+            // identité insuffisamment qualifiée ou d'une session faible
+            // (P003-B1.3a §priorité). P003-B1 ne possède pas encore de
+            // preuve d'approbation, donc jamais "allowed" ici.
             if ($capability->approval_required) {
                 return [
                     ...$empty,
@@ -227,22 +305,19 @@ class AuthorizationEngine
                         'approval_required',
                         'Cette action exige une approbation distincte avant exécution.',
                         $request->correlationId,
-                        $capability->stable_key,
-                        $capability->version,
+                        $policy->stable_key,
+                        $policy->version,
+                        capabilityKey: $capability->stable_key,
+                        capabilityVersion: $capability->version,
                     ),
                 ];
             }
 
-            $effectResult = $this->applyEffect($request, $capability, $grant, $scope);
-
-            // Un effet incompatible avec l'opération demandée (ex. read_only
-            // + write) ne qualifie pas ce grant pour cette requête précise,
-            // mais ne neutralise pas les autres candidats.
-            if ($effectResult->decision === AuthorizationDecision::Denied) {
-                continue;
-            }
-
-            $qualifying[] = ['grant' => $grant, 'result' => $effectResult];
+            $qualifying[] = [
+                'grant' => $grant,
+                'policy' => $policy,
+                'result' => $this->buildEffectResult($request, $capability, $policy, $grant, $scope),
+            ];
         }
 
         if ($qualifying === []) {
@@ -255,8 +330,10 @@ class AuthorizationEngine
                         'session_assurance_insufficient',
                         'Une authentification plus forte est requise pour cette action.',
                         $request->correlationId,
-                        $capability->stable_key,
-                        $capability->version,
+                        $lastPolicyKey,
+                        $lastPolicyVersion,
+                        capabilityKey: $capability->stable_key,
+                        capabilityVersion: $capability->version,
                     ),
                 ];
             }
@@ -283,8 +360,8 @@ class AuthorizationEngine
                     'ambiguous_grants',
                     "Plusieurs droits actifs s'appliquent avec des effets incompatibles ; l'accès est refusé par prudence.",
                     $request->correlationId,
-                    $capability->stable_key,
-                    $capability->version,
+                    capabilityKey: $capability->stable_key,
+                    capabilityVersion: $capability->version,
                     obligations: [new AuthorizationObligation('ambiguous_grants', ['grant_ids' => $grantIds])],
                 ),
             ];
@@ -301,7 +378,7 @@ class AuthorizationEngine
 
         return [
             ...$empty,
-            'policyVersion' => $chosen['grant']->policyVersion->version,
+            'policyVersion' => $chosen['policy']->version,
             'result' => new AuthorizationResult(
                 decision: $chosenResult->decision,
                 reason: $chosenResult->reason,
@@ -311,51 +388,80 @@ class AuthorizationEngine
                 validUntil: $chosenResult->validUntil,
                 correlationId: $chosenResult->correlationId,
                 allowedFields: $chosenResult->allowedFields,
+                capabilityKey: $chosenResult->capabilityKey,
+                capabilityVersion: $chosenResult->capabilityVersion,
             ),
         ];
     }
 
-    private function applyEffect(
+    private function isWithinPeriod(CarbonInterface $effectiveFrom, ?CarbonInterface $effectiveTo, CarbonInterface $evaluatedAt): bool
+    {
+        if ($evaluatedAt->lessThan($effectiveFrom)) {
+            return false;
+        }
+
+        return $effectiveTo === null || $evaluatedAt->lessThan($effectiveTo);
+    }
+
+    /**
+     * Un effet `read_only` ou `masked` ne couvre jamais autre chose qu'une
+     * lecture ; `allow` ne restreint pas l'opération par lui-même mais reste
+     * toujours borné, en amont, par l'opération déclarée de la capacité
+     * (P003-B1.3 §3, §6).
+     */
+    private function effectIsCompatibleWithOperation(GrantEffect $effect, Operation $operation): bool
+    {
+        return match ($effect) {
+            GrantEffect::Allow => true,
+            GrantEffect::ReadOnly, GrantEffect::Masked => $operation === Operation::Read,
+        };
+    }
+
+    /**
+     * Construit le résultat d'un grant déjà reconnu qualifiant : portée,
+     * organisation, finalité, période, opération et compatibilité d'effet
+     * ont toutes déjà été vérifiées par l'appelant.
+     */
+    private function buildEffectResult(
         AuthorizationRequest $request,
         CapabilityDefinition $capability,
+        PolicyVersion $policy,
         Grant $grant,
         ScopePayload $scope,
     ): AuthorizationResult {
-        if ($request->operation === Operation::Export && $capability->action !== 'export') {
-            return $this->denied($request, 'export_requires_dedicated_capability', "L'export exige une capacité explicitement conçue pour l'export.", $capability);
-        }
-
         return match ($grant->effect) {
             GrantEffect::Allow => AuthorizationResult::make(
                 AuthorizationDecision::Allowed,
                 'allowed',
                 'Action autorisée.',
                 $request->correlationId,
-                $capability->stable_key,
-                $capability->version,
+                $policy->stable_key,
+                $policy->version,
+                capabilityKey: $capability->stable_key,
+                capabilityVersion: $capability->version,
             ),
-            GrantEffect::ReadOnly => $request->operation === Operation::Read
-                ? AuthorizationResult::make(
-                    AuthorizationDecision::AllowedReadOnly,
-                    'allowed_read_only',
-                    'Action autorisée en lecture seule.',
-                    $request->correlationId,
-                    $capability->stable_key,
-                    $capability->version,
-                )
-                : $this->denied($request, 'read_only_grant_cannot_write', "Ce droit n'autorise que la lecture.", $capability),
-            GrantEffect::Masked => $request->operation === Operation::Read
-                ? AuthorizationResult::make(
-                    AuthorizationDecision::AllowedMasked,
-                    'allowed_masked',
-                    'Action autorisée avec certains champs masqués.',
-                    $request->correlationId,
-                    $capability->stable_key,
-                    $capability->version,
-                    obligations: [new AuthorizationObligation('field_mask', ['fields' => $scope->fields ?? []])],
-                    allowedFields: $scope->fields ?? [],
-                )
-                : $this->denied($request, 'masked_grant_cannot_write', 'Ce droit ne permet pas cette opération.', $capability),
+            GrantEffect::ReadOnly => AuthorizationResult::make(
+                AuthorizationDecision::AllowedReadOnly,
+                'allowed_read_only',
+                'Action autorisée en lecture seule.',
+                $request->correlationId,
+                $policy->stable_key,
+                $policy->version,
+                capabilityKey: $capability->stable_key,
+                capabilityVersion: $capability->version,
+            ),
+            GrantEffect::Masked => AuthorizationResult::make(
+                AuthorizationDecision::AllowedMasked,
+                'allowed_masked',
+                'Action autorisée avec certains champs masqués.',
+                $request->correlationId,
+                $policy->stable_key,
+                $policy->version,
+                obligations: [new AuthorizationObligation('field_mask', ['fields' => $scope->fields ?? []])],
+                allowedFields: $scope->fields ?? [],
+                capabilityKey: $capability->stable_key,
+                capabilityVersion: $capability->version,
+            ),
         };
     }
 
@@ -370,8 +476,8 @@ class AuthorizationEngine
             $reasonCode,
             $explanation,
             $request->correlationId,
-            $capability?->stable_key,
-            $capability?->version,
+            capabilityKey: $capability?->stable_key,
+            capabilityVersion: $capability?->version,
         );
     }
 }

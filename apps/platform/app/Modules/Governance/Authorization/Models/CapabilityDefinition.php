@@ -3,6 +3,7 @@
 namespace App\Modules\Governance\Authorization\Models;
 
 use App\Modules\Governance\Authorization\Enums\CapabilityState;
+use App\Modules\Governance\Authorization\Enums\Operation;
 use App\Modules\Governance\Authorization\Enums\RiskClass;
 use App\Modules\Identity\Enums\SessionAssurance;
 use Carbon\CarbonImmutable;
@@ -20,6 +21,7 @@ use Illuminate\Support\Str;
  * @property string $domain
  * @property string $action
  * @property string $description
+ * @property Operation $operation
  * @property RiskClass $risk_class
  * @property bool $purpose_required
  * @property bool $approval_required
@@ -39,7 +41,7 @@ class CapabilityDefinition extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'stable_key', 'version', 'domain', 'action', 'description',
+        'stable_key', 'version', 'domain', 'action', 'description', 'operation',
         'risk_class', 'purpose_required', 'approval_required',
         'minimum_session_assurance', 'state', 'effective_from', 'effective_to',
     ];
@@ -48,6 +50,7 @@ class CapabilityDefinition extends Model
     {
         return [
             'version' => 'integer',
+            'operation' => Operation::class,
             'risk_class' => RiskClass::class,
             'purpose_required' => 'boolean',
             'approval_required' => 'boolean',

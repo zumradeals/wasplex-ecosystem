@@ -206,17 +206,15 @@ class SemanticImmutabilityTest extends AuthorizationTestCase
         ]);
         $roleTemplate->update(['state' => RoleTemplateState::Active]);
 
+        // La référence au rôle modèle est posée dès la proposition : après
+        // création, role_template_id n'est plus modifiable (P003-B1.3 §4).
         $this->proposeAndActivateGrant(
             $link,
             $capability,
             $policy,
             $this->makeAuthor(),
+            roleTemplate: $roleTemplate,
         );
-
-        // Établir la référence explicite du grant vers ce rôle modèle.
-        DB::table('governance.grants')
-            ->where('capability_definition_id', $capability->id)
-            ->update(['role_template_id' => $roleTemplate->id]);
 
         $this->expectException(QueryException::class);
 

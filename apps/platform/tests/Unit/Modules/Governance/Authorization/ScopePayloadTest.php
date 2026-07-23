@@ -24,6 +24,28 @@ class ScopePayloadTest extends TestCase
         ScopePayload::fromArray([]);
     }
 
+    public function test_self_false_is_rejected(): void
+    {
+        $this->expectException(InvalidScopePayloadException::class);
+
+        ScopePayload::fromArray(['self' => false]);
+    }
+
+    public function test_fields_alone_never_constitutes_a_scope(): void
+    {
+        $this->expectException(InvalidScopePayloadException::class);
+
+        ScopePayload::fromArray(['fields' => ['name']]);
+    }
+
+    public function test_fields_combined_with_an_effective_restriction_is_accepted(): void
+    {
+        $scope = ScopePayload::fromArray(['self' => true, 'fields' => ['name']]);
+
+        $this->assertTrue($scope->self);
+        $this->assertSame(['name'], $scope->fields);
+    }
+
     public function test_an_unknown_key_is_rejected(): void
     {
         $this->expectException(InvalidScopePayloadException::class);

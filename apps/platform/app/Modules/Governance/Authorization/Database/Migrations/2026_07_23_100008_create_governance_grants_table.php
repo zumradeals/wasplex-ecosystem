@@ -153,6 +153,11 @@ return new class extends Migration
             .'CHECK (octet_length(scope_payload::text) <= 8192)'
         );
 
+        DB::statement(
+            'ALTER TABLE governance.grants ADD CONSTRAINT grants_conditions_payload_size_check '
+            .'CHECK (octet_length(conditions_payload::text) <= 8192)'
+        );
+
         DB::statement(<<<'SQL'
             CREATE OR REPLACE FUNCTION governance.prevent_grants_deletion()
             RETURNS trigger AS $$
@@ -168,29 +173,88 @@ return new class extends Migration
             .'FOR EACH ROW EXECUTE FUNCTION governance.prevent_grants_deletion()'
         );
 
+        // Machine d'états explicite (P003-B1.3 §4) :
+        //   proposed  -> active, revoked, expired
+        //   active    -> suspended, revoked, expired
+        //   suspended -> revoked, expired
+        //   revoked, expired : terminaux.
+        // Aucune réactivation suspended -> active tant qu'aucun événement
+        // métier "resumed" n'existe ; aucune activation répétée active ->
+        // active ; toute transition identique (NEW.state = OLD.state) est
+        // également refusée par ce même déclencheur.
         DB::statement(<<<'SQL'
-            CREATE OR REPLACE FUNCTION governance.prevent_grant_reactivation()
+            CREATE OR REPLACE FUNCTION governance.enforce_grant_state_machine()
             RETURNS trigger AS $$
             BEGIN
-                IF OLD.state IN ('revoked', 'expired') AND NEW.state = 'active' THEN
-                    RAISE EXCEPTION 'governance: un grant révoqué ou expiré ne peut jamais redevenir actif par UPDATE (P003-B1 §9)';
+                IF NEW.state = OLD.state THEN
+                    RAISE EXCEPTION 'governance: une transition vers le même état de grant est refusée, y compris active -> active (aucune activation répétée), P003-B1.3 §4';
                 END IF;
+
+                IF NOT (
+                    (OLD.state = 'proposed' AND NEW.state IN ('active', 'revoked', 'expired')) OR
+                    (OLD.state = 'active' AND NEW.state IN ('suspended', 'revoked', 'expired')) OR
+                    (OLD.state = 'suspended' AND NEW.state IN ('revoked', 'expired'))
+                ) THEN
+                    RAISE EXCEPTION 'governance: transition d''état de grant refusée : % -> % (P003-B1.3 §4)', OLD.state, NEW.state;
+                END IF;
+
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
         SQL);
 
         DB::statement(
-            'CREATE TRIGGER grants_prevent_reactivation BEFORE UPDATE ON governance.grants '
-            .'FOR EACH ROW EXECUTE FUNCTION governance.prevent_grant_reactivation()'
+            'CREATE TRIGGER grants_enforce_state_machine BEFORE UPDATE ON governance.grants '
+            .'FOR EACH ROW EXECUTE FUNCTION governance.enforce_grant_state_machine()'
+        );
+
+        // Immutabilité sémantique (P003-B1.3 §4) : après création, aucun
+        // champ substantiel d'un grant n'est modifiable, quel que soit son
+        // état. Seuls le cycle de vie (state, activated_at,
+        // approver_person_account_link_id, revoked_at, revocation_reason,
+        // updated_at) restent mutables.
+        DB::statement(<<<'SQL'
+            CREATE OR REPLACE FUNCTION governance.prevent_grants_semantic_mutation()
+            RETURNS trigger AS $$
+            BEGIN
+                IF NEW.person_account_link_id IS DISTINCT FROM OLD.person_account_link_id OR
+                   NEW.membership_id IS DISTINCT FROM OLD.membership_id OR
+                   NEW.capability_definition_id IS DISTINCT FROM OLD.capability_definition_id OR
+                   NEW.purpose_definition_id IS DISTINCT FROM OLD.purpose_definition_id OR
+                   NEW.policy_version_id IS DISTINCT FROM OLD.policy_version_id OR
+                   NEW.role_template_id IS DISTINCT FROM OLD.role_template_id OR
+                   NEW.scope_schema_version IS DISTINCT FROM OLD.scope_schema_version OR
+                   NEW.scope_payload IS DISTINCT FROM OLD.scope_payload OR
+                   NEW.conditions_schema_version IS DISTINCT FROM OLD.conditions_schema_version OR
+                   NEW.conditions_payload IS DISTINCT FROM OLD.conditions_payload OR
+                   NEW.effect IS DISTINCT FROM OLD.effect OR
+                   NEW.source IS DISTINCT FROM OLD.source OR
+                   NEW.source_reference IS DISTINCT FROM OLD.source_reference OR
+                   NEW.valid_from IS DISTINCT FROM OLD.valid_from OR
+                   NEW.valid_until IS DISTINCT FROM OLD.valid_until OR
+                   NEW.author_person_account_link_id IS DISTINCT FROM OLD.author_person_account_link_id
+                THEN
+                    RAISE EXCEPTION 'governance: un grant ne peut voir aucun de ses champs sémantiques modifiés après création (P003-B1.3 §4)';
+                END IF;
+
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        SQL);
+
+        DB::statement(
+            'CREATE TRIGGER grants_prevent_semantic_mutation BEFORE UPDATE ON governance.grants '
+            .'FOR EACH ROW EXECUTE FUNCTION governance.prevent_grants_semantic_mutation()'
         );
     }
 
     public function down(): void
     {
-        DB::statement('DROP TRIGGER IF EXISTS grants_prevent_reactivation ON governance.grants');
+        DB::statement('DROP TRIGGER IF EXISTS grants_prevent_semantic_mutation ON governance.grants');
+        DB::statement('DROP FUNCTION IF EXISTS governance.prevent_grants_semantic_mutation()');
+        DB::statement('DROP TRIGGER IF EXISTS grants_enforce_state_machine ON governance.grants');
+        DB::statement('DROP FUNCTION IF EXISTS governance.enforce_grant_state_machine()');
         DB::statement('DROP TRIGGER IF EXISTS grants_prevent_deletion ON governance.grants');
-        DB::statement('DROP FUNCTION IF EXISTS governance.prevent_grant_reactivation()');
         DB::statement('DROP FUNCTION IF EXISTS governance.prevent_grants_deletion()');
         Schema::dropIfExists('governance.grants');
     }

@@ -17,12 +17,14 @@ use App\Modules\Governance\Authorization\Models\PolicyVersion;
 use App\Modules\Governance\Authorization\Models\PurposeDefinition;
 use App\Modules\Governance\Authorization\Models\RoleTemplate;
 use App\Modules\Governance\Authorization\Services\Exceptions\CapabilityNotAvailableException;
+use App\Modules\Governance\Authorization\Services\Exceptions\GrantNotProposedException;
 use App\Modules\Governance\Authorization\Services\Exceptions\PolicyNotAvailableException;
 use App\Modules\Governance\Authorization\Services\Exceptions\PurposeNotAuthorizedException;
 use App\Modules\Governance\Authorization\Services\Exceptions\SelfAuthorizationRefusedException;
 use App\Modules\Governance\Authorization\Services\Exceptions\SeparationOfDutiesViolationException;
 use App\Modules\Governance\Authorization\Services\Exceptions\SubjectOrganizationMismatchException;
 use App\Modules\Governance\Authorization\Support\ConditionsPayload;
+use App\Modules\Governance\Authorization\Support\InvalidScopePayloadException;
 use App\Modules\Governance\Authorization\Support\ScopePayload;
 use App\Modules\Identity\Models\Membership;
 use App\Modules\Identity\Models\PersonAccountLink;
@@ -63,6 +65,7 @@ class GrantManager
         $this->assertPolicyActive($policy);
         $this->assertPurposeValid($capability, $purpose);
         $this->assertSubjectOrganizationCoherence($subject, $scope);
+        $this->assertScopeEffectCoherence($scope, $effect);
 
         return DB::transaction(function () use (
             $subject, $capability, $policy, $scope, $conditions, $effect, $source,
@@ -95,11 +98,18 @@ class GrantManager
     }
 
     /**
+     * @throws GrantNotProposedException Le grant n'est plus au stade `proposed` (aucune réactivation ni activation répétée).
      * @throws SelfAuthorizationRefusedException Auteur = sujet sans approbateur distinct.
      * @throws SeparationOfDutiesViolationException Approbateur requis (sensitive/critical) ou identique à l'auteur.
      */
     public function activate(Grant $grant, PersonAccountLink $author, ?PersonAccountLink $approver, string $correlationId): Grant
     {
+        if ($grant->state !== GrantState::Proposed) {
+            throw new GrantNotProposedException(
+                "seul un grant à l'état proposed peut être activé ; état actuel : {$grant->state->value}"
+            );
+        }
+
         $capability = $grant->capabilityDefinition;
         $policy = $grant->policyVersion;
 
@@ -241,26 +251,52 @@ class GrantManager
      * Un `organization_id` de portée doit toujours correspondre exactement
      * à l'organisation réelle de l'appartenance portant le grant : une
      * liaison individuelle sans appartenance ne peut jamais recevoir une
-     * portée organisationnelle, et une appartenance ne peut jamais recevoir
-     * une portée déclarant l'organisation d'une autre (P003-B1.1 §2). Toute
+     * portée organisationnelle (P003-B1.1 §2). Réciproquement, un sujet
+     * porté par une appartenance exige TOUJOURS une portée déclarant
+     * l'organization_id de cette appartenance : une habilitation
+     * organisationnelle sans cette restriction explicite ne serait jamais
+     * détectable comme telle par le moteur (P003-B1.3 §2). Toute
      * incohérence est refusée dès la proposition, avant toute autorisation.
      */
     private function assertSubjectOrganizationCoherence(PersonAccountLink|Membership $subject, ScopePayload $scope): void
     {
-        if ($scope->organizationId === null) {
+        if ($subject instanceof Membership) {
+            if ($scope->organizationId === null) {
+                throw new SubjectOrganizationMismatchException(
+                    "un sujet porté par une appartenance exige toujours une portée déclarant l'organization_id de cette appartenance"
+                );
+            }
+
+            if ($subject->organization_id !== $scope->organizationId) {
+                throw new SubjectOrganizationMismatchException(
+                    "l'organization_id de la portée ne correspond pas à l'organisation réelle de l'appartenance"
+                );
+            }
+
             return;
         }
 
-        if (! $subject instanceof Membership) {
+        if ($scope->organizationId !== null) {
             throw new SubjectOrganizationMismatchException(
                 'une portée déclarant organization_id exige un sujet porté par une appartenance, pas une liaison individuelle seule'
             );
         }
+    }
 
-        if ($subject->organization_id !== $scope->organizationId) {
-            throw new SubjectOrganizationMismatchException(
-                "l'organization_id de la portée ne correspond pas à l'organisation réelle de l'appartenance"
-            );
+    /**
+     * Un effet `masked` n'a de sens que rapporté à une liste `fields`
+     * explicite ; réciproquement, `fields` n'a de sens que pour un effet
+     * `masked` — l'associer à `allow` ou `read_only` laisserait croire à une
+     * restriction de champs jamais appliquée par le moteur (P003-B1.3 §1).
+     */
+    private function assertScopeEffectCoherence(ScopePayload $scope, GrantEffect $effect): void
+    {
+        if ($effect === GrantEffect::Masked && ($scope->fields === null || $scope->fields === [])) {
+            throw new InvalidScopePayloadException('un effet masked exige une liste "fields" non vide dans la portée');
+        }
+
+        if ($effect !== GrantEffect::Masked && $scope->fields !== null) {
+            throw new InvalidScopePayloadException('la clé "fields" de la portée est refusée pour tout effet autre que masked');
         }
     }
 

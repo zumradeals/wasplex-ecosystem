@@ -197,9 +197,10 @@ class SessionAssuranceFloorTest extends AuthorizationTestCase
         $link = $this->activeLinkFor($user);
         $policy = $this->makePolicy();
 
-        $grant = $this->proposeAndActivateGrant($link, $capability, $policy, $this->makeAuthor());
-        // Version de schéma de conditions inconnue simulée directement en base.
-        $grant->forceFill(['conditions_schema_version' => 99])->save();
+        $author = $this->makeAuthor();
+        // Version de schéma de conditions inconnue : un grant sémantiquement
+        // figé après création (P003-B1.3 §4) est directement inséré ainsi.
+        $this->insertRawGrant($link, $capability, $policy, $author, ['conditions_schema_version' => 99]);
 
         $result = app(AuthorizationEngine::class)->evaluate($this->makeRequest(
             $user,
