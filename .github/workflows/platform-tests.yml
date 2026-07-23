@@ -90,8 +90,8 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict
 
-      - name: Run CI checks
-        run: composer ci:check
-
       - name: Build frontend assets
         run: npm run build
+
+      - name: Run CI checks
+        run: composer ci:check
