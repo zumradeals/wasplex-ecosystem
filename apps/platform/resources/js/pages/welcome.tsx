@@ -5,12 +5,12 @@ const engagements = [
     {
         title: 'Attention volontaire',
         description:
-            "Aucune sollicitation forcée. L'utilisateur choisit ce qu'il regarde et ce qu'il partage.",
+            "L'utilisateur choisit librement de participer et garde le contrôle de ses consentements.",
     },
     {
         title: 'Données protégées',
         description:
-            "Les données personnelles ne sont jamais vendues ni exposées comme une base de contacts.",
+            'Les données personnelles ne sont jamais vendues ni exposées comme une base de contacts.',
     },
     {
         title: 'Valeur traçable',
@@ -64,8 +64,7 @@ export default function Welcome() {
                         </p>
                         <h1 className="mt-3 text-3xl leading-tight font-bold text-balance text-[#10233F] sm:text-4xl dark:text-[#F5F8FC]">
                             Transformer l'attention publicitaire en valeur
-                            économique traçable et redistribuée aux
-                            populations.
+                            économique traçable et redistribuée aux populations.
                         </h1>
                     </section>
 
