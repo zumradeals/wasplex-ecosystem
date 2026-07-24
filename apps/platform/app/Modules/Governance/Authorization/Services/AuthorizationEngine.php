@@ -25,6 +25,7 @@ use App\Modules\Identity\Enums\AccountState;
 use App\Modules\Identity\Enums\LinkStatus;
 use App\Modules\Identity\Enums\MembershipStatus;
 use App\Modules\Identity\Enums\OrganizationState;
+use App\Modules\Identity\Enums\SessionAssurance;
 use App\Modules\Identity\Models\Membership;
 use App\Modules\Identity\Models\PersonAccountLink;
 use Carbon\CarbonInterface;
@@ -169,6 +170,9 @@ class AuthorizationEngine
         /** @var list<array{grant: Grant, policy: PolicyVersion}> $stepUpCandidates */
         $stepUpCandidates = [];
 
+        /** @var array<string, SessionAssurance> $requiredSessionAssuranceByGrantId */
+        $requiredSessionAssuranceByGrantId = [];
+
         /** @var list<array{grant: Grant, policy: PolicyVersion}> $approvalCandidates */
         $approvalCandidates = [];
 
@@ -288,8 +292,13 @@ class AuthorizationEngine
                     // plutôt que retourné immédiatement : la provenance
                     // doit rester déterministe même avec plusieurs
                     // candidats (TD-0001-B), jamais dépendante de l'ordre
-                    // d'itération.
+                    // d'itération. Le palier effectivement exigé
+                    // (`requiredSessionAssurance`) est conservé pour que le
+                    // résultat renvoyé au client sache lequel viser
+                    // (TD-0002-B), sans jamais exposer le grant ou la
+                    // politique eux-mêmes.
                     $stepUpCandidates[] = ['grant' => $grant, 'policy' => $policy];
+                    $requiredSessionAssuranceByGrantId[$grant->id] = $conditionsResult->requiredSessionAssurance;
                 }
 
                 continue;
@@ -360,7 +369,15 @@ class AuthorizationEngine
                         $chosen['policy']->version,
                         capabilityKey: $capability->stable_key,
                         capabilityVersion: $capability->version,
-                        obligations: [new AuthorizationObligation('matched_grant', ['grant_id' => $chosen['grant']->id])],
+                        obligations: [
+                            new AuthorizationObligation('matched_grant', ['grant_id' => $chosen['grant']->id]),
+                            // Palier requis exposé à l'appelant HTTP
+                            // (TD-0002-B) : jamais le grant ni la politique,
+                            // seulement le niveau de session à atteindre.
+                            new AuthorizationObligation('required_session_assurance', [
+                                'minimum_session_assurance' => $requiredSessionAssuranceByGrantId[$chosen['grant']->id]->value,
+                            ]),
+                        ],
                     ),
                 ];
             }
