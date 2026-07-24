@@ -56,6 +56,15 @@ final class ConditionsMatcher
         'strong' => 2,
     ];
 
+    /**
+     * @var array<int, SessionAssurance>
+     */
+    private const RANK_TO_SESSION_ASSURANCE = [
+        0 => SessionAssurance::Weak,
+        1 => SessionAssurance::Standard,
+        2 => SessionAssurance::Strong,
+    ];
+
     public function evaluate(
         ConditionsPayload $conditions,
         AssuranceContext $assurance,
@@ -91,7 +100,7 @@ final class ConditionsMatcher
         $effectiveFloor = max($capabilityFloor, $conditionFloor);
 
         if (self::SESSION_ASSURANCE_RANK[$assurance->sessionAssurance->value] < $effectiveFloor) {
-            return ConditionsMatchResult::sessionAssuranceInsufficient();
+            return ConditionsMatchResult::sessionAssuranceInsufficient(self::RANK_TO_SESSION_ASSURANCE[$effectiveFloor]);
         }
 
         return ConditionsMatchResult::satisfied();
