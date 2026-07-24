@@ -41,6 +41,8 @@ use Illuminate\Support\Str;
  * @property string|null $approver_person_account_link_id
  * @property Carbon|CarbonImmutable|null $approved_at
  * @property Carbon|CarbonImmutable|null $retired_at
+ * @property string|null $rejection_reason
+ * @property Carbon|CarbonImmutable|null $rejected_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -59,7 +61,7 @@ class CampaignVersion extends Model
         'reward_configuration_key', 'reward_configuration_version',
         'valid_from', 'valid_until',
         'author_person_account_link_id', 'approver_person_account_link_id',
-        'approved_at', 'retired_at',
+        'approved_at', 'retired_at', 'rejection_reason', 'rejected_at',
     ];
 
     protected function casts(): array
@@ -74,6 +76,7 @@ class CampaignVersion extends Model
             'valid_until' => 'datetime',
             'approved_at' => 'datetime',
             'retired_at' => 'datetime',
+            'rejected_at' => 'datetime',
         ];
     }
 
