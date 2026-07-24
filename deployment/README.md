@@ -17,9 +17,11 @@ externe sans instruction distincte et explicite »).
 
 ## Prérequis
 
-- Exécuté en tant qu'utilisateur disposant des droits d'écriture sur
-  `/var/www/html/wasplex-ecosystem` et du droit `sudo systemctl reload
-  php8.3-fpm` (le serveur actuel fait tourner ce script en `root`).
+- Exécuté directement par un utilisateur déjà `root` (le serveur actuel fait
+  tourner ce script en `root`) — **jamais** via `sudo bash deploy.sh` : `sudo`
+  applique son `secure_path`, qui exclut le répertoire nvm de root
+  (`~/.nvm/versions/node/.../bin`, où vit `npm`) et fait échouer la
+  vérification des prérequis. Le script refuse de continuer si `EUID != 0`.
 - `git`, `composer`, `npm`, `php`, `systemctl` disponibles dans `PATH`.
 - Le `.env` de production existe déjà et n'est pas touché par ce script :
   aucune étape ne le lit, l'écrit ou le régénère.
@@ -27,8 +29,13 @@ externe sans instruction distincte et explicite »).
 ## Usage
 
 ```bash
-sudo bash deployment/deploy.sh
+bash deployment/deploy.sh
 ```
+
+Exécuté directement en root, sans `sudo` externe (voir Prérequis ci-dessus).
+Le `sudo systemctl reload` de l'étape 11 reste interne au script et
+fonctionne déjà : `systemctl` reste sur le `secure_path` de `sudo`, seul
+`npm` en est exclu.
 
 Peut être lancé depuis n'importe quel répertoire courant ; tous les chemins
 utilisés sont fixes (`/var/www/html/wasplex-ecosystem`), pas relatifs au

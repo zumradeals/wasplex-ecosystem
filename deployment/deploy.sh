@@ -3,7 +3,11 @@
 # Déploiement de production Wasplex — voir deployment/README.md pour le
 # détail de chaque étape et les raisons des choix faits ici.
 #
-# Usage : sudo bash deployment/deploy.sh
+# Usage : bash deployment/deploy.sh
+# Exécuté directement par un utilisateur déjà root — jamais via
+# "sudo bash deploy.sh" (voir la vérification EUID ci-dessous et le
+# README pour la raison : sudo restreint PATH via secure_path et casse
+# la détection de npm installé par nvm dans le HOME de root).
 # (exécuté depuis n'importe quel répertoire ; les chemins sont fixes)
 
 set -euo pipefail
@@ -17,6 +21,15 @@ step() {
     echo
     echo "==> [$1/12] $2"
 }
+
+# --- Prérequis : ce script doit déjà tourner en root (pas via
+# "sudo bash deploy.sh", qui restreint PATH via secure_path et rend
+# introuvable un npm installé par nvm dans le HOME de root). ---
+if [[ "$EUID" -ne 0 ]]; then
+    echo "ERREUR : lance ce script directement en root, pas via 'sudo bash deploy.sh'." >&2
+    echo "sudo restreint PATH (secure_path) et casse la détection de npm/nvm." >&2
+    exit 1
+fi
 
 # --- Prérequis : échouer tôt et clairement plutôt que sur une commande
 # introuvable au milieu du déploiement. ---
