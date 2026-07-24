@@ -128,6 +128,56 @@ class CampaignVersionService
         });
     }
 
+    /**
+     * Refus d'une CampaignVersion en revue (P005-C). `CampaignVersionState`
+     * n'a pas d'état `rejected` (ADR-0010 §3 : draft/in_review/approved/
+     * suspended/retired) et ce lot n'en introduit aucun : un refus renvoie
+     * la version à `draft`, où son auteur la retrouve pour révision — une
+     * transition d'état déjà permise par le déclencheur d'immuabilité
+     * (`OLD.state = 'in_review'` n'est jamais protégé), sur le modèle exact
+     * de `submitForReview()`/`suspend()`/`retire()` ci-dessus. Le motif est
+     * enregistré sur la ligne elle-même (`rejection_reason`, `rejected_at`)
+     * plutôt que dans une nouvelle table : ni ReportCase ni ModerationCase
+     * supplémentaire ne sont construits par ce lot (ADR-0010 §8, hors
+     * périmètre P005-C). Le contenu original (créations, événement attendu,
+     * destination, territoire) n'est jamais modifié par cette méthode : il
+     * reste consultable tel quel sur la même ligne
+     * (`ecosystem/publicite/02-preuves-moderation-et-destinations.md` §2 :
+     * « l'ancienne preuve reste conservée »).
+     *
+     * Même refus inconditionnel de l'auto-révision qu'{@see approve()} :
+     * un réviseur ne peut jamais être l'auteur de la version qu'il refuse,
+     * quel que soit le niveau de revue du secteur — une campagne que son
+     * créateur pourrait refuser puis resoumettre à volonté contournerait
+     * la revue indépendante tout autant qu'une auto-approbation
+     * (ADR-0010 §5).
+     *
+     * @throws CampaignVersionNotApprovableException La version n'est pas à l'état in_review.
+     * @throws SelfApprovalRefusedException Le réviseur transmis est l'auteur de la version.
+     */
+    public function reject(CampaignVersion $version, PersonAccountLink $reviewer, string $reason): CampaignVersion
+    {
+        if ($version->state !== CampaignVersionState::InReview) {
+            throw new CampaignVersionNotApprovableException(
+                "seule une version à l'état in_review peut être refusée ; état actuel : {$version->state->value}"
+            );
+        }
+
+        if ($reviewer->id === $version->author_person_account_link_id) {
+            throw new SelfApprovalRefusedException(
+                "l'auteur d'une campagne ne peut être son propre réviseur (ADR-0010 §5)"
+            );
+        }
+
+        $version->forceFill([
+            'state' => CampaignVersionState::Draft,
+            'rejection_reason' => $reason,
+            'rejected_at' => now(),
+        ])->save();
+
+        return $version->fresh();
+    }
+
     public function suspend(CampaignVersion $version): CampaignVersion
     {
         $version->forceFill(['state' => CampaignVersionState::Suspended])->save();
