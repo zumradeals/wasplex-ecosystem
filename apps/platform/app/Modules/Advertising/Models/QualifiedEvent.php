@@ -5,6 +5,7 @@ namespace App\Modules\Advertising\Models;
 use App\Modules\Advertising\Enums\BillingStatus;
 use App\Modules\Advertising\Enums\FraudDecision;
 use App\Modules\Advertising\Services\CampaignBudgetService;
+use App\Modules\Identity\Models\PersonAccountLink;
 use App\Modules\Wallet\Ledger\Models\LedgerTransaction;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -22,6 +23,7 @@ use Illuminate\Support\Str;
  * @property string $id
  * @property string $campaign_id
  * @property string $campaign_version_id
+ * @property string $beneficiary_person_account_link_id
  * @property string $format
  * @property array<string, mixed> $evidence
  * @property Carbon|CarbonImmutable $occurred_at
@@ -49,7 +51,7 @@ class QualifiedEvent extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'campaign_id', 'campaign_version_id', 'format', 'evidence', 'occurred_at',
+        'campaign_id', 'campaign_version_id', 'beneficiary_person_account_link_id', 'format', 'evidence', 'occurred_at',
         'fraud_decision', 'applied_price_amount', 'applied_price_currency',
         'pricing_configuration_key', 'pricing_configuration_version',
         'billing_status', 'reservation_transaction_id', 'consumption_transaction_id',
@@ -91,6 +93,14 @@ class QualifiedEvent extends Model
     public function campaignVersion(): BelongsTo
     {
         return $this->belongsTo(CampaignVersion::class, 'campaign_version_id');
+    }
+
+    /**
+     * @return BelongsTo<PersonAccountLink, $this>
+     */
+    public function beneficiary(): BelongsTo
+    {
+        return $this->belongsTo(PersonAccountLink::class, 'beneficiary_person_account_link_id');
     }
 
     /**

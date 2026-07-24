@@ -11,6 +11,7 @@ use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Services\Exceptions\CampaignNotAcceptingReservationsException;
 use App\Modules\Advertising\Services\Exceptions\InsufficientBudgetException;
+use App\Modules\Identity\Models\PersonAccountLink;
 use App\Modules\Wallet\Ledger\Enums\PostingDirection;
 use App\Modules\Wallet\Ledger\Models\LedgerTransaction;
 use App\Modules\Wallet\Ledger\Services\LedgerPoster;
@@ -94,6 +95,7 @@ class CampaignBudgetService
     public function submitQualifiedEvent(
         Campaign $campaign,
         CampaignVersion $version,
+        PersonAccountLink $beneficiary,
         string $format,
         array $evidence,
         int $appliedPriceAmount,
@@ -139,6 +141,7 @@ class CampaignBudgetService
             return QualifiedEvent::create([
                 'campaign_id' => $campaign->id,
                 'campaign_version_id' => $version->id,
+                'beneficiary_person_account_link_id' => $beneficiary->id,
                 'format' => $format,
                 'evidence' => $evidence,
                 'occurred_at' => now(),
@@ -207,6 +210,16 @@ class CampaignBudgetService
         $userShare = intdiv($amount, 2);
         $wasplexShare = $amount - $userShare;
 
+        // Dimensions minimales pour reconstruire, par requête sur les
+        // postings (pas seulement via la transaction), tous les crédits dus
+        // à une personne donnée — le compte `user_rights` reste mutualisé
+        // par devise (TD-0004-F), la traçabilité par bénéficiaire passe par
+        // ces dimensions.
+        $beneficiaryDimensions = [
+            'qualified_event_id' => $event->id,
+            'beneficiary_person_account_link_id' => $event->beneficiary_person_account_link_id,
+        ];
+
         $distribution = $this->poster->post(new TransactionIntent(
             type: 'advertising_campaign_distribution',
             businessDate: now(),
@@ -219,8 +232,8 @@ class CampaignBudgetService
             authoredBy: 'advertising.campaign_budget_service',
             postings: [
                 new PostingLine($campaign->consumed_account_id, PostingDirection::Debit, $amount, $campaign->currency, "Répartition — {$event->format}"),
-                new PostingLine($this->sharedAccounts->userRights($campaign->currency)->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}"),
-                new PostingLine($this->sharedAccounts->wasplexRevenue($campaign->currency)->id, PostingDirection::Credit, $wasplexShare, $campaign->currency, "Part Wasplex — {$event->format}"),
+                new PostingLine($this->sharedAccounts->userRights($campaign->currency)->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}", $beneficiaryDimensions),
+                new PostingLine($this->sharedAccounts->wasplexRevenue($campaign->currency)->id, PostingDirection::Credit, $wasplexShare, $campaign->currency, "Part Wasplex — {$event->format}", $beneficiaryDimensions),
             ],
         ));
 

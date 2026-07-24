@@ -21,10 +21,12 @@ class BillingRequiresAcceptedProofTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 2_000,
@@ -43,10 +45,12 @@ class BillingRequiresAcceptedProofTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 2_000,

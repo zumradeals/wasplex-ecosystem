@@ -43,6 +43,11 @@ abstract class AdvertisingTestCase extends TestCase
         return $this->activeLinkFor($this->makeUser('representant-'.Str::uuid().'@example.com'));
     }
 
+    protected function makeBeneficiary(): PersonAccountLink
+    {
+        return $this->activeLinkFor($this->makeUser('beneficiaire-'.Str::uuid().'@example.com'));
+    }
+
     protected function makeAdvertiserProfile(?PersonAccountLink $representative = null): AdvertiserProfile
     {
         return AdvertiserProfile::create([

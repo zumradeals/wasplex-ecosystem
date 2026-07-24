@@ -24,13 +24,15 @@ class CampaignSuspensionTest extends AdvertisingTestCase
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
 
+        $beneficiary = $this->makeBeneficiary();
+
         $case = app(ModerationService::class)->openCase($campaign, 'Destination non déclarée', 'high');
         app(ModerationService::class)->applyPrecautionaryMeasure($case, PrecautionaryMeasure::CampaignSuspended);
 
         $this->expectException(CampaignNotAcceptingReservationsException::class);
 
         $this->budgetService()->submitQualifiedEvent(
-            campaign: $campaign->fresh(), version: $version, format: 'banner',
+            campaign: $campaign->fresh(), version: $version, beneficiary: $beneficiary, format: 'banner',
             evidence: ['proof' => 'completion'], appliedPriceAmount: 1_000,
             idempotencyKey: (string) Str::uuid(), correlationId: (string) Str::uuid(),
         );
@@ -41,9 +43,10 @@ class CampaignSuspensionTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
-            campaign: $campaign, version: $version, format: 'banner',
+            campaign: $campaign, version: $version, beneficiary: $beneficiary, format: 'banner',
             evidence: ['proof' => 'completion'], appliedPriceAmount: 1_000,
             idempotencyKey: (string) Str::uuid(), correlationId: (string) Str::uuid(),
         );
@@ -61,9 +64,10 @@ class CampaignSuspensionTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
-            campaign: $campaign, version: $version, format: 'banner',
+            campaign: $campaign, version: $version, beneficiary: $beneficiary, format: 'banner',
             evidence: ['proof' => 'completion'], appliedPriceAmount: 1_000,
             idempotencyKey: (string) Str::uuid(), correlationId: (string) Str::uuid(),
         );

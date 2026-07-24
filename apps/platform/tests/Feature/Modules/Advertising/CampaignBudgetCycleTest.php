@@ -37,12 +37,14 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 1_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $this->expectException(InsufficientBudgetException::class);
 
         $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 1_001,
@@ -56,11 +58,13 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
         $projection = app(CampaignBudgetProjection::class);
 
         $event = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 3_000,
@@ -79,11 +83,13 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
         $projection = app(CampaignBudgetProjection::class);
 
         $event = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 4_000,
@@ -116,10 +122,12 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_001);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 4_001,
@@ -142,11 +150,13 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
         $projection = app(CampaignBudgetProjection::class);
 
         $event = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 2_500,
@@ -172,10 +182,12 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
+            beneficiary: $beneficiary,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 1_500,

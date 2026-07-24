@@ -52,13 +52,44 @@ Même situation que TD-0003-A (Wallet) : aucune route, aucun contrôleur, aucune
 **Mesure temporaire :** identique — aucune route, aucune façade alternative.
 **Porte de reprise :** créer et faire vérifier `campaign.create`, `campaign.approve`, `campaign.moderate` (ADR-0004 §5) via `AuthorizationGate` avant toute route réelle.
 
-### TD-0004-F — Aucune attribution par utilisateur individuel
+### TD-0004-F — Compte `user_rights` mutualisé, non segmenté par utilisateur
 
-`QualifiedEvent` ne référence aucun utilisateur bénéficiaire (fidèle au modèle minimal d'ADR-0010 §3, qui n'en liste pas). La part utilisateur de la répartition 50/50 est créditée à un compte `user_rights` mutualisé (`SharedLedgerAccounts::userRights()`), pas à un compte par utilisateur : Wallet/Ledger (P004-A) n'a lui-même pas encore construit de compte par utilisateur.
+**Correction du 2026-07-24 (revue post P005-A) :** `QualifiedEvent` référence
+désormais obligatoirement (`beneficiary_person_account_link_id`, NOT NULL) la
+personne dont l'attention qualifiée est rémunérée — même sujet que
+Governance/Authorization (P003-B2, `AuthenticatedSubject::$personAccountLink`).
+Un `QualifiedEvent` sans bénéficiaire est refusé à la création, pas seulement
+déconseillé. Cette référence est propagée en dimensions
+(`qualified_event_id`, `beneficiary_person_account_link_id`) sur les postings
+de crédit `user_rights` et `wasplex_revenue` de `CampaignBudgetService::acceptQualifiedEvent()` :
+tous les crédits dus à une personne donnée sont donc reconstructibles par
+requête directe sur `ledger.postings` (pas seulement via la transaction ou
+le `QualifiedEvent` d'origine). Voir `QualifiedEventBeneficiaryTest`.
 
-**Risque :** aucun à ce stade — ce noyau ne verse aucun gain à un utilisateur réel.
-**Mesure temporaire :** le compte `user_rights.advertising.{devise}` représente l'agrégat des droits générés par la publicité, en attente d'attribution individuelle.
-**Porte de reprise :** avant de créditer un utilisateur réel, Wallet/Ledger et Identity doivent d'abord établir le provisionnement de comptes par utilisateur (dette partagée avec P004-A) ; `QualifiedEvent` devra alors référencer le bénéficiaire.
+Ce qui reste différé, précisément : la part utilisateur de la répartition
+50/50 continue de créditer un compte `user_rights` **mutualisé par devise**
+(`SharedLedgerAccounts::userRights()`), pas un compte Ledger séparé par
+utilisateur. Wallet/Ledger (P004-A) n'a lui-même pas encore construit de
+provisionnement de compte par utilisateur ; la traçabilité par personne
+repose donc sur une projection par dimension sur un compte partagé, pas sur
+une véritable segmentation comptable par bénéficiaire.
+
+**Risque :** aucun risque d'attribution erronée à ce stade — la dimension
+identifie sans ambiguïté le bénéficiaire de chaque crédit, et aucun gain
+n'est encore versé à un utilisateur réel. Le risque resterait latent si un
+solde individuel par personne devait un jour être calculé directement par
+somme sur le compte mutualisé sans repasser par cette projection par
+dimension.
+**Mesure temporaire :** `beneficiary_person_account_link_id` sur `QualifiedEvent`
+et la dimension équivalente sur les postings constituent la seule voie de
+reconstruction du dû par personne ; aucun solde par utilisateur n'est stocké
+ni exposé directement par `Account`/`AccountBalanceProjection`.
+**Porte de reprise :** avant de calculer ou d'exposer un solde individuel par
+utilisateur (ex. « mes gains publicité »), Wallet/Ledger et Identity doivent
+d'abord établir le provisionnement de comptes Ledger séparés par utilisateur
+(dette partagée avec P004-A) ; `CampaignBudgetService::acceptQualifiedEvent()`
+devra alors créditer ce compte individuel directement, plutôt que de
+reconstruire le dû par une agrégation de postings sur un compte partagé.
 
 ## Porte de reprise générale
 

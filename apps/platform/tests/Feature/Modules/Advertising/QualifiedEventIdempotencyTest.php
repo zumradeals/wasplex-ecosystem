@@ -19,16 +19,17 @@ class QualifiedEventIdempotencyTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
         $key = 'same-proof-'.Str::uuid();
 
         $first = $this->budgetService()->submitQualifiedEvent(
-            campaign: $campaign, version: $version, format: 'banner',
+            campaign: $campaign, version: $version, beneficiary: $beneficiary, format: 'banner',
             evidence: ['proof' => 'completion'], appliedPriceAmount: 2_000,
             idempotencyKey: $key, correlationId: (string) Str::uuid(),
         );
 
         $second = $this->budgetService()->submitQualifiedEvent(
-            campaign: $campaign, version: $version, format: 'banner',
+            campaign: $campaign, version: $version, beneficiary: $beneficiary, format: 'banner',
             evidence: ['proof' => 'completion'], appliedPriceAmount: 2_000,
             idempotencyKey: $key, correlationId: (string) Str::uuid(),
         );
@@ -45,9 +46,10 @@ class QualifiedEventIdempotencyTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
-            campaign: $campaign, version: $version, format: 'banner',
+            campaign: $campaign, version: $version, beneficiary: $beneficiary, format: 'banner',
             evidence: ['proof' => 'completion'], appliedPriceAmount: 2_000,
             idempotencyKey: (string) Str::uuid(), correlationId: (string) Str::uuid(),
         );
@@ -67,9 +69,10 @@ class QualifiedEventIdempotencyTest extends AdvertisingTestCase
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
 
         $event = $this->budgetService()->submitQualifiedEvent(
-            campaign: $campaign, version: $version, format: 'banner',
+            campaign: $campaign, version: $version, beneficiary: $beneficiary, format: 'banner',
             evidence: ['proof' => 'completion'], appliedPriceAmount: 2_000,
             idempotencyKey: (string) Str::uuid(), correlationId: (string) Str::uuid(),
         );
