@@ -61,10 +61,11 @@ Après validation explicite seulement, Claude Code peut créer un commit intenti
 
 ## 5. Fusion et mise en production
 
-- Une pull request reste en brouillon jusqu'à revue de SIRR et décision de Koné.
-- Seul Koné autorise la fusion dans `main`.
-- Une validation de code n'autorise pas implicitement un déploiement.
-- Aucun déploiement, migration de production, activation pays, traitement réel ou communication externe sans instruction distincte et explicite.
+- Claude Code exécute la campagne de contrôles complète (tests, lint, types, build) pendant sa propre session. S'il juge tout vert et conforme à la mission, il pousse sa branche, ouvre la PR et la fusionne lui-même dans `main`, sans attendre de revue préalable de SIRR ni de confirmation séparée de Koné à chaque lot.
+- Si la fusion directe est techniquement impossible (garde-fou du harnais Claude Code, indépendant de ce fichier), Claude Code le signale clairement et s'arrête à cette étape précise plutôt que d'improviser un contournement — un clic humain reste alors nécessaire, et seulement celui-là.
+- Une fusion réussie sur `main` déclenche automatiquement le déploiement (`deployment/deploy.sh`) pour tout lot dont la mission le prévoit explicitement — plus besoin d'une instruction de déploiement distincte à chaque fois.
+- SIRR effectue une revue a posteriori, après fusion/déploiement, et signale toute anomalie trouvée ; Claude Code corrige par un nouveau commit si nécessaire.
+- Ce mode allégé est un choix explicite de Koné, réversible à tout moment : il redevient caduc dès qu'une donnée utilisateur réelle ou un mouvement financier réel existe en production, moment auquel la revue préalable redevient obligatoire par défaut sauf nouvelle décision explicite.
 
 ## 6. Discipline d'implémentation
 
