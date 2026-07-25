@@ -14,7 +14,9 @@ use App\Modules\Governance\Authorization\Models\PolicyVersion;
 use App\Modules\Governance\Authorization\Services\GrantManager;
 use App\Modules\Governance\Authorization\Support\ConditionsPayload;
 use App\Modules\Governance\Authorization\Support\ScopePayload;
+use App\Modules\Identity\Enums\LinkOrigin;
 use App\Modules\Identity\Models\PersonAccountLink;
+use App\Modules\Identity\Services\RegistersUserIdentity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -122,7 +124,19 @@ class CampaignReportRouteTest extends AdvertisingTestCase
     public function test_an_authenticated_subject_without_a_grant_receives_a_safe_403(): void
     {
         $campaign = $this->makeCampaign();
-        $reporter = $this->makeRepresentative();
+
+        // Depuis P007, une inscription réelle (`LinkOrigin::Registration`)
+        // émet automatiquement les grants `user.base` (dont
+        // `campaign.report`) — `$this->makeRepresentative()` ne produirait
+        // donc plus jamais un sujet sans grant. `LinkOrigin::Migration`
+        // contourne délibérément l'octroi automatique
+        // (`RegistersUserIdentity`), le seul moyen de garder ce test
+        // représentatif d'un sujet réellement sans aucun grant.
+        $reporter = $this->activeLinkFor(app(RegistersUserIdentity::class)->register([
+            'name' => 'Utilisateur sans grant',
+            'email' => 'sans-grant-'.Str::uuid().'@example.com',
+            'password' => 'password',
+        ], LinkOrigin::Migration));
 
         $response = $this->actingAs($reporter->user)->postJson(
             "/advertising/campaigns/{$campaign->id}/reports", $this->validPayload()

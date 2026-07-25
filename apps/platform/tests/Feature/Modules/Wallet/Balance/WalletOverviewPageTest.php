@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Modules\Wallet\Balance;
 
+use App\Modules\Identity\Enums\LinkOrigin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -26,7 +27,11 @@ class WalletOverviewPageTest extends WalletBalanceTestCase
 
     public function test_a_subject_without_a_grant_sees_the_denied_state_not_a_crash(): void
     {
-        $user = $this->makeUser('no-grant-'.Str::uuid().'@example.com');
+        // Depuis P007, une inscription réelle émet automatiquement les
+        // grants `user.base` (dont `wallet.view`) — `LinkOrigin::Migration`
+        // est le seul moyen de garder ce test représentatif d'un sujet
+        // réellement sans aucun grant.
+        $user = $this->makeUser('no-grant-'.Str::uuid().'@example.com', LinkOrigin::Migration);
         $user->forceFill(['email_verified_at' => now()])->save();
 
         $response = $this->actingAs($user)->get('/wallet');

@@ -14,6 +14,7 @@ use App\Modules\Advertising\Models\SectorClassification;
 use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Advertising\Services\CampaignService;
 use App\Modules\Advertising\Services\CampaignVersionService;
+use App\Modules\Identity\Enums\LinkOrigin;
 use App\Modules\Identity\Models\PersonAccountLink;
 use App\Modules\Identity\Services\RegistersUserIdentity;
 use Illuminate\Support\Str;
@@ -21,13 +22,20 @@ use Tests\TestCase;
 
 abstract class AdvertisingTestCase extends TestCase
 {
-    protected function makeUser(string $email): User
+    /**
+     * Depuis P007, `LinkOrigin::Registration` (le défaut) émet
+     * automatiquement les grants `user.base` — `LinkOrigin::Migration`
+     * contourne délibérément l'octroi automatique (`RegistersUserIdentity`)
+     * pour les tests qui doivent encore constituer un sujet réellement sans
+     * aucun grant.
+     */
+    protected function makeUser(string $email, LinkOrigin $origin = LinkOrigin::Registration): User
     {
         return app(RegistersUserIdentity::class)->register([
             'name' => 'Utilisateur '.$email,
             'email' => $email,
             'password' => 'password',
-        ]);
+        ], $origin);
     }
 
     protected function activeLinkFor(User $user): PersonAccountLink

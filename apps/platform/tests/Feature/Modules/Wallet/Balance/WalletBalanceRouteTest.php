@@ -3,6 +3,7 @@
 namespace Tests\Feature\Modules\Wallet\Balance;
 
 use App\Modules\Governance\Authorization\Models\CapabilityDefinition;
+use App\Modules\Identity\Enums\LinkOrigin;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +29,11 @@ class WalletBalanceRouteTest extends WalletBalanceTestCase
 
     public function test_an_authenticated_subject_without_a_grant_receives_a_safe_403(): void
     {
-        $user = $this->makeUser('no-grant-'.Str::uuid().'@example.com');
+        // Depuis P007, une inscription réelle émet automatiquement les
+        // grants `user.base` (dont `wallet.view`) — `LinkOrigin::Migration`
+        // est le seul moyen de garder ce test représentatif d'un sujet
+        // réellement sans aucun grant.
+        $user = $this->makeUser('no-grant-'.Str::uuid().'@example.com', LinkOrigin::Migration);
 
         $response = $this->actingAs($user)->getJson('/wallet/balance');
 
