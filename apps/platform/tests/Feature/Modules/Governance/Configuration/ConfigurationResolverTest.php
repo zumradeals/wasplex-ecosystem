@@ -57,4 +57,47 @@ class ConfigurationResolverTest extends ConfigurationTestCase
 
         $this->resolver()->resolve('sample.later_retired');
     }
+
+    public function test_resolve_exact_version_keeps_resolving_a_replaced_version_pinned_by_number(): void
+    {
+        $definition = $this->makeDefinition(stableKey: 'sample.pinned_after_replacement');
+        $author = $this->makeLink('author-pinned@example.com');
+        $approver = $this->makeLink('approver-pinned@example.com');
+        $manager = app(ConfigurationValueManager::class);
+
+        $first = $manager->propose($definition, 10, 'Première.', $author);
+        $first = $manager->submitForReview($first);
+        $first = $manager->approve($first, $approver);
+        $first = $manager->activate($first, $approver, (string) Str::uuid());
+
+        $second = $manager->propose($definition, 20, 'Seconde.', $author);
+        $second = $manager->submitForReview($second);
+        $second = $manager->approve($second, $approver);
+        $manager->activate($second, $approver, (string) Str::uuid());
+
+        $pinned = $this->resolver()->resolveExactVersion('sample.pinned_after_replacement', $first->version);
+
+        $this->assertSame(10, $pinned->value);
+        $this->assertSame('replaced', $pinned->state->value);
+    }
+
+    public function test_resolve_exact_version_fails_closed_for_a_version_never_activated(): void
+    {
+        $definition = $this->makeDefinition(stableKey: 'sample.never_activated');
+        $author = $this->makeLink('author-never@example.com');
+        $manager = app(ConfigurationValueManager::class);
+
+        $version = $manager->propose($definition, 10, 'Jamais activée.', $author);
+
+        $this->expectException(NoActiveConfigurationException::class);
+
+        $this->resolver()->resolveExactVersion('sample.never_activated', $version->version);
+    }
+
+    public function test_resolve_exact_version_fails_closed_for_an_unknown_key(): void
+    {
+        $this->expectException(NoActiveConfigurationException::class);
+
+        $this->resolver()->resolveExactVersion('sample.unknown_pricing_key', 1);
+    }
 }
