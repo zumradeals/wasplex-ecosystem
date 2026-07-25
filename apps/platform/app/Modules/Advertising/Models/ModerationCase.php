@@ -2,6 +2,8 @@
 
 namespace App\Modules\Advertising\Models;
 
+use App\Modules\Advertising\Enums\ModerationCaseStatus;
+use App\Modules\Advertising\Enums\ModerationDecision;
 use App\Modules\Advertising\Enums\PrecautionaryMeasure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,9 +22,9 @@ use Illuminate\Support\Str;
  * @property string $reason
  * @property string|null $observed_destination
  * @property string $severity
- * @property string $status
+ * @property ModerationCaseStatus $status
  * @property PrecautionaryMeasure $precautionary_measure
- * @property string|null $decision
+ * @property ModerationDecision|null $decision
  * @property string|null $recourse_status
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -43,7 +45,9 @@ class ModerationCase extends Model
     protected function casts(): array
     {
         return [
+            'status' => ModerationCaseStatus::class,
             'precautionary_measure' => PrecautionaryMeasure::class,
+            'decision' => ModerationDecision::class,
         ];
     }
 
@@ -51,7 +55,7 @@ class ModerationCase extends Model
     {
         static::creating(function (self $case): void {
             $case->id ??= (string) Str::uuid7();
-            $case->status ??= 'open';
+            $case->status ??= ModerationCaseStatus::Open;
             $case->precautionary_measure ??= PrecautionaryMeasure::None;
         });
     }

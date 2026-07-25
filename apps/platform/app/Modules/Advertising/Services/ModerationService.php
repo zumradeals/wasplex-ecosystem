@@ -3,6 +3,8 @@
 namespace App\Modules\Advertising\Services;
 
 use App\Modules\Advertising\Enums\CampaignState;
+use App\Modules\Advertising\Enums\ModerationCaseStatus;
+use App\Modules\Advertising\Enums\ModerationDecision;
 use App\Modules\Advertising\Enums\PrecautionaryMeasure;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
@@ -31,6 +33,24 @@ class ModerationService
             'observed_destination' => $observedDestination,
             'severity' => $severity,
         ]);
+    }
+
+    /**
+     * Clôture un ModerationCase (P005-D, `03-...md` §1-2). Toujours résolu
+     * dès qu'une décision est rendue — ce lot ne construit aucun état
+     * intermédiaire type « en instruction » (hors périmètre P005-D) :
+     * `campaign.moderate` applique une décision définitive, éventuellement
+     * accompagnée d'une mesure conservatoire ({@see applyPrecautionaryMeasure()},
+     * appelée séparément par l'appelant lorsqu'une mesure est transmise).
+     */
+    public function recordDecision(ModerationCase $case, ModerationDecision $decision): ModerationCase
+    {
+        $case->forceFill([
+            'decision' => $decision,
+            'status' => ModerationCaseStatus::Resolved,
+        ])->save();
+
+        return $case->fresh();
     }
 
     /**
