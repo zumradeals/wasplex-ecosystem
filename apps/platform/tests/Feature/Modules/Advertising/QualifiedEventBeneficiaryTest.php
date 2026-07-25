@@ -5,7 +5,7 @@ namespace Tests\Feature\Modules\Advertising;
 use App\Modules\Advertising\Enums\BillingStatus;
 use App\Modules\Advertising\Enums\FraudDecision;
 use App\Modules\Advertising\Models\QualifiedEvent;
-use App\Modules\Advertising\Services\SharedLedgerAccounts;
+use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
 use App\Modules\Wallet\Ledger\Enums\PostingDirection;
 use App\Modules\Wallet\Ledger\Models\Posting;
 use Illuminate\Database\QueryException;
@@ -18,6 +18,12 @@ use Illuminate\Support\Str;
  * d'une sous-spécification d'ADR-0010 §3 (voir TD-0004-F).
  * `beneficiary_person_account_link_id` référence le même sujet que
  * Governance/Authorization (P003-B2, `AuthenticatedSubject::$personAccountLink`).
+ *
+ * Depuis P006-A, le crédit `user_rights` atterrit directement sur le
+ * compte Ledger individuel du bénéficiaire ({@see PersonLedgerAccounts}),
+ * plus sur un compte mutualisé par devise : ce test vérifie donc
+ * l'isolement par personne au niveau du compte lui-même, pas seulement par
+ * une dimension applicative sur un compte partagé.
  */
 class QualifiedEventBeneficiaryTest extends AdvertisingTestCase
 {
@@ -75,16 +81,15 @@ class QualifiedEventBeneficiaryTest extends AdvertisingTestCase
 
         $accepted = $this->budgetService()->acceptQualifiedEvent($event);
 
-        $userRightsAccountId = app(SharedLedgerAccounts::class)->userRights($campaign->currency)->id;
+        $beneficiaryAccountId = app(PersonLedgerAccounts::class)->available($beneficiary->person_id, $campaign->currency)->id;
 
-        // Retrouvable par requête sur les postings eux-mêmes (pas seulement
-        // via la transaction), grâce à la dimension portée par le posting de
-        // crédit `user_rights` — le compte reste mutualisé par devise, mais
-        // les droits dus à cette personne restent reconstructibles.
+        // Retrouvable directement sur le compte individuel du bénéficiaire
+        // (P006-A) : la dimension reste portée par le posting pour
+        // identifier l'événement qualifié précis, mais l'isolement par
+        // personne est désormais garanti par le compte lui-même.
         $creditToBeneficiary = Posting::query()
-            ->where('account_id', $userRightsAccountId)
+            ->where('account_id', $beneficiaryAccountId)
             ->where('direction', PostingDirection::Credit)
-            ->where('dimensions->beneficiary_person_account_link_id', $beneficiary->id)
             ->get();
 
         $this->assertCount(1, $creditToBeneficiary);
@@ -92,15 +97,17 @@ class QualifiedEventBeneficiaryTest extends AdvertisingTestCase
         $this->assertSame($accepted->distribution_transaction_id, $posting->ledger_transaction_id);
         $this->assertSame(1_000, $posting->amount);
         $this->assertSame($event->id, $posting->dimensions['qualified_event_id']);
+        $this->assertSame($beneficiary->id, $posting->dimensions['beneficiary_person_account_link_id']);
 
-        // Une autre personne bénéficiaire ne remonte jamais dans cette
-        // requête : la dimension isole bien les droits par personne, même
-        // sur un compte `user_rights` mutualisé.
+        // Une autre personne bénéficiaire possède son propre compte, jamais
+        // crédité par l'événement ci-dessus : l'isolement ne dépend plus
+        // d'une dimension applicative sur un compte partagé.
         $otherBeneficiary = $this->makeBeneficiary();
+        $otherAccountId = app(PersonLedgerAccounts::class)->available($otherBeneficiary->person_id, $campaign->currency)->id;
+        $this->assertNotSame($beneficiaryAccountId, $otherAccountId);
         $noCreditForOther = Posting::query()
-            ->where('account_id', $userRightsAccountId)
+            ->where('account_id', $otherAccountId)
             ->where('direction', PostingDirection::Credit)
-            ->where('dimensions->beneficiary_person_account_link_id', $otherBeneficiary->id)
             ->count();
         $this->assertSame(0, $noCreditForOther);
     }

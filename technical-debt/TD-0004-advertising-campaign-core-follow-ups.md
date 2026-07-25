@@ -91,6 +91,15 @@ d'abord établir le provisionnement de comptes Ledger séparés par utilisateur
 devra alors créditer ce compte individuel directement, plutôt que de
 reconstruire le dû par une agrégation de postings sur un compte partagé.
 
+**Correction (P006-A) :** `App\Modules\Wallet\Balance\Services\PersonLedgerAccounts`
+provisionne désormais un compte `user_rights` individuel par personne et
+devise ; `CampaignBudgetService::acceptQualifiedEvent()` y crédite
+directement la part utilisateur, plus sur le compte mutualisé
+`SharedLedgerAccounts::userRights()` (méthode supprimée). Le solde
+individuel est exposé en lecture seule par `GET /wallet/balance`
+(`wallet.view`, portée `self`). Seul l'état disponible est couvert — voir
+TD-0005-A pour le provisoire/réservé, resté hors périmètre.
+
 ## Porte de reprise générale
 
 Compatible avec la porte de reprise déjà posée par `TD-0001`, `TD-0002` et `TD-0003` :

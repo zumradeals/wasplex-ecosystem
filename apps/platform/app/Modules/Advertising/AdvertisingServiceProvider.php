@@ -11,6 +11,7 @@ use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
+use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -55,6 +56,12 @@ use Illuminate\Support\ServiceProvider;
  * (ADR-0002) n'existe encore pour permettre un vrai flux self-service par
  * le bénéficiaire (dette documentée, `event.submit`, migration
  * `2026_07_25_100009`).
+ *
+ * Depuis P006-A, `CampaignBudgetService::acceptQualifiedEvent()` crédite la
+ * part utilisateur sur le compte Ledger individuel du bénéficiaire
+ * ({@see PersonLedgerAccounts}), plus jamais sur un compte `user_rights`
+ * mutualisé par devise (fermeture de TD-0004-F) — ce solde est désormais
+ * consultable via `GET /wallet/balance` (module Wallet).
  */
 class AdvertisingServiceProvider extends ServiceProvider
 {

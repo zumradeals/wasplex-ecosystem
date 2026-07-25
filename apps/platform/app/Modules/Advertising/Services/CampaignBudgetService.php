@@ -12,6 +12,7 @@ use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Services\Exceptions\CampaignNotAcceptingReservationsException;
 use App\Modules\Advertising\Services\Exceptions\InsufficientBudgetException;
 use App\Modules\Identity\Models\PersonAccountLink;
+use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
 use App\Modules\Wallet\Ledger\Enums\PostingDirection;
 use App\Modules\Wallet\Ledger\Models\LedgerTransaction;
 use App\Modules\Wallet\Ledger\Services\LedgerPoster;
@@ -35,6 +36,7 @@ class CampaignBudgetService
     public function __construct(
         private readonly LedgerPoster $poster,
         private readonly SharedLedgerAccounts $sharedAccounts,
+        private readonly PersonLedgerAccounts $personAccounts,
         private readonly CampaignBudgetProjection $budgetProjection,
     ) {}
 
@@ -210,15 +212,18 @@ class CampaignBudgetService
         $userShare = intdiv($amount, 2);
         $wasplexShare = $amount - $userShare;
 
-        // Dimensions minimales pour reconstruire, par requête sur les
-        // postings (pas seulement via la transaction), tous les crédits dus
-        // à une personne donnée — le compte `user_rights` reste mutualisé
-        // par devise (TD-0004-F), la traçabilité par bénéficiaire passe par
-        // ces dimensions.
+        // Dimensions conservées pour retrouver, par requête directe sur les
+        // postings, l'événement qualifié précis à l'origine de ce crédit —
+        // même sur le compte individuel du bénéficiaire, qui peut recevoir
+        // plusieurs crédits au fil du temps (P006-A ferme TD-0004-F : le
+        // compte `user_rights` n'est plus mutualisé par devise, il est
+        // désormais provisionné par personne via `PersonLedgerAccounts`).
         $beneficiaryDimensions = [
             'qualified_event_id' => $event->id,
             'beneficiary_person_account_link_id' => $event->beneficiary_person_account_link_id,
         ];
+
+        $beneficiaryAccount = $this->personAccounts->available($event->beneficiary->person_id, $campaign->currency);
 
         $distribution = $this->poster->post(new TransactionIntent(
             type: 'advertising_campaign_distribution',
@@ -232,7 +237,7 @@ class CampaignBudgetService
             authoredBy: 'advertising.campaign_budget_service',
             postings: [
                 new PostingLine($campaign->consumed_account_id, PostingDirection::Debit, $amount, $campaign->currency, "Répartition — {$event->format}"),
-                new PostingLine($this->sharedAccounts->userRights($campaign->currency)->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}", $beneficiaryDimensions),
+                new PostingLine($beneficiaryAccount->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}", $beneficiaryDimensions),
                 new PostingLine($this->sharedAccounts->wasplexRevenue($campaign->currency)->id, PostingDirection::Credit, $wasplexShare, $campaign->currency, "Part Wasplex — {$event->format}", $beneficiaryDimensions),
             ],
         ));
