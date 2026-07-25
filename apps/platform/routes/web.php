@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\HealthController;
+use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingOverviewController;
 use App\Modules\Advertising\Http\Controllers\CampaignController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
@@ -28,6 +30,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // (redirection vers la connexion, jamais un 401 JSON) : c'est un écran,
     // pas un point de terminaison API.
     Route::get('wallet', [WalletOverviewController::class, 'show'])->name('wallet.show');
+
+    // P007-W1 : tableau de bord annonceur (A-001-01/A-002-01) — reprend
+    // l'autorisation campaign.view (portée self) et affiche un état d'écran
+    // plutôt qu'une erreur JSON en cas de refus (voir
+    // AdvertisingOverviewController). Volontairement dans le groupe 'auth'
+    // (redirection vers la connexion, jamais un 401 JSON) : c'est un écran,
+    // pas un point de terminaison API — même raisonnement que 'wallet'.
+    Route::get('advertising', [AdvertisingOverviewController::class, 'index'])->name('advertising.overview');
 });
 
 // Non protégée par le middleware 'auth' : une requête non authentifiée doit
@@ -36,6 +46,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // une page de connexion (P005-B).
 Route::middleware('web')->post('advertising/campaigns', [CampaignController::class, 'store'])
     ->name('advertising.campaigns.store');
+
+// P007-W1 : déclaration par une personne authentifiée de son propre
+// dossier annonceur (advertiser_profile.create, migration
+// 2026_07_25_100012) — même discipline que ci-dessus : groupe 'web' hors
+// du groupe 'auth', 401 JSON structuré pour un appel non authentifié.
+Route::middleware('web')->post('advertising/advertiser-profile', [AdvertiserProfileController::class, 'store'])
+    ->name('advertising.advertiser-profile.store');
 
 // P005-C : cycle de revue d'une CampaignVersion. Mêmes garanties que
 // ci-dessus (groupe 'web' pour session/CSRF, hors du groupe 'auth' : un

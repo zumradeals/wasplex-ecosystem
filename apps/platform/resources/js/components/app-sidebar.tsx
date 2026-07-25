@@ -3,6 +3,7 @@ import {
     BookOpen,
     FolderGit2,
     LayoutGrid,
+    Megaphone,
     Wallet as WalletIcon,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -19,6 +20,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import advertising from '@/routes/advertising';
 import wallet from '@/routes/wallet';
 import type { NavItem } from '@/types';
 
@@ -32,6 +34,11 @@ const mainNavItems: NavItem[] = [
         title: 'Wallet',
         href: wallet.show(),
         icon: WalletIcon,
+    },
+    {
+        title: 'Publicité',
+        href: advertising.overview(),
+        icon: Megaphone,
     },
 ];
 

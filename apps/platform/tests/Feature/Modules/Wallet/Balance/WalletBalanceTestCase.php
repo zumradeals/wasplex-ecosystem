@@ -11,6 +11,7 @@ use App\Modules\Governance\Authorization\Models\PolicyVersion;
 use App\Modules\Governance\Authorization\Services\GrantManager;
 use App\Modules\Governance\Authorization\Support\ConditionsPayload;
 use App\Modules\Governance\Authorization\Support\ScopePayload;
+use App\Modules\Identity\Enums\LinkOrigin;
 use App\Modules\Identity\Models\PersonAccountLink;
 use App\Modules\Identity\Services\RegistersUserIdentity;
 use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
@@ -27,13 +28,20 @@ use Tests\TestCase;
 
 abstract class WalletBalanceTestCase extends TestCase
 {
-    protected function makeUser(string $email): User
+    /**
+     * Depuis P007, `LinkOrigin::Registration` (le défaut) émet
+     * automatiquement les grants `user.base` (dont `wallet.view`) —
+     * `LinkOrigin::Migration` contourne délibérément l'octroi automatique
+     * (`RegistersUserIdentity`) pour les tests qui doivent encore
+     * constituer un sujet réellement sans aucun grant.
+     */
+    protected function makeUser(string $email, LinkOrigin $origin = LinkOrigin::Registration): User
     {
         return app(RegistersUserIdentity::class)->register([
             'name' => 'Utilisateur '.$email,
             'email' => $email,
             'password' => 'password',
-        ]);
+        ], $origin);
     }
 
     protected function activeLinkFor(User $user): PersonAccountLink
