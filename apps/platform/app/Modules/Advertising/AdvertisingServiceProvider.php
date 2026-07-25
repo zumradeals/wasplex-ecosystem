@@ -8,6 +8,9 @@ use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
 use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
+use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
+use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
+use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -40,6 +43,18 @@ use Illuminate\Support\ServiceProvider;
  * première capacité de tout l'écosystème à produire réellement une écriture
  * Ledger équilibrée (ADR-0010 §4 ligne 1 ; ADR-0003 §7-8) — réservée au
  * personnel finance Wasplex, jamais à l'annonceur lui-même.
+ *
+ * Depuis P005-F, trois capacités couvrent le cycle de vie complet d'un
+ * QualifiedEvent (ADR-0010 §4 lignes 3-5) : `event.submit`
+ * ({@see QualifiedEventSubmissionController}, réservation), `event.accept`
+ * ({@see QualifiedEventAcceptanceController}, validation + répartition
+ * 50/50 — première capacité à créer réellement un droit utilisateur
+ * payable) et `event.reject` ({@see QualifiedEventRejectionController},
+ * contre-écriture de la réservation). Toutes trois réservées au personnel
+ * Wasplex anti-fraude/mesure d'attention : aucun moteur de prix versionné
+ * (ADR-0002) n'existe encore pour permettre un vrai flux self-service par
+ * le bénéficiaire (dette documentée, `event.submit`, migration
+ * `2026_07_25_100009`).
  */
 class AdvertisingServiceProvider extends ServiceProvider
 {
