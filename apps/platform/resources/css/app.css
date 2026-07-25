@@ -9,9 +9,9 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+        'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+        Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -133,42 +133,97 @@
 }
 
 /*
- * Sous-ensemble initial des tokens sémantiques DS-0001 §6.1/§6.2, introduit
- * par le premier écran de production réel (Wallet, P006-A2). Valeurs
- * copiées telles quelles depuis DS-0001, pas devinées. Ce n'est pas encore
- * le pipeline de tokens versionnés générant variables CSS et types
- * TypeScript annoncé par DS-0001 §19 (différé) : seules les valeurs
- * réellement consommées par un écran existant sont déclarées ici.
+ * Tokens DS-0001 — palette de marque §6.1, sémantique §6.2 et neutres §6.3.
+ * Valeurs copiées telles quelles depuis DS-0001, pas devinées ni ajustées.
+ * Ce n'est pas encore le pipeline de génération automatique (différé DS-0001
+ * §32) : déclaration manuelle des valeurs réellement consommées par les écrans.
  */
 :root {
-    --wallet-gold: #936800; /* DS-0001 §6.1 brand.gold — Wallet et valeur confirmée contextualisée */
-    --wallet-success: #137a50; /* DS-0001 §6.2 status.success — confirmé, réussi, disponible */
-    --wallet-pending: #6b5b00; /* DS-0001 §6.2 status.pending — en attente ou en traitement */
-    --wallet-unknown: #53657d; /* DS-0001 §6.2 status.unknown — résultat non encore établi */
+    /* DS-0001 §6.1 — Palette de marque (thème clair) */
+    --brand-navy:  #10233F;
+    --brand-blue:  #075CCF;
+    --brand-cyan:  #007F9F;
+    --brand-orange: #C75100;
+    --brand-gold:  #936800;
+
+    /* DS-0001 §6.2 — Couleurs sémantiques (thème clair) */
+    --status-success: #137A50;
+    --status-warning: #9A5B00;
+    --status-danger:  #B42318;
+    --status-info:    #075CCF;
+    --status-pending: #6B5B00;
+    --status-unknown: #53657D;
+
+    /* DS-0001 §6.3 — Neutres (thème clair) */
+    --bg-canvas:  #F5F7FA;
+    --bg-surface: #FFFFFF;
+    --bg-raised:  #F8FAFC;
+    --text-primary:   #10233F;
+    --text-secondary: #53657D;
+    --border-default: #CBD5E1;
+    --focus-ring:     #075CCF;
+
+    /* Rétrocompatibilité — noms utilisés par wallet/overview */
+    --wallet-gold:    #936800;
+    --wallet-success: #137A50;
+    --wallet-pending: #6B5B00;
+    --wallet-unknown: #53657D;
 }
 
 .dark {
-    --wallet-gold: #f2c14e;
-    --wallet-success: #42d392;
-    --wallet-pending: #e7cf61;
-    --wallet-unknown: #a9b7c8;
+    /* DS-0001 §6.1 — Palette de marque (thème sombre) */
+    --brand-navy:  #07182D;
+    --brand-blue:  #4FA3FF;
+    --brand-cyan:  #2BC4DE;
+    --brand-orange: #FF9A3D;
+    --brand-gold:  #F2C14E;
+
+    /* DS-0001 §6.2 — Couleurs sémantiques (thème sombre) */
+    --status-success: #42D392;
+    --status-warning: #F4B942;
+    --status-danger:  #FF6B61;
+    --status-info:    #70B7FF;
+    --status-pending: #E7CF61;
+    --status-unknown: #A9B7C8;
+
+    /* DS-0001 §6.3 — Neutres (thème sombre) */
+    --bg-canvas:  #07182D;
+    --bg-surface: #0E2542;
+    --bg-raised:  #173251;
+    --text-primary:   #F5F8FC;
+    --text-secondary: #A9B7C8;
+    --border-default: #35506D;
+    --focus-ring:     #70B7FF;
+
+    /* Rétrocompatibilité */
+    --wallet-gold:    #F2C14E;
+    --wallet-success: #42D392;
+    --wallet-pending: #E7CF61;
+    --wallet-unknown: #A9B7C8;
 }
 
-.text-wallet-gold {
-    color: var(--wallet-gold);
-}
+/* Utilitaires DS-0001 exposés directement */
+.text-brand-navy   { color: var(--brand-navy); }
+.text-brand-blue   { color: var(--brand-blue); }
+.text-brand-cyan   { color: var(--brand-cyan); }
+.text-brand-orange { color: var(--brand-orange); }
+.text-brand-gold   { color: var(--brand-gold); }
 
-.text-wallet-success {
-    color: var(--wallet-success);
-}
+.bg-brand-navy   { background-color: var(--brand-navy); }
+.bg-brand-blue   { background-color: var(--brand-blue); }
+.bg-brand-cyan   { background-color: var(--brand-cyan); }
+.bg-brand-orange { background-color: var(--brand-orange); }
 
-.text-wallet-pending {
-    color: var(--wallet-pending);
-}
+.text-status-success { color: var(--status-success); }
+.text-status-pending { color: var(--status-pending); }
+.text-status-danger  { color: var(--status-danger); }
+.text-status-unknown { color: var(--status-unknown); }
 
-.text-wallet-unknown {
-    color: var(--wallet-unknown);
-}
+/* Rétrocompatibilité noms wallet */
+.text-wallet-gold    { color: var(--wallet-gold); }
+.text-wallet-success { color: var(--wallet-success); }
+.text-wallet-pending { color: var(--wallet-pending); }
+.text-wallet-unknown { color: var(--wallet-unknown); }
 
 @layer base {
     * {
