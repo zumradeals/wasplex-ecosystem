@@ -11,6 +11,7 @@ use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
+use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -19,6 +20,14 @@ Route::get('/health', HealthController::class)->name('health');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+
+    // P006-A2 : premier écran de production réel (U-006-01-apercu-wallet,
+    // UX-0002 §3.3) — reprend l'autorisation wallet.view (portée self) et
+    // affiche un état d'écran plutôt qu'une erreur JSON en cas de refus
+    // (voir WalletOverviewController). Volontairement dans le groupe 'auth'
+    // (redirection vers la connexion, jamais un 401 JSON) : c'est un écran,
+    // pas un point de terminaison API.
+    Route::get('wallet', [WalletOverviewController::class, 'show'])->name('wallet.show');
 });
 
 // Non protégée par le middleware 'auth' : une requête non authentifiée doit
