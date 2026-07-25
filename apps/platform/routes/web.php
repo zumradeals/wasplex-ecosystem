@@ -16,8 +16,20 @@ use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-Route::inertia('/', 'welcome')->name('home');
+// Accueil public minimal (L01) : explique Wasplex en 30 secondes et mène
+// directement à la connexion — jamais de page marketing. Un compte déjà
+// authentifié est redirigé directement vers son écran d'accueil (pas de
+// second passage par l'explication), même principe que le groupe
+// 'auth'/'verified' ci-dessous.
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return Inertia::render('welcome');
+})->name('home');
 
 Route::get('/health', HealthController::class)->name('health');
 
