@@ -3,6 +3,7 @@
 use App\Modules\Advertising\AdvertisingServiceProvider;
 use App\Modules\Governance\Authorization\AuthorizationServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
+use App\Modules\Wallet\Balance\WalletBalanceServiceProvider;
 use App\Modules\Wallet\Ledger\WalletLedgerServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Providers\FortifyServiceProvider;
@@ -13,5 +14,6 @@ return [
     IdentityServiceProvider::class,
     AuthorizationServiceProvider::class,
     WalletLedgerServiceProvider::class,
+    WalletBalanceServiceProvider::class,
     AdvertisingServiceProvider::class,
 ];

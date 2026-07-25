@@ -10,6 +10,7 @@ use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
+use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -70,5 +71,13 @@ Route::middleware('web')->post('advertising/qualified-events/{qualifiedEvent}/ac
 
 Route::middleware('web')->post('advertising/qualified-events/{qualifiedEvent}/reject', [QualifiedEventRejectionController::class, 'store'])
     ->name('advertising.qualified-events.reject');
+
+// P006-A : première route sensible réelle du module Wallet — consultation
+// par une personne de son propre solde WP (ecosystem/wallet/01 §3, §7),
+// jamais celui d'autrui (wallet.view, migration 2026_07_25_200001). Même
+// discipline que ci-dessus : groupe 'web' hors du groupe 'auth', 401 JSON
+// structuré pour un appel non authentifié.
+Route::middleware('web')->get('wallet/balance', [WalletBalanceController::class, 'show'])
+    ->name('wallet.balance.show');
 
 require __DIR__.'/settings.php';

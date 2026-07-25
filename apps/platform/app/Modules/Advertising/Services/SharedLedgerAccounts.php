@@ -22,11 +22,6 @@ class SharedLedgerAccounts
         return $this->getOrCreate('coverage.advertising', AccountNature::Asset, AccountPurpose::Coverage, $currency);
     }
 
-    public function userRights(string $currency): Account
-    {
-        return $this->getOrCreate('user_rights.advertising', AccountNature::Liability, AccountPurpose::UserRights, $currency);
-    }
-
     public function wasplexRevenue(string $currency): Account
     {
         return $this->getOrCreate('wasplex_own_resources.advertising', AccountNature::Revenue, AccountPurpose::WasplexOwnResources, $currency);
