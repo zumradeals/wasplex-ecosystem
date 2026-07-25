@@ -8,6 +8,7 @@ use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
+use App\Modules\Advertising\Http\Controllers\FeedController;
 use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
@@ -34,7 +35,10 @@ Route::get('/', function () {
 Route::get('/health', HealthController::class)->name('health');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    // W4 (L03) : le Feed remplace le placeholder générique du kit de
+    // démarrage — point d'entrée quotidien de l'utilisateur (voir
+    // FeedController).
+    Route::get('dashboard', [FeedController::class, 'index'])->name('dashboard');
 
     // P006-A2 : premier écran de production réel (U-006-01-apercu-wallet,
     // UX-0002 §3.3) — reprend l'autorisation wallet.view (portée self) et
