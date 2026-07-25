@@ -11,6 +11,7 @@ use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController
 use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
+use App\Modules\Advertising\Http\Controllers\QualifiedEventSelfSubmissionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
@@ -91,6 +92,13 @@ Route::middleware('web')->post('advertising/campaigns/{campaign}/funding', [Camp
 // authentifié.
 Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/qualified-events', [QualifiedEventSubmissionController::class, 'store'])
     ->name('advertising.qualified-events.store');
+
+// W2 : auto-soumission par le bénéficiaire de sa propre preuve
+// d'attention qualifiée (event.self_submit, prix résolu serveur via le
+// registre Configuration) — même discipline que ci-dessus : groupe 'web'
+// hors du groupe 'auth', 401 JSON structuré pour un appel non authentifié.
+Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/qualified-events/self-submit', [QualifiedEventSelfSubmissionController::class, 'store'])
+    ->name('advertising.qualified-events.self-submit');
 
 Route::middleware('web')->post('advertising/qualified-events/{qualifiedEvent}/accept', [QualifiedEventAcceptanceController::class, 'store'])
     ->name('advertising.qualified-events.accept');

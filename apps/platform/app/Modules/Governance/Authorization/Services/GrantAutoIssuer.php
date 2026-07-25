@@ -50,6 +50,7 @@ class GrantAutoIssuer
         'campaign.submit_for_review',
         'campaign.view',
         'advertiser_profile.create',
+        'event.self_submit',
     ];
 
     /**

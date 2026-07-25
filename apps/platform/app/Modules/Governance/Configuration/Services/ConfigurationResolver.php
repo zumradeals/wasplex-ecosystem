@@ -58,4 +58,44 @@ class ConfigurationResolver
     {
         return $this->resolve($stableKey)->value;
     }
+
+    /**
+     * Résolution épinglée par (clé stable, version) — pas nécessairement la
+     * version actuellement active. ADR-0002 §6 : « chaque événement utilise
+     * la version diffusée au moment de son exécution » ; une campagne fige
+     * `pricing_configuration_key`/`version` à son approbation, qui doit
+     * rester résolvable même après qu'une version plus récente ait
+     * remplacé celle épinglée (`replaced`).
+     *
+     * `draft`/`in_review`/`rejected`/`cancelled` sont toujours refusés :
+     * seule une version ayant réellement été mise en effet un jour
+     * (`active` ou `replaced`) constitue une référence légitime — jamais
+     * une proposition qui n'a jamais été activée.
+     *
+     * @throws NoActiveConfigurationException Aucune definition ne porte cette clé, ou cette version n'a jamais été mise en effet.
+     */
+    public function resolveExactVersion(string $stableKey, int $version): ValueVersion
+    {
+        $definition = Definition::query()
+            ->where('stable_key', $stableKey)
+            ->first();
+
+        if ($definition === null) {
+            throw new NoActiveConfigurationException("aucune definition pour la clé « {$stableKey} »");
+        }
+
+        $pinned = ValueVersion::query()
+            ->where('definition_id', $definition->id)
+            ->where('version', $version)
+            ->whereIn('state', [ValueVersionState::Active, ValueVersionState::Replaced])
+            ->first();
+
+        if ($pinned === null) {
+            throw new NoActiveConfigurationException(
+                "aucune version {$version} légitimement mise en effet pour la definition « {$stableKey} »"
+            );
+        }
+
+        return $pinned;
+    }
 }

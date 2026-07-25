@@ -2,6 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Governance\Configuration\Enums\ConfigurationLevel;
+use App\Modules\Governance\Configuration\Enums\DefinitionState;
+use App\Modules\Governance\Configuration\Enums\ValueType;
+use App\Modules\Governance\Configuration\Models\Definition;
+use App\Modules\Governance\Configuration\Services\ConfigurationValueManager;
+use App\Modules\Identity\Models\PersonAccountLink;
+use App\Modules\Identity\Services\RegistersUserIdentity;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -41,10 +48,30 @@ use Illuminate\Support\Str;
  * À retirer (ou remplacer, jamais muter) dès qu'une vraie valeur est
  * décidée et versionnée par les personnes habilitées (Koné/SIRR, via
  * ADR-0002).
+ *
+ * Peuple aussi (W2) une `Definition` DÉMONSTRATION de prix de base pour
+ * `QualifiedEventPricingResolver` (`advertising.qualified_event_base_price`,
+ * `value = 1`, la plus petite unité monétaire non nulle possible — jamais
+ * un vrai prix décidé) : sans elle, aucune `CampaignVersion` créée par
+ * l'écran de démonstration (P007-W1) ne pourrait résoudre de prix et donc
+ * jamais accepter d'auto-soumission `event.self_submit`. Contrairement aux
+ * deux données ci-dessus, celle-ci passe par le vrai cycle
+ * `ConfigurationValueManager` (propose → soumission → approbation →
+ * activation, avec deux comptes démonstration distincts comme auteur et
+ * approbateur) : elle prouve que le mécanisme réel fonctionne, plutôt que
+ * de contourner ses garanties de séparation des pouvoirs même pour une
+ * donnée de démonstration.
  */
 class AdvertisingDemoConfigurationSeeder extends Seeder
 {
     public function run(): void
+    {
+        $this->seedSectorClassification();
+        $this->seedAudienceThreshold();
+        $this->seedQualifiedEventBasePrice();
+    }
+
+    private function seedSectorClassification(): void
     {
         if (! DB::table('advertising.sector_classifications')
             ->where('country_code', 'ZZ')
@@ -74,7 +101,10 @@ class AdvertisingDemoConfigurationSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+    }
 
+    private function seedAudienceThreshold(): void
+    {
         if (! DB::table('advertising.audience_segment_size_thresholds')->where('state', 'active')->exists()) {
             $nextVersion = 1 + (int) DB::table('advertising.audience_segment_size_thresholds')->max('version');
 
@@ -89,5 +119,58 @@ class AdvertisingDemoConfigurationSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+    }
+
+    private function seedQualifiedEventBasePrice(): void
+    {
+        $stableKey = 'advertising.qualified_event_base_price';
+
+        if (Definition::query()->where('stable_key', $stableKey)->where('state', DefinitionState::Active)->exists()) {
+            return;
+        }
+
+        $definition = Definition::create([
+            'stable_key' => $stableKey,
+            'version' => 1,
+            'domain' => 'advertising',
+            'level' => ConfigurationLevel::C2,
+            'value_type' => ValueType::Integer,
+            'unit' => 'smallest_currency_unit',
+            'constraints' => ['minimum' => 0],
+            'description' => 'DÉMONSTRATION — prix de base d\'un événement publicitaire qualifié, sans coefficient de format/fréquence/rareté (TD-0006, noyau). Jamais un vrai prix décidé.',
+            'state' => DefinitionState::Active,
+        ]);
+
+        $author = $this->demoLink('demo-pricing-author@wasplex.internal', 'Démonstration Auteur Tarification');
+        $approver = $this->demoLink('demo-pricing-approver@wasplex.internal', 'Démonstration Approbateur Tarification');
+
+        $manager = app(ConfigurationValueManager::class);
+
+        $version = $manager->propose(
+            $definition,
+            1,
+            'DÉMONSTRATION — aucune valeur réelle décidée ; ne pas utiliser en production (voir AdvertisingDemoConfigurationSeeder).',
+            $author,
+        );
+        $version = $manager->submitForReview($version);
+        $version = $manager->approve($version, $approver, 'Démonstration.');
+        $manager->activate($version, $approver, (string) Str::uuid());
+    }
+
+    private function demoLink(string $email, string $name): PersonAccountLink
+    {
+        $existingUser = DB::table('users')->where('email', $email)->first();
+
+        if ($existingUser !== null) {
+            return PersonAccountLink::query()->where('user_id', $existingUser->id)->firstOrFail();
+        }
+
+        $user = app(RegistersUserIdentity::class)->register([
+            'name' => $name,
+            'email' => $email,
+            'password' => (string) Str::uuid(),
+        ]);
+
+        return PersonAccountLink::query()->where('user_id', $user->id)->firstOrFail();
     }
 }

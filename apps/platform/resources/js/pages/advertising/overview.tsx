@@ -232,12 +232,13 @@ function CreateCampaignForm({
                 .split(',')
                 .map((code) => code.trim().toUpperCase())
                 .filter(Boolean),
-            // Aucune vraie configuration tarifaire n'existe encore
-            // (ADR-0010 §6, §7 : prix de base et coefficients sont une
-            // configuration versionnée sous ADR-0002, jamais codée en dur ni
-            // devinée ici) — valeur de démonstration explicite, jamais
-            // présentée comme un tarif réel.
-            pricing_configuration_key: 'demonstration_placeholder',
+            // Référence une Definition de démonstration réellement
+            // résolvable par QualifiedEventPricingResolver (W2,
+            // AdvertisingDemoConfigurationSeeder) — value=1, la plus
+            // petite unité monétaire non nulle possible, jamais un vrai
+            // tarif décidé (ADR-0010 §6, §7 : coefficients de format,
+            // fréquence, rareté de segment restent hors périmètre, TD-0006).
+            pricing_configuration_key: 'advertising.qualified_event_base_price',
             pricing_configuration_version: 1,
             audience: {
                 criteria: { country: territory.split(',')[0]?.trim() },
