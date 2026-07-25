@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HealthController;
 use App\Modules\Advertising\Http\Controllers\CampaignController;
+use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
@@ -42,5 +43,13 @@ Route::middleware('web')->post('advertising/campaigns/{campaign}/reports', [Camp
 
 Route::middleware('web')->post('advertising/moderation-cases/{moderationCase}/decisions', [ModerationCaseDecisionController::class, 'store'])
     ->name('advertising.moderation-cases.decisions.store');
+
+// P005-E : encaissement confirmé d'annonceur (ADR-0010 §4 ligne 1 ;
+// ADR-0003 §7-8). Réservé au personnel finance Wasplex, jamais à
+// l'annonceur — voir `campaign.fund` (migration 2026_07_25_100008). Même
+// discipline que ci-dessus : groupe 'web' hors du groupe 'auth', 401 JSON
+// structuré pour un appel non authentifié.
+Route::middleware('web')->post('advertising/campaigns/{campaign}/funding', [CampaignFundingController::class, 'store'])
+    ->name('advertising.campaigns.funding.store');
 
 require __DIR__.'/settings.php';

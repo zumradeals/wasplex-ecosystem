@@ -3,6 +3,7 @@
 namespace App\Modules\Advertising;
 
 use App\Modules\Advertising\Http\Controllers\CampaignController;
+use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
@@ -32,8 +33,13 @@ use Illuminate\Support\ServiceProvider;
  * à tout utilisateur authentifié — `03-signalements-sanctions-et-remuneration.md`
  * §1) et `campaign.moderate` ({@see ModerationCaseDecisionController},
  * décision + mesure conservatoire éventuelle, dont la suspension réelle
- * d'une Campaign). Aucune sanction formelle, aucun effet Ledger, aucun
- * parcours de recours complet n'existe encore (ADR-0010 §8).
+ * d'une Campaign). Aucune sanction formelle, aucun parcours de recours
+ * complet n'existe encore (ADR-0010 §8).
+ *
+ * Depuis P005-E, `campaign.fund` ({@see CampaignFundingController}) est la
+ * première capacité de tout l'écosystème à produire réellement une écriture
+ * Ledger équilibrée (ADR-0010 §4 ligne 1 ; ADR-0003 §7-8) — réservée au
+ * personnel finance Wasplex, jamais à l'annonceur lui-même.
  */
 class AdvertisingServiceProvider extends ServiceProvider
 {
