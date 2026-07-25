@@ -7,6 +7,9 @@ use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
 use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
+use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
+use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
+use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -51,5 +54,21 @@ Route::middleware('web')->post('advertising/moderation-cases/{moderationCase}/de
 // structuré pour un appel non authentifié.
 Route::middleware('web')->post('advertising/campaigns/{campaign}/funding', [CampaignFundingController::class, 'store'])
     ->name('advertising.campaigns.funding.store');
+
+// P005-F : cycle de vie d'un QualifiedEvent (ADR-0010 §4 lignes 3-5).
+// event.submit/event.accept/event.reject sont réservées au personnel
+// Wasplex anti-fraude/mesure d'attention, jamais au bénéficiaire lui-même
+// — voir le raisonnement documenté sur chaque capacité (migrations
+// 2026_07_25_100009 à 100011). Même discipline que ci-dessus : groupe
+// 'web' hors du groupe 'auth', 401 JSON structuré pour un appel non
+// authentifié.
+Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/qualified-events', [QualifiedEventSubmissionController::class, 'store'])
+    ->name('advertising.qualified-events.store');
+
+Route::middleware('web')->post('advertising/qualified-events/{qualifiedEvent}/accept', [QualifiedEventAcceptanceController::class, 'store'])
+    ->name('advertising.qualified-events.accept');
+
+Route::middleware('web')->post('advertising/qualified-events/{qualifiedEvent}/reject', [QualifiedEventRejectionController::class, 'store'])
+    ->name('advertising.qualified-events.reject');
 
 require __DIR__.'/settings.php';
