@@ -139,5 +139,6 @@ export default function Register({ passwordRules }: Props) {
 
 Register.layout = {
     title: 'Créer un compte',
-    description: 'Rejoignez Wasplex — la publicité qui vous rémunère directement',
+    description:
+        'Rejoignez Wasplex — la publicité qui vous rémunère directement',
 };

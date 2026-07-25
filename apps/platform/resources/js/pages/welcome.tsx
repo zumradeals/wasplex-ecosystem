@@ -1,5 +1,14 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ChevronDown, ChevronUp, Eye, EyeOff, Megaphone, Shield, Smartphone, Wallet } from 'lucide-react';
+import {
+    ChevronDown,
+    ChevronUp,
+    Eye,
+    EyeOff,
+    Megaphone,
+    Shield,
+    Smartphone,
+    Wallet,
+} from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { Spinner } from '@/components/ui/spinner';
@@ -75,7 +84,7 @@ function LoginForm() {
                             required
                             autoComplete="email"
                             placeholder="ton@adresse.com"
-                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:outline-none focus:ring-2 focus:ring-[#4FA3FF]/30"
+                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
                         />
                         <InputError message={errors.email} />
                     </div>
@@ -95,15 +104,23 @@ function LoginForm() {
                                 required
                                 autoComplete="current-password"
                                 placeholder="Minimum 8 caractères"
-                                className="h-12 w-full rounded-xl border border-[#35506D] bg-[#173251] px-4 pr-12 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:outline-none focus:ring-2 focus:ring-[#4FA3FF]/30"
+                                className="h-12 w-full rounded-xl border border-[#35506D] bg-[#173251] px-4 pr-12 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((v) => !v)}
-                                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#53657D] hover:text-[#A9B7C8]"
+                                aria-label={
+                                    showPassword
+                                        ? 'Masquer le mot de passe'
+                                        : 'Afficher le mot de passe'
+                                }
+                                className="absolute top-1/2 right-3 -translate-y-1/2 text-[#53657D] hover:text-[#A9B7C8]"
                             >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                {showPassword ? (
+                                    <EyeOff size={18} />
+                                ) : (
+                                    <Eye size={18} />
+                                )}
                             </button>
                         </div>
                         <InputError message={errors.password} />
@@ -148,7 +165,10 @@ function RegisterForm({ passwordRules }: { passwordRules?: string }) {
             {({ processing, errors }) => (
                 <>
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="reg-name" className="text-sm font-medium text-[#A9B7C8]">
+                        <label
+                            htmlFor="reg-name"
+                            className="text-sm font-medium text-[#A9B7C8]"
+                        >
                             Ton prénom ou nom
                         </label>
                         <input
@@ -158,13 +178,16 @@ function RegisterForm({ passwordRules }: { passwordRules?: string }) {
                             required
                             autoComplete="name"
                             placeholder="Ton nom"
-                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:outline-none focus:ring-2 focus:ring-[#4FA3FF]/30"
+                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
                         />
                         <InputError message={errors.name} />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="reg-email" className="text-sm font-medium text-[#A9B7C8]">
+                        <label
+                            htmlFor="reg-email"
+                            className="text-sm font-medium text-[#A9B7C8]"
+                        >
                             Adresse e-mail
                         </label>
                         <input
@@ -174,13 +197,16 @@ function RegisterForm({ passwordRules }: { passwordRules?: string }) {
                             required
                             autoComplete="email"
                             placeholder="ton@adresse.com"
-                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:outline-none focus:ring-2 focus:ring-[#4FA3FF]/30"
+                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
                         />
                         <InputError message={errors.email} />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="reg-password" className="text-sm font-medium text-[#A9B7C8]">
+                        <label
+                            htmlFor="reg-password"
+                            className="text-sm font-medium text-[#A9B7C8]"
+                        >
                             Mot de passe
                         </label>
                         <div className="relative">
@@ -192,22 +218,33 @@ function RegisterForm({ passwordRules }: { passwordRules?: string }) {
                                 autoComplete="new-password"
                                 placeholder="Minimum 8 caractères"
                                 passwordrules={passwordRules}
-                                className="h-12 w-full rounded-xl border border-[#35506D] bg-[#173251] px-4 pr-12 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:outline-none focus:ring-2 focus:ring-[#4FA3FF]/30"
+                                className="h-12 w-full rounded-xl border border-[#35506D] bg-[#173251] px-4 pr-12 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((v) => !v)}
-                                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#53657D] hover:text-[#A9B7C8]"
+                                aria-label={
+                                    showPassword
+                                        ? 'Masquer le mot de passe'
+                                        : 'Afficher le mot de passe'
+                                }
+                                className="absolute top-1/2 right-3 -translate-y-1/2 text-[#53657D] hover:text-[#A9B7C8]"
                             >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                {showPassword ? (
+                                    <EyeOff size={18} />
+                                ) : (
+                                    <Eye size={18} />
+                                )}
                             </button>
                         </div>
                         <InputError message={errors.password} />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="reg-password-confirm" className="text-sm font-medium text-[#A9B7C8]">
+                        <label
+                            htmlFor="reg-password-confirm"
+                            className="text-sm font-medium text-[#A9B7C8]"
+                        >
                             Confirmer le mot de passe
                         </label>
                         <input
@@ -217,7 +254,7 @@ function RegisterForm({ passwordRules }: { passwordRules?: string }) {
                             required
                             autoComplete="new-password"
                             placeholder="Répète ton mot de passe"
-                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:outline-none focus:ring-2 focus:ring-[#4FA3FF]/30"
+                            className="h-12 rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white placeholder-[#53657D] focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
                         />
                         <InputError message={errors.password_confirmation} />
                     </div>
@@ -253,9 +290,9 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
 
             <div className="flex min-h-svh flex-col bg-[#07182D] text-white">
                 {/* ── Héros ─────────────────────────────────────────── */}
-                <div className="flex flex-col items-center pt-10 pb-6 px-5 text-center">
+                <div className="flex flex-col items-center px-5 pt-10 pb-6 text-center">
                     {/* Mascotte + marque */}
-                    <div className="flex flex-col items-center gap-2 mb-5">
+                    <div className="mb-5 flex flex-col items-center gap-2">
                         <WasplexMascot className="h-24 w-24 drop-shadow-lg" />
                         <span className="text-2xl font-bold tracking-tight">
                             Wasplex
@@ -263,13 +300,13 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
                     </div>
 
                     {/* Accroche — fidèle à la Constitution art. 1 */}
-                    <p className="text-[#4FA3FF] text-base font-medium leading-snug max-w-xs">
+                    <p className="max-w-xs text-base leading-snug font-medium text-[#4FA3FF]">
                         La publicité qui te paie directement sur ton mobile
                     </p>
                 </div>
 
                 {/* ── 3 badges clés ─────────────────────────────────── */}
-                <div className="grid grid-cols-3 gap-2 px-5 mb-6">
+                <div className="mb-6 grid grid-cols-3 gap-2 px-5">
                     {[
                         { label: 'Gratuit', sub: 'Inscription simple' },
                         { label: '1 WP', sub: '= 1 FCFA garanti' },
@@ -279,14 +316,18 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
                             key={label}
                             className="flex flex-col items-center rounded-2xl border border-[#35506D] bg-[#0E2542] p-3 text-center"
                         >
-                            <span className="text-sm font-bold text-white">{label}</span>
-                            <span className="text-[11px] text-[#A9B7C8] leading-tight mt-0.5">{sub}</span>
+                            <span className="text-sm font-bold text-white">
+                                {label}
+                            </span>
+                            <span className="mt-0.5 text-[11px] leading-tight text-[#A9B7C8]">
+                                {sub}
+                            </span>
                         </div>
                     ))}
                 </div>
 
                 {/* ── Grille 2×2 features ───────────────────────────── */}
-                <div className="grid grid-cols-2 gap-3 px-5 mb-8">
+                <div className="mb-8 grid grid-cols-2 gap-3 px-5">
                     {features.map((f) => {
                         const Icon = f.icon;
 
@@ -299,12 +340,15 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
                                     className="flex h-9 w-9 items-center justify-center rounded-xl"
                                     style={{ backgroundColor: `${f.color}18` }}
                                 >
-                                    <Icon size={18} style={{ color: f.color }} />
+                                    <Icon
+                                        size={18}
+                                        style={{ color: f.color }}
+                                    />
                                 </span>
-                                <p className="text-sm font-semibold leading-snug text-white">
+                                <p className="text-sm leading-snug font-semibold text-white">
                                     {f.title}
                                 </p>
-                                <p className="text-[12px] text-[#A9B7C8] leading-relaxed">
+                                <p className="text-[12px] leading-relaxed text-[#A9B7C8]">
                                     {f.body}
                                 </p>
                             </div>
@@ -314,7 +358,7 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
 
                 {/* ── Connexion rapide ───────────────────────────────── */}
                 <div className="px-5 pb-10">
-                    <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-widest text-[#FF9A3D]">
+                    <p className="mb-3 text-center text-[11px] font-semibold tracking-widest text-[#FF9A3D] uppercase">
                         Connexion rapide
                     </p>
 
@@ -330,9 +374,15 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
                                 Connexion Utilisateur
                             </span>
                             {open === 'user' ? (
-                                <ChevronUp size={20} className="text-white/70" />
+                                <ChevronUp
+                                    size={20}
+                                    className="text-white/70"
+                                />
                             ) : (
-                                <ChevronDown size={20} className="text-white/70" />
+                                <ChevronDown
+                                    size={20}
+                                    className="text-white/70"
+                                />
                             )}
                         </button>
 
@@ -367,7 +417,9 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
                                 {tab === 'login' ? (
                                     <LoginForm />
                                 ) : (
-                                    <RegisterForm passwordRules={passwordRules} />
+                                    <RegisterForm
+                                        passwordRules={passwordRules}
+                                    />
                                 )}
                             </div>
                         )}
@@ -390,9 +442,14 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
                     {/* Footer légal — UX-0001 §4 */}
                     <p className="mt-6 text-center text-[12px] text-[#53657D]">
                         En continuant, tu acceptes les{' '}
-                        <span className="text-[#4FA3FF]">Conditions Wasplex</span>{' '}
+                        <span className="text-[#4FA3FF]">
+                            Conditions Wasplex
+                        </span>{' '}
                         et la{' '}
-                        <span className="text-[#4FA3FF]">Politique de confidentialité</span>.
+                        <span className="text-[#4FA3FF]">
+                            Politique de confidentialité
+                        </span>
+                        .
                     </p>
                 </div>
             </div>

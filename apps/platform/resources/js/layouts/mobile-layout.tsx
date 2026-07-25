@@ -18,7 +18,10 @@ export default function MobileLayout({
     showHeader?: boolean;
     fullScreen?: boolean;
 }) {
-    const page = usePage<{ auth?: { user?: { name?: string } }; wallet_balance?: { available?: number; currency?: string } }>();
+    const page = usePage<{
+        auth?: { user?: { name?: string } };
+        wallet_balance?: { available?: number; currency?: string };
+    }>();
     const walletBalance = page.props.wallet_balance;
 
     return (
@@ -42,7 +45,10 @@ export default function MobileLayout({
                             className="flex items-center gap-1.5 rounded-full bg-[#173251] px-3 py-1.5 text-sm font-semibold"
                             aria-label={`Solde disponible : ${walletBalance.available ?? 0} WP`}
                         >
-                            <span className="h-2 w-2 rounded-full bg-[#FF9A3D]" aria-hidden="true" />
+                            <span
+                                className="h-2 w-2 rounded-full bg-[#FF9A3D]"
+                                aria-hidden="true"
+                            />
                             <span className="text-white">
                                 {new Intl.NumberFormat('fr-FR').format(
                                     walletBalance.available ?? 0,

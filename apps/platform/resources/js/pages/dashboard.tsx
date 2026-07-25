@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import QualifiedEventSelfSubmissionController from '@/actions/App/Modules/Advertising/Http/Controllers/QualifiedEventSelfSubmissionController';
 import MobileLayout from '@/layouts/mobile-layout';
 import { postJson } from '@/lib/api';
-import QualifiedEventSelfSubmissionController from '@/actions/App/Modules/Advertising/Http/Controllers/QualifiedEventSelfSubmissionController';
 
 type Ad = {
     campaign_version_id: string;
@@ -113,14 +113,14 @@ function AdCard({ ad }: { ad: Ad }) {
     return (
         <article className="overflow-hidden rounded-2xl border border-[#35506D] bg-[#0E2542]">
             {/* Media placeholder / attention state indicator */}
-            <div className="relative flex h-44 select-none items-center justify-center bg-gradient-to-br from-[#173251] to-[#0A1E38]">
+            <div className="relative flex h-44 items-center justify-center bg-gradient-to-br from-[#173251] to-[#0A1E38] select-none">
                 {/* Format badge — top left */}
-                <span className="absolute left-3 top-3 rounded-md bg-[#0E2542]/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-[#A9B7C8] backdrop-blur-sm">
+                <span className="absolute top-3 left-3 rounded-md bg-[#0E2542]/80 px-2 py-0.5 text-[10px] font-medium tracking-widest text-[#A9B7C8] uppercase backdrop-blur-sm">
                     {FORMAT_LABELS[ad.format] ?? ad.format}
                 </span>
 
                 {/* Reward pill — top right */}
-                <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-[#C75100] px-2.5 py-1 text-xs font-bold text-white shadow-lg">
+                <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-[#C75100] px-2.5 py-1 text-xs font-bold text-white shadow-lg">
                     {rewardText}
                 </span>
 
@@ -137,7 +137,7 @@ function AdCard({ ad }: { ad: Ad }) {
 
                 {state.status === 'watching' && (
                     <div className="text-center">
-                        <p className="text-4xl font-bold tabular-nums text-[#4FA3FF]">
+                        <p className="text-4xl font-bold text-[#4FA3FF] tabular-nums">
                             {Math.round(state.progress)}%
                         </p>
                         <p className="mt-1 text-xs text-[#A9B7C8]">
@@ -194,7 +194,7 @@ function AdCard({ ad }: { ad: Ad }) {
 
             {/* Card body */}
             <div className="p-4">
-                <h3 className="mb-1 text-base font-semibold leading-snug text-[#F5F8FC]">
+                <h3 className="mb-1 text-base leading-snug font-semibold text-[#F5F8FC]">
                     {ad.headline}
                 </h3>
                 <p className="mb-4 text-xs text-[#A9B7C8]">
@@ -287,9 +287,7 @@ export default function Dashboard({ ads }: { ads: Ad[] }) {
                     <button
                         key={tab.key}
                         disabled={!tab.available}
-                        onClick={() =>
-                            tab.available && setActiveTab(tab.key)
-                        }
+                        onClick={() => tab.available && setActiveTab(tab.key)}
                         title={
                             !tab.available ? 'Bientôt disponible' : undefined
                         }

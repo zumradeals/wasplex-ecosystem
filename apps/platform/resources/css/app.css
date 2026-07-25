@@ -140,90 +140,124 @@
  */
 :root {
     /* DS-0001 §6.1 — Palette de marque (thème clair) */
-    --brand-navy:  #10233F;
-    --brand-blue:  #075CCF;
-    --brand-cyan:  #007F9F;
-    --brand-orange: #C75100;
-    --brand-gold:  #936800;
+    --brand-navy: #10233f;
+    --brand-blue: #075ccf;
+    --brand-cyan: #007f9f;
+    --brand-orange: #c75100;
+    --brand-gold: #936800;
 
     /* DS-0001 §6.2 — Couleurs sémantiques (thème clair) */
-    --status-success: #137A50;
-    --status-warning: #9A5B00;
-    --status-danger:  #B42318;
-    --status-info:    #075CCF;
-    --status-pending: #6B5B00;
-    --status-unknown: #53657D;
+    --status-success: #137a50;
+    --status-warning: #9a5b00;
+    --status-danger: #b42318;
+    --status-info: #075ccf;
+    --status-pending: #6b5b00;
+    --status-unknown: #53657d;
 
     /* DS-0001 §6.3 — Neutres (thème clair) */
-    --bg-canvas:  #F5F7FA;
-    --bg-surface: #FFFFFF;
-    --bg-raised:  #F8FAFC;
-    --text-primary:   #10233F;
-    --text-secondary: #53657D;
-    --border-default: #CBD5E1;
-    --focus-ring:     #075CCF;
+    --bg-canvas: #f5f7fa;
+    --bg-surface: #ffffff;
+    --bg-raised: #f8fafc;
+    --text-primary: #10233f;
+    --text-secondary: #53657d;
+    --border-default: #cbd5e1;
+    --focus-ring: #075ccf;
 
     /* Rétrocompatibilité — noms utilisés par wallet/overview */
-    --wallet-gold:    #936800;
-    --wallet-success: #137A50;
-    --wallet-pending: #6B5B00;
-    --wallet-unknown: #53657D;
+    --wallet-gold: #936800;
+    --wallet-success: #137a50;
+    --wallet-pending: #6b5b00;
+    --wallet-unknown: #53657d;
 }
 
 .dark {
     /* DS-0001 §6.1 — Palette de marque (thème sombre) */
-    --brand-navy:  #07182D;
-    --brand-blue:  #4FA3FF;
-    --brand-cyan:  #2BC4DE;
-    --brand-orange: #FF9A3D;
-    --brand-gold:  #F2C14E;
+    --brand-navy: #07182d;
+    --brand-blue: #4fa3ff;
+    --brand-cyan: #2bc4de;
+    --brand-orange: #ff9a3d;
+    --brand-gold: #f2c14e;
 
     /* DS-0001 §6.2 — Couleurs sémantiques (thème sombre) */
-    --status-success: #42D392;
-    --status-warning: #F4B942;
-    --status-danger:  #FF6B61;
-    --status-info:    #70B7FF;
-    --status-pending: #E7CF61;
-    --status-unknown: #A9B7C8;
+    --status-success: #42d392;
+    --status-warning: #f4b942;
+    --status-danger: #ff6b61;
+    --status-info: #70b7ff;
+    --status-pending: #e7cf61;
+    --status-unknown: #a9b7c8;
 
     /* DS-0001 §6.3 — Neutres (thème sombre) */
-    --bg-canvas:  #07182D;
-    --bg-surface: #0E2542;
-    --bg-raised:  #173251;
-    --text-primary:   #F5F8FC;
-    --text-secondary: #A9B7C8;
-    --border-default: #35506D;
-    --focus-ring:     #70B7FF;
+    --bg-canvas: #07182d;
+    --bg-surface: #0e2542;
+    --bg-raised: #173251;
+    --text-primary: #f5f8fc;
+    --text-secondary: #a9b7c8;
+    --border-default: #35506d;
+    --focus-ring: #70b7ff;
 
     /* Rétrocompatibilité */
-    --wallet-gold:    #F2C14E;
-    --wallet-success: #42D392;
-    --wallet-pending: #E7CF61;
-    --wallet-unknown: #A9B7C8;
+    --wallet-gold: #f2c14e;
+    --wallet-success: #42d392;
+    --wallet-pending: #e7cf61;
+    --wallet-unknown: #a9b7c8;
 }
 
 /* Utilitaires DS-0001 exposés directement */
-.text-brand-navy   { color: var(--brand-navy); }
-.text-brand-blue   { color: var(--brand-blue); }
-.text-brand-cyan   { color: var(--brand-cyan); }
-.text-brand-orange { color: var(--brand-orange); }
-.text-brand-gold   { color: var(--brand-gold); }
+.text-brand-navy {
+    color: var(--brand-navy);
+}
+.text-brand-blue {
+    color: var(--brand-blue);
+}
+.text-brand-cyan {
+    color: var(--brand-cyan);
+}
+.text-brand-orange {
+    color: var(--brand-orange);
+}
+.text-brand-gold {
+    color: var(--brand-gold);
+}
 
-.bg-brand-navy   { background-color: var(--brand-navy); }
-.bg-brand-blue   { background-color: var(--brand-blue); }
-.bg-brand-cyan   { background-color: var(--brand-cyan); }
-.bg-brand-orange { background-color: var(--brand-orange); }
+.bg-brand-navy {
+    background-color: var(--brand-navy);
+}
+.bg-brand-blue {
+    background-color: var(--brand-blue);
+}
+.bg-brand-cyan {
+    background-color: var(--brand-cyan);
+}
+.bg-brand-orange {
+    background-color: var(--brand-orange);
+}
 
-.text-status-success { color: var(--status-success); }
-.text-status-pending { color: var(--status-pending); }
-.text-status-danger  { color: var(--status-danger); }
-.text-status-unknown { color: var(--status-unknown); }
+.text-status-success {
+    color: var(--status-success);
+}
+.text-status-pending {
+    color: var(--status-pending);
+}
+.text-status-danger {
+    color: var(--status-danger);
+}
+.text-status-unknown {
+    color: var(--status-unknown);
+}
 
 /* Rétrocompatibilité noms wallet */
-.text-wallet-gold    { color: var(--wallet-gold); }
-.text-wallet-success { color: var(--wallet-success); }
-.text-wallet-pending { color: var(--wallet-pending); }
-.text-wallet-unknown { color: var(--wallet-unknown); }
+.text-wallet-gold {
+    color: var(--wallet-gold);
+}
+.text-wallet-success {
+    color: var(--wallet-success);
+}
+.text-wallet-pending {
+    color: var(--wallet-pending);
+}
+.text-wallet-unknown {
+    color: var(--wallet-unknown);
+}
 
 @layer base {
     * {

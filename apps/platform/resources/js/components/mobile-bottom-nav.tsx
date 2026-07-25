@@ -1,11 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import {
-    Bell,
-    HandHeart,
-    Tv2,
-    User,
-    Wallet,
-} from 'lucide-react';
+import { Bell, HandHeart, Tv2, User, Wallet } from 'lucide-react';
 import { dashboard } from '@/routes';
 import wallet from '@/routes/wallet';
 
@@ -31,7 +25,7 @@ const items: NavItem[] = [
     {
         key: 'feed',
         label: 'Feed',
-        href: dashboard(),
+        href: dashboard().url,
         icon: Tv2,
     },
     {
@@ -43,7 +37,7 @@ const items: NavItem[] = [
     {
         key: 'wallet',
         label: 'Wallet',
-        href: wallet.show(),
+        href: wallet.show().url,
         icon: Wallet,
         isWallet: true,
     },
@@ -63,8 +57,8 @@ const items: NavItem[] = [
 
 function isActive(href: string | undefined, currentUrl: string): boolean {
     if (!href) {
-return false;
-}
+        return false;
+    }
 
     return currentUrl.startsWith(href);
 }
@@ -75,7 +69,7 @@ export default function MobileBottomNav() {
     return (
         <nav
             aria-label="Navigation principale"
-            className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#35506D] bg-[#0E2542] pb-safe"
+            className="pb-safe fixed right-0 bottom-0 left-0 z-50 border-t border-[#35506D] bg-[#0E2542]"
             style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
             <ul className="flex h-16 items-stretch">
@@ -85,13 +79,18 @@ export default function MobileBottomNav() {
 
                     if (item.isWallet) {
                         return (
-                            <li key={item.key} className="flex flex-1 items-center justify-center">
+                            <li
+                                key={item.key}
+                                className="flex flex-1 items-center justify-center"
+                            >
                                 {item.href ? (
                                     <Link
                                         href={item.href}
                                         aria-label={item.label}
-                                        aria-current={active ? 'page' : undefined}
-                                        className="flex flex-col items-center gap-0.5 -mt-5"
+                                        aria-current={
+                                            active ? 'page' : undefined
+                                        }
+                                        className="-mt-5 flex flex-col items-center gap-0.5"
                                     >
                                         <span
                                             className={[
@@ -101,12 +100,16 @@ export default function MobileBottomNav() {
                                                     : 'bg-[#C75100]',
                                             ].join(' ')}
                                             style={{
-                                                boxShadow: '0 0 0 3px #0E2542, 0 4px 12px rgba(199,81,0,0.5)',
+                                                boxShadow:
+                                                    '0 0 0 3px #0E2542, 0 4px 12px rgba(199,81,0,0.5)',
                                             }}
                                         >
-                                            <Icon size={22} className="text-white" />
+                                            <Icon
+                                                size={22}
+                                                className="text-white"
+                                            />
                                         </span>
-                                        <span className="text-[10px] font-medium text-[#A9B7C8] mt-0.5">
+                                        <span className="mt-0.5 text-[10px] font-medium text-[#A9B7C8]">
                                             {item.label}
                                         </span>
                                     </Link>
@@ -117,14 +120,20 @@ export default function MobileBottomNav() {
 
                     if (item.disabled || !item.href) {
                         return (
-                            <li key={item.key} className="flex flex-1 items-center justify-center">
+                            <li
+                                key={item.key}
+                                className="flex flex-1 items-center justify-center"
+                            >
                                 <button
                                     disabled
                                     aria-label={`${item.label} — bientôt disponible`}
                                     title="Bientôt disponible"
-                                    className="flex flex-col items-center gap-0.5 py-2 opacity-40 cursor-not-allowed"
+                                    className="flex cursor-not-allowed flex-col items-center gap-0.5 py-2 opacity-40"
                                 >
-                                    <Icon size={22} className="text-[#A9B7C8]" />
+                                    <Icon
+                                        size={22}
+                                        className="text-[#A9B7C8]"
+                                    />
                                     <span className="text-[10px] font-medium text-[#A9B7C8]">
                                         {item.label}
                                     </span>
@@ -134,7 +143,10 @@ export default function MobileBottomNav() {
                     }
 
                     return (
-                        <li key={item.key} className="flex flex-1 items-center justify-center">
+                        <li
+                            key={item.key}
+                            className="flex flex-1 items-center justify-center"
+                        >
                             <Link
                                 href={item.href}
                                 aria-label={item.label}
