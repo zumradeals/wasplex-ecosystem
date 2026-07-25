@@ -3,8 +3,10 @@
 namespace App\Modules\Advertising;
 
 use App\Modules\Advertising\Http\Controllers\CampaignController;
+use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
+use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -23,8 +25,15 @@ use Illuminate\Support\ServiceProvider;
  * ({@see CampaignVersionSubmissionController}, draft → in_review) et
  * `campaign.approve` ({@see CampaignVersionApprovalController},
  * in_review → approved, avec séparation des tâches pour les secteurs à
- * revue renforcée — ADR-0004 §12, ADR-0010 §5). Aucune capacité de
- * modération ni de diffusion n'existe encore (ADR-0010 §8).
+ * revue renforcée — ADR-0004 §12, ADR-0010 §5).
+ *
+ * Depuis P005-D, deux capacités couvrent le signalement et la modération :
+ * `campaign.report` ({@see CampaignReportController}, largement disponible
+ * à tout utilisateur authentifié — `03-signalements-sanctions-et-remuneration.md`
+ * §1) et `campaign.moderate` ({@see ModerationCaseDecisionController},
+ * décision + mesure conservatoire éventuelle, dont la suspension réelle
+ * d'une Campaign). Aucune sanction formelle, aucun effet Ledger, aucun
+ * parcours de recours complet n'existe encore (ADR-0010 §8).
  */
 class AdvertisingServiceProvider extends ServiceProvider
 {
