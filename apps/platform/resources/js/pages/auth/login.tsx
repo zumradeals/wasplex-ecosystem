@@ -20,20 +20,31 @@ type Props = {
 export default function Login({ status, canResetPassword }: Props) {
     return (
         <>
-            <Head title="Log in" />
+            <Head title="Connexion" />
 
             <PasskeyVerify />
+
+            {status && (
+                <div className="mb-4 rounded-lg bg-[#42D392]/10 px-4 py-3 text-center text-sm font-medium text-[#42D392]">
+                    {status}
+                </div>
+            )}
 
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                        <div className="grid gap-5">
+                            <div className="grid gap-1.5">
+                                <Label
+                                    htmlFor="email"
+                                    className="text-sm font-medium text-[#F5F8FC]"
+                                >
+                                    Adresse e-mail
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -42,21 +53,27 @@ export default function Login({ status, canResetPassword }: Props) {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="vous@exemple.com"
+                                    className="border-[#35506D] bg-[#173251] text-[#F5F8FC] placeholder:text-[#53657D] focus:border-[#4FA3FF]"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                            <div className="grid gap-1.5">
+                                <div className="flex items-center justify-between">
+                                    <Label
+                                        htmlFor="password"
+                                        className="text-sm font-medium text-[#F5F8FC]"
+                                    >
+                                        Mot de passe
+                                    </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="text-xs text-[#4FA3FF]"
                                             tabIndex={5}
                                         >
-                                            Forgot your password?
+                                            Mot de passe oublié ?
                                         </TextLink>
                                     )}
                                 </div>
@@ -66,52 +83,56 @@ export default function Login({ status, canResetPassword }: Props) {
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="Mot de passe"
+                                    className="border-[#35506D] bg-[#173251] text-[#F5F8FC] placeholder:text-[#53657D] focus:border-[#4FA3FF]"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center gap-2">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label
+                                    htmlFor="remember"
+                                    className="text-sm text-[#A9B7C8]"
+                                >
+                                    Rester connecté
+                                </Label>
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-1 w-full bg-[#075CCF] font-semibold hover:bg-[#0A4FAF]"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                Se connecter
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
+                        <p className="text-center text-sm text-[#A9B7C8]">
+                            Pas encore de compte ?{' '}
+                            <TextLink
+                                href={register()}
+                                tabIndex={6}
+                                className="text-[#4FA3FF]"
+                            >
+                                Créer un compte
                             </TextLink>
-                        </div>
+                        </p>
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: 'Connexion',
+    description: 'Entrez vos identifiants pour accéder à votre espace Wasplex',
 };

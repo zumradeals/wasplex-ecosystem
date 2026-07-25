@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
-import AppLogoIcon from '@/components/app-logo-icon';
-import { home } from '@/routes';
+import WasplexMascot from '@/components/wasplex-mascot';
 import type { AuthLayoutProps } from '@/types';
+import { home } from '@/routes';
 
 export default function AuthSimpleLayout({
     children,
@@ -9,27 +9,32 @@ export default function AuthSimpleLayout({
     description,
 }: AuthLayoutProps) {
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
-            <div className="w-full max-w-sm">
-                <div className="flex flex-col gap-8">
-                    <div className="flex flex-col items-center gap-4">
-                        <Link
-                            href={home()}
-                            className="flex flex-col items-center gap-2 font-medium"
-                        >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
-                            </div>
-                            <span className="sr-only">{title}</span>
-                        </Link>
+        <div className="flex min-h-svh flex-col items-center justify-center bg-[#07182D] px-4 py-10">
+            <div className="w-full max-w-sm space-y-8">
+                {/* Logo + title */}
+                <div className="flex flex-col items-center gap-3 text-center">
+                    <Link
+                        href={home()}
+                        aria-label="Accueil Wasplex"
+                        className="flex items-center gap-2"
+                    >
+                        <WasplexMascot className="h-10 w-10" />
+                        <span className="text-xl font-bold tracking-tight text-white">
+                            Wasplex
+                        </span>
+                    </Link>
+                    {title && (
+                        <h1 className="text-lg font-semibold text-[#F5F8FC]">
+                            {title}
+                        </h1>
+                    )}
+                    {description && (
+                        <p className="text-sm text-[#A9B7C8]">{description}</p>
+                    )}
+                </div>
 
-                        <div className="space-y-2 text-center">
-                            <h1 className="text-xl font-medium">{title}</h1>
-                            <p className="text-center text-sm text-muted-foreground">
-                                {description}
-                            </p>
-                        </div>
-                    </div>
+                {/* Form card */}
+                <div className="rounded-2xl border border-[#35506D] bg-[#0E2542] p-6">
                     {children}
                 </div>
             </div>

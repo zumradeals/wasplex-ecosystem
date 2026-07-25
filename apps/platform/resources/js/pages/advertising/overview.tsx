@@ -21,10 +21,10 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { postJson } from '@/lib/api';
+import type { BreadcrumbItem } from '@/types';
 import advertising from '@/routes/advertising';
 import advertiserProfile from '@/routes/advertising/advertiser-profile';
 import campaigns from '@/routes/advertising/campaigns';
-import type { BreadcrumbItem } from '@/types';
 
 type Access = {
     allowed: boolean;

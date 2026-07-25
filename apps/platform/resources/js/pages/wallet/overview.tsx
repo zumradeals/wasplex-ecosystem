@@ -1,9 +1,5 @@
 import { Head } from '@inertiajs/react';
-import Heading from '@/components/heading';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import wallet from '@/routes/wallet';
-import type { BreadcrumbItem } from '@/types';
+import MobileLayout from '@/layouts/mobile-layout';
 
 type Balance = {
     currency: string;
@@ -19,9 +15,8 @@ type Access = {
 
 const amountFormatter = new Intl.NumberFormat('fr-FR');
 
-// Wasplex ne présente jamais un motif de refus interne (grant, politique,
-// définition de capacité — ADR-0004 §"décision explicable") : seul un
-// texte destiné à la personne, jamais le code technique brut, est affiché.
+// Wasplex never exposes internal denial reasons (grant, policy, capability
+// definition — ADR-0004 §"décision explicable").
 const ACCESS_DENIED_MESSAGES: Record<string, string> = {
     no_active_grant:
         "L'accès à votre Wallet n'est pas encore activé sur ce compte. Cet écran fonctionne, mais aucun droit de consultation ne vous a encore été accordé (P006, TD-0005-D).",
@@ -29,39 +24,53 @@ const ACCESS_DENIED_MESSAGES: Record<string, string> = {
         "Votre session n'a pas pu être confirmée. Reconnectez-vous pour réessayer.",
 };
 
-function AmountCard({
+type BalanceTone = 'available' | 'provisional' | 'reserved';
+
+const TONE_STYLES: Record<BalanceTone, { value: string; label: string; dot: string }> = {
+    available: {
+        value: 'text-[#F2C14E]',
+        label: 'text-[#A9B7C8]',
+        dot: 'bg-[#F2C14E]',
+    },
+    provisional: {
+        value: 'text-[#E7CF61]',
+        label: 'text-[#A9B7C8]',
+        dot: 'bg-[#E7CF61]',
+    },
+    reserved: {
+        value: 'text-[#A9B7C8]',
+        label: 'text-[#A9B7C8]',
+        dot: 'bg-[#A9B7C8]',
+    },
+};
+
+function BalanceRow({
     label,
     value,
     tone,
 }: {
     label: string;
     value: number;
-    tone: 'available' | 'provisional' | 'reserved';
+    tone: BalanceTone;
 }) {
-    const toneClassName =
-        tone === 'available'
-            ? 'text-wallet-gold'
-            : tone === 'provisional'
-              ? 'text-wallet-pending'
-              : 'text-wallet-unknown';
+    const styles = TONE_STYLES[tone];
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-sm font-normal text-muted-foreground">
-                    {label}
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className={`text-2xl font-semibold ${toneClassName}`}>
-                    {amountFormatter.format(value)}{' '}
-                    <span className="text-base font-normal">WP</span>
+        <div className="flex items-center justify-between rounded-xl border border-[#35506D] bg-[#0E2542] px-4 py-4">
+            <div className="flex items-center gap-3">
+                <span className={`h-2.5 w-2.5 rounded-full ${styles.dot}`} aria-hidden="true" />
+                <span className={`text-sm font-medium ${styles.label}`}>{label}</span>
+            </div>
+            <div className="text-right">
+                <p className={`text-lg font-bold tabular-nums ${styles.value}`}>
+                    {amountFormatter.format(value)}
+                    <span className="ml-1 text-sm font-normal text-[#A9B7C8]">WP</span>
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-[#A9B7C8]">
                     ≈ {amountFormatter.format(value)} FCFA
                 </p>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }
 
@@ -73,77 +82,77 @@ export default function WalletOverview({
     balances: Balance[];
 }) {
     return (
-        <>
+        <MobileLayout>
             <Head title="Wallet" />
 
-            <div className="flex flex-1 flex-col gap-6 p-4">
-                <Heading
-                    title="Votre Wallet"
-                    description="1 WP = 1 FCFA. Le solde affiché est reconstruit depuis le registre comptable, jamais une valeur modifiable."
-                />
+            <div className="p-4 space-y-6">
+                {/* Header */}
+                <div>
+                    <h1 className="text-xl font-bold text-[#F5F8FC]">Votre Wallet</h1>
+                    <p className="mt-1 text-xs text-[#A9B7C8]">
+                        1 WP = 1 FCFA · solde reconstruit depuis le registre comptable
+                    </p>
+                </div>
 
+                {/* Access denied */}
                 {!access.allowed && (
-                    <Alert>
-                        <AlertTitle>
+                    <div className="rounded-xl border border-[#35506D] bg-[#0E2542] px-4 py-4">
+                        <p className="text-sm font-semibold text-[#FF9A3D]">
                             Consultation indisponible pour le moment
-                        </AlertTitle>
-                        <AlertDescription>
+                        </p>
+                        <p className="mt-1.5 text-xs text-[#A9B7C8] leading-relaxed">
                             {ACCESS_DENIED_MESSAGES[access.reason ?? ''] ??
                                 "Cet écran n'est pas encore disponible pour votre compte."}
-                        </AlertDescription>
-                    </Alert>
+                        </p>
+                    </div>
                 )}
 
+                {/* No operations yet */}
                 {access.allowed && balances.length === 0 && (
-                    <Alert>
-                        <AlertTitle>Aucune opération enregistrée</AlertTitle>
-                        <AlertDescription>
-                            Vous n'avez encore reçu aucun droit WP. Cette page
-                            se mettra à jour dès la première rémunération
-                            créditée.
-                        </AlertDescription>
-                    </Alert>
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#173251]">
+                            <span className="text-2xl">💰</span>
+                        </div>
+                        <h3 className="mb-2 text-base font-semibold text-[#F5F8FC]">
+                            Aucune opération enregistrée
+                        </h3>
+                        <p className="text-sm text-[#A9B7C8] leading-relaxed">
+                            Vous n'avez encore reçu aucun droit WP.
+                            <br />
+                            Cette page se mettra à jour dès la première rémunération créditée.
+                        </p>
+                    </div>
                 )}
 
+                {/* Balance sections */}
                 {access.allowed &&
                     balances.map((balance) => (
                         <section
                             key={balance.currency}
-                            className="space-y-3"
                             aria-label={`Solde en ${balance.currency}`}
+                            className="space-y-2"
                         >
-                            <p className="text-sm font-medium text-muted-foreground">
+                            <p className="px-1 text-xs font-semibold uppercase tracking-widest text-[#A9B7C8]">
                                 {balance.currency}
                             </p>
-                            <div className="grid gap-4 md:grid-cols-3">
-                                <AmountCard
-                                    label="Disponibles"
-                                    value={balance.available}
-                                    tone="available"
-                                />
-                                <AmountCard
-                                    label="Provisoires"
-                                    value={balance.provisional}
-                                    tone="provisional"
-                                />
-                                <AmountCard
-                                    label="Réservés"
-                                    value={balance.reserved}
-                                    tone="reserved"
-                                />
-                            </div>
+                            <BalanceRow
+                                label="Disponibles"
+                                value={balance.available}
+                                tone="available"
+                            />
+                            <BalanceRow
+                                label="Provisoires"
+                                value={balance.provisional}
+                                tone="provisional"
+                            />
+                            <BalanceRow
+                                label="Réservés"
+                                value={balance.reserved}
+                                tone="reserved"
+                            />
                         </section>
                     ))}
             </div>
-        </>
+        </MobileLayout>
     );
 }
-
-WalletOverview.layout = {
-    breadcrumbs: [
-        {
-            title: 'Wallet',
-            href: wallet.show(),
-        },
-    ] satisfies BreadcrumbItem[],
-};

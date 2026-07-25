@@ -19,10 +19,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import type { NavItem } from '@/types';
 import { dashboard } from '@/routes';
 import advertising from '@/routes/advertising';
 import wallet from '@/routes/wallet';
-import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
