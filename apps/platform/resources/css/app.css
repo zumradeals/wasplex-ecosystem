@@ -132,6 +132,44 @@
     --sidebar-ring: oklch(0.439 0 0);
 }
 
+/*
+ * Sous-ensemble initial des tokens sémantiques DS-0001 §6.1/§6.2, introduit
+ * par le premier écran de production réel (Wallet, P006-A2). Valeurs
+ * copiées telles quelles depuis DS-0001, pas devinées. Ce n'est pas encore
+ * le pipeline de tokens versionnés générant variables CSS et types
+ * TypeScript annoncé par DS-0001 §19 (différé) : seules les valeurs
+ * réellement consommées par un écran existant sont déclarées ici.
+ */
+:root {
+    --wallet-gold: #936800; /* DS-0001 §6.1 brand.gold — Wallet et valeur confirmée contextualisée */
+    --wallet-success: #137a50; /* DS-0001 §6.2 status.success — confirmé, réussi, disponible */
+    --wallet-pending: #6b5b00; /* DS-0001 §6.2 status.pending — en attente ou en traitement */
+    --wallet-unknown: #53657d; /* DS-0001 §6.2 status.unknown — résultat non encore établi */
+}
+
+.dark {
+    --wallet-gold: #f2c14e;
+    --wallet-success: #42d392;
+    --wallet-pending: #e7cf61;
+    --wallet-unknown: #a9b7c8;
+}
+
+.text-wallet-gold {
+    color: var(--wallet-gold);
+}
+
+.text-wallet-success {
+    color: var(--wallet-success);
+}
+
+.text-wallet-pending {
+    color: var(--wallet-pending);
+}
+
+.text-wallet-unknown {
+    color: var(--wallet-unknown);
+}
+
 @layer base {
     * {
         @apply border-border;
