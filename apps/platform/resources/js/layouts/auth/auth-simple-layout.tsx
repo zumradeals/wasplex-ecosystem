@@ -18,10 +18,7 @@ export default function AuthSimpleLayout({
                         aria-label="Accueil Wasplex"
                         className="flex items-center gap-2"
                     >
-                        <WasplexMascot className="h-10 w-10" />
-                        <span className="text-xl font-bold tracking-tight text-white">
-                            Wasplex
-                        </span>
+                        <WasplexMascot className="h-16 w-16" />
                     </Link>
                     {title && (
                         <h1 className="text-lg font-semibold text-[#F5F8FC]">

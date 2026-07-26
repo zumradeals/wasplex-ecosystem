@@ -37,10 +37,7 @@ export default function MobileLayout({
                             className="flex items-center gap-2"
                             aria-label="Accueil Wasplex"
                         >
-                            <WasplexMascot className="h-8 w-8" />
-                            <span className="text-base font-bold tracking-tight text-white">
-                                Wasplex
-                            </span>
+                            <WasplexMascot className="h-10 w-10" />
                         </Link>
 
                         {/* Compteur WP — DS-0001 §17, UX-0001 §10 */}
