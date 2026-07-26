@@ -9,8 +9,8 @@ use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /**
- * Tableau de bord annonceur (P007-W1, `A-001-01`/`A-002-01`). Contrairement
- * à `CampaignSubmissionRouteTest` (API JSON), cette route vit dans le
+ * Vue d'ensemble du portail annonceur (P007-W2). Contrairement à
+ * `CampaignSubmissionRouteTest` (API JSON), cette route vit dans le
  * groupe `auth`/`verified` : un visiteur non authentifié est redirigé vers
  * la connexion, jamais un 401 JSON — même protocole que
  * `WalletOverviewPageTest`.
@@ -39,7 +39,7 @@ class AdvertisingOverviewPageTest extends AdvertisingTestCase
             ->where('access.allowed', false)
             ->where('access.reason', 'no_active_grant')
             ->where('advertiserProfile', null)
-            ->where('campaigns', []),
+            ->where('campaignCounts', []),
         );
     }
 
@@ -55,11 +55,11 @@ class AdvertisingOverviewPageTest extends AdvertisingTestCase
             ->component('advertising/overview')
             ->where('access.allowed', true)
             ->where('advertiserProfile', null)
-            ->where('campaigns', []),
+            ->where('campaignCounts', []),
         );
     }
 
-    public function test_a_representative_sees_only_its_own_campaigns_with_projected_budget(): void
+    public function test_a_representative_sees_only_its_own_aggregated_budget(): void
     {
         $user = $this->makeUser('representative-'.Str::uuid().'@example.com');
         $user->forceFill(['email_verified_at' => now()])->save();
@@ -69,7 +69,8 @@ class AdvertisingOverviewPageTest extends AdvertisingTestCase
         $this->fundCampaign($campaign, 5_000);
 
         // Une autre annonceuse ne doit jamais apparaître dans cette liste.
-        $this->makeCampaign($this->makeAdvertiserProfile());
+        $otherCampaign = $this->makeCampaign($this->makeAdvertiserProfile());
+        $this->fundCampaign($otherCampaign, 9_999_999);
 
         $response = $this->actingAs($user)->get('/advertising');
 
@@ -78,12 +79,12 @@ class AdvertisingOverviewPageTest extends AdvertisingTestCase
             ->component('advertising/overview')
             ->where('access.allowed', true)
             ->where('advertiserProfile.legal_name', $advertiser->legal_name)
-            ->has('campaigns', 1)
-            ->where('campaigns.0.id', $campaign->id)
-            ->where('campaigns.0.state', 'active')
-            ->where('campaigns.0.budget.available', 5_000)
-            ->where('campaigns.0.budget.reserved', 0)
-            ->where('campaigns.0.budget.consumed', 0),
+            ->where('campaignCounts.active', 1)
+            ->has('budgetTotals', 1)
+            ->where('budgetTotals.0.currency', 'XOF')
+            ->where('budgetTotals.0.available', 5_000)
+            ->has('recentCampaigns', 1)
+            ->where('recentCampaigns.0.id', $campaign->id),
         );
     }
 
