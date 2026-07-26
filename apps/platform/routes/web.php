@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountOverviewController;
 use App\Http\Controllers\HealthController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
@@ -67,6 +68,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Volontairement dans le groupe 'auth' : c'est un écran, pas un point
     // de terminaison API — même raisonnement que 'advertising'/'wallet'.
     Route::get('admin/moderation', [ModerationOverviewController::class, 'index'])->name('admin.moderation');
+
+    // W4 : « Mon espace » — cinquième destination de la navigation mobile,
+    // restée désactivée depuis la refonte W4 faute d'écran. Équivalent
+    // mobile-first de Settings\ProfileController (mêmes colonnes users,
+    // mêmes règles de validation), jamais de nouveau champ de profil (voir
+    // AccountOverviewController).
+    Route::get('me', [AccountOverviewController::class, 'index'])->name('account.overview');
+
+    // POST, pas PATCH : ces écrans mobiles appellent l'action via `fetch`
+    // JSON (postJson, lib/api.ts) — le spoofing `_method` de Laravel ne
+    // s'applique qu'aux soumissions de formulaire, jamais à un corps JSON
+    // (même raisonnement que les autres routes d'action mobile de ce
+    // fichier, toutes en POST).
+    Route::post('me/profile', [AccountOverviewController::class, 'update'])->name('account.profile.update');
 });
 
 // Non protégée par le middleware 'auth' : une requête non authentifiée doit

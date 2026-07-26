@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { Bell, HandHeart, Tv2, User, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { dashboard } from '@/routes';
+import account from '@/routes/account';
 import wallet from '@/routes/wallet';
 
 /**
@@ -51,8 +52,8 @@ const items: NavItem[] = [
     {
         key: 'espace',
         label: 'Mon espace',
+        href: account.overview().url,
         icon: User,
-        disabled: true,
     },
 ];
 
