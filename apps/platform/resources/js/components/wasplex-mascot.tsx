@@ -1,97 +1,156 @@
 import type { SVGAttributes } from 'react';
+import { useId } from 'react';
 
 /**
  * Martin-pêcheur Wasplex — DS-0001 §3/§4.
- * Référence directionnelle en attendant la redessination vectorielle officielle.
- * Couleurs : brand.blue #075CCF, brand.orange #C75100, brand.navy #10233F.
- * Préserve : crête, bec horizontal, contraste bleu/orange, poisson, énergie.
+ * Vectorisation directionnelle du logo officiel (oiseau perché sur une
+ * branche, poisson tenu en travers du long bec, crête balayée vers
+ * l'arrière, poitrine orange, dos et ailes bleus, pattes orange).
+ * Couleurs : brand.blue #075CCF / #4FA3FF, brand.orange #C75100,
+ * brand.navy #10233F. Remplaçable par l'asset officiel dès qu'il est
+ * versionné dans `public/brand/`.
  */
 export default function WasplexMascot({
     className,
     ...props
 }: SVGAttributes<SVGElement>) {
+    // Des identifiants uniques par instance : plusieurs mascottes peuvent
+    // coexister sur un écran sans collision d'IDs de dégradés.
+    const uid = useId();
+    const blue = `wpx-blue-${uid}`;
+    const deep = `wpx-deep-${uid}`;
+    const orange = `wpx-orange-${uid}`;
+
     return (
         <svg
-            viewBox="0 0 160 160"
+            viewBox="0 0 160 150"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
             className={className}
             {...props}
         >
-            {/* Queue pointée bas-gauche */}
+            <defs>
+                <linearGradient id={blue} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#4FA3FF" />
+                    <stop offset="1" stopColor="#075CCF" />
+                </linearGradient>
+                <linearGradient id={deep} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#0A4FAF" />
+                    <stop offset="1" stopColor="#072F66" />
+                </linearGradient>
+                <linearGradient id={orange} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#FFB25C" />
+                    <stop offset="1" stopColor="#C75100" />
+                </linearGradient>
+            </defs>
+
+            {/* Queue : plumes sombres pointant bas-droite, derrière la branche */}
             <path
-                d="M 46 112 L 18 138 L 38 128 L 22 148 L 50 130"
-                fill="#0A4FAF"
+                d="M 96 90 L 140 124 L 122 122 L 144 140 L 100 116 Z"
+                fill={`url(#${deep})`}
             />
 
-            {/* Corps principal (ovale bleu, légèrement incliné) */}
-            <ellipse
-                cx="62"
-                cy="100"
-                rx="26"
-                ry="36"
-                fill="#075CCF"
-                transform="rotate(-8 62 100)"
+            {/* Branche */}
+            <path
+                d="M 6 132 Q 80 118 154 126 L 153 137 Q 80 129 7 143 Z"
+                fill="#8A5A33"
+            />
+            <path
+                d="M 6 138 Q 80 125 154 132 L 153 137 Q 80 129 7 143 Z"
+                fill="#6E4522"
             />
 
-            {/* Poitrine orangée — Constitution art. 1, énergie de marque */}
+            {/* Corps */}
             <path
-                d="M 68 72 Q 82 82 78 108 Q 64 116 52 104 Q 48 86 60 72 Z"
-                fill="#C75100"
+                d="M 48 60 Q 32 90 48 112 Q 62 128 84 126 Q 108 122 110 94 Q 112 66 86 52 Z"
+                fill={`url(#${blue})`}
             />
 
-            {/* Cou reliant tête et corps */}
+            {/* Poitrine orange (avant, descend vers le ventre) */}
             <path
-                d="M 70 76 Q 72 68 80 64"
-                stroke="#075CCF"
-                strokeWidth="14"
+                d="M 48 64 Q 36 92 50 110 Q 62 124 82 124 Q 88 110 80 92 Q 70 72 64 62 Z"
+                fill={`url(#${orange})`}
+            />
+
+            {/* Aile repliée (droite), plumes sombres */}
+            <path
+                d="M 78 66 Q 106 70 106 94 Q 104 114 88 122 Q 98 98 80 74 Z"
+                fill={`url(#${deep})`}
+            />
+            <path
+                d="M 86 78 Q 100 86 96 106"
+                stroke="#4FA3FF"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 fill="none"
+                opacity="0.5"
             />
 
-            {/* Tête (grand cercle — proportion martin-pêcheur) */}
-            <circle cx="88" cy="58" r="30" fill="#075CCF" />
-
-            {/* Crête — DS-0001 §4, trois pointes ascendantes */}
-            <path d="M 74 34 L 79 16 L 84 34" fill="#10233F" />
-            <path d="M 82 31 L 88 10 L 94 31" fill="#10233F" />
-            <path d="M 90 34 L 96 18 L 102 34" fill="#10233F" />
-
-            {/* Tache jugulaire blanche */}
-            <ellipse
-                cx="100"
-                cy="68"
-                rx="8"
-                ry="6"
-                fill="#E8F0FC"
-                opacity="0.85"
-            />
-
-            {/* Œil — blanc */}
-            <circle cx="96" cy="52" r="7" fill="white" />
-            {/* Pupille */}
-            <circle cx="97" cy="52" r="3.5" fill="#10233F" />
-            {/* Point spéculaire */}
-            <circle cx="95.5" cy="50.5" r="1.2" fill="white" />
-
-            {/* Bec long pointant droite-bas — DS-0001 §4 bec horizontal */}
-            <path d="M 114 60 L 148 68 L 114 66 Z" fill="#10233F" />
-            {/* Mandibule inférieure légèrement plus claire */}
-            <path d="M 114 63 L 145 70 L 114 66 Z" fill="#1A3050" />
-
-            {/* Poisson au bout du bec — DS-0001 §3, valeur économique captée */}
-            <ellipse cx="152" cy="65" rx="7" ry="4" fill="#CBD5E1" />
-            <path d="M 156 62 L 162 58 L 162 70 Z" fill="#CBD5E1" />
-            {/* Œil du poisson */}
-            <circle cx="149" cy="64" r="1.2" fill="#10233F" />
-
-            {/* Détail aile — légère variation de ton */}
+            {/* Crête : plumes balayées vers l'arrière (sous la tête) */}
             <path
-                d="M 44 88 Q 36 100 40 118"
-                stroke="#0A4FAF"
-                strokeWidth="3"
+                d="M 44 34 Q 38 14 50 4 Q 54 18 60 24 Z"
+                fill={`url(#${blue})`}
+            />
+            <path
+                d="M 54 26 Q 56 4 72 0 Q 68 16 72 22 Z"
+                fill={`url(#${blue})`}
+            />
+            <path
+                d="M 66 24 Q 76 4 92 4 Q 84 18 84 26 Z"
+                fill={`url(#${blue})`}
+            />
+            <path
+                d="M 80 30 Q 90 20 98 22 Q 92 28 90 33 Z"
+                fill={`url(#${deep})`}
+            />
+
+            {/* Bec : long poignard sombre, base cachée sous la tête */}
+            <path d="M 54 38 L 0 48 L 54 50 Z" fill="#10233F" />
+            <path d="M 54 52 L 4 53 L 54 60 Z" fill="#1A3050" />
+
+            {/* Tête */}
+            <circle cx="66" cy="46" r="27" fill={`url(#${blue})`} />
+
+            {/* Tache blanche du cou (arrière de la joue) */}
+            <ellipse
+                cx="84"
+                cy="60"
+                rx="6.5"
+                ry="9.5"
+                fill="#F5F8FC"
+                transform="rotate(25 84 60)"
+            />
+
+            {/* Œil */}
+            <circle cx="56" cy="44" r="8.5" fill="#F5F8FC" />
+            <circle cx="54" cy="45" r="5.2" fill="#10233F" />
+            <circle cx="52.5" cy="43" r="1.8" fill="#FFFFFF" />
+
+            {/* Poisson tenu en travers du bec — valeur économique captée */}
+            <g transform="rotate(-30 11 49)">
+                <ellipse cx="11" cy="49" rx="5" ry="10" fill="#C8D3DE" />
+                <path d="M 7 41 L 11 28 L 16 41 Z" fill="#AFBDCB" />
+                <circle cx="9" cy="55" r="1.4" fill="#10233F" />
+                <path
+                    d="M 6 47 Q 11 51 16 47"
+                    stroke="#93A5B6"
+                    strokeWidth="1.2"
+                    fill="none"
+                />
+            </g>
+
+            {/* Pattes orange agrippées sur le dessus de la branche */}
+            <path
+                d="M 62 118 L 57 130 M 62 118 L 63 131 M 62 118 L 69 129"
+                stroke="#FF9A3D"
+                strokeWidth="4.5"
                 strokeLinecap="round"
-                fill="none"
+            />
+            <path
+                d="M 84 116 L 80 128 M 84 116 L 88 128"
+                stroke="#FF9A3D"
+                strokeWidth="4.5"
+                strokeLinecap="round"
             />
         </svg>
     );
