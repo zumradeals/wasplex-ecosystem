@@ -45,7 +45,7 @@ class FeedController extends Controller
     {
         $campaigns = Campaign::query()
             ->where('state', CampaignState::Active)
-            ->with(['versions' => function ($query): void {
+            ->with(['advertiserProfile', 'versions' => function ($query): void {
                 $query->where('state', CampaignVersionState::Approved);
             }])
             ->get()
@@ -87,6 +87,11 @@ class FeedController extends Controller
 
         return [
             'campaign_version_id' => $version->id,
+            // UX-0001 §9 : « Avant une publicité, l'utilisateur voit :
+            // annonceur ; format ; durée ou condition ; gain potentiel… ».
+            // Le nom légal est la seule identité annonceur constitutionnelle —
+            // jamais un pseudonyme commercial servant de clé (CLAUDE.md §2).
+            'advertiser' => $campaign->advertiserProfile->legal_name,
             'headline' => $version->creations['headline'] ?? $campaign->code,
             'format' => $version->expected_event['format'] ?? 'display',
             'condition' => $version->expected_event['condition'] ?? 'completion',

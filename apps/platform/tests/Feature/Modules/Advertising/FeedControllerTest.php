@@ -187,6 +187,7 @@ class FeedControllerTest extends AdvertisingTestCase
         $response->assertInertia(fn (Assert $page) => $page
             ->component('dashboard')
             ->has('ads', 1)
+            ->where('ads.0.advertiser', $campaign->advertiserProfile->legal_name)
             ->where('ads.0.headline', 'Découvrez notre offre')
             ->where('ads.0.reward_amount', 777)
             ->where('ads.0.currency', $campaign->currency)
