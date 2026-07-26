@@ -3,18 +3,11 @@
 namespace Tests\Feature\Modules\Advertising\Admin;
 
 use App\Modules\Advertising\Enums\FraudDecision;
+use App\Modules\Advertising\Enums\ModerationDecision;
 use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Advertising\Services\CampaignVersionService;
-use App\Modules\Governance\Authorization\Enums\GrantEffect;
-use App\Modules\Governance\Authorization\Enums\GrantSource;
-use App\Modules\Governance\Authorization\Models\CapabilityDefinition;
-use App\Modules\Governance\Authorization\Models\Grant;
-use App\Modules\Governance\Authorization\Models\PolicyVersion;
-use App\Modules\Governance\Authorization\Services\GrantManager;
-use App\Modules\Governance\Authorization\Support\ConditionsPayload;
-use App\Modules\Governance\Authorization\Support\ScopePayload;
+use App\Modules\Advertising\Services\ModerationService;
 use App\Modules\Identity\Enums\LinkOrigin;
-use App\Modules\Identity\Models\PersonAccountLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -33,52 +26,6 @@ use Tests\Feature\Modules\Advertising\AdvertisingTestCase;
 class ModerationOverviewRouteTest extends AdvertisingTestCase
 {
     use RefreshDatabase;
-
-    /**
-     * Portée `resource_type` seule (aucun `resource_ids`) : même choix que
-     * `CampaignFundingRouteTest::grantFund()` — une habilitation personnel
-     * couvre toute ressource de ce type, jamais une liste figée.
-     */
-    private function grantStaffCapability(PersonAccountLink $subject, string $capabilityKey, string $resourceType): Grant
-    {
-        $capability = CapabilityDefinition::query()
-            ->where('stable_key', $capabilityKey)
-            ->where('state', 'active')
-            ->firstOrFail();
-
-        $policy = PolicyVersion::create([
-            'stable_key' => 'test_policy_'.$capabilityKey.'_'.Str::uuid(),
-            'version' => 1,
-            'state' => 'active',
-            'checksum' => hash('sha256', $capabilityKey.random_int(1, PHP_INT_MAX)),
-            'effective_from' => now(),
-        ]);
-
-        $author = $this->activeLinkFor($this->makeUser('grant-author-'.Str::uuid().'@example.com'));
-        $approver = $this->activeLinkFor($this->makeUser('grant-approver-'.Str::uuid().'@example.com'));
-
-        $manager = app(GrantManager::class);
-        $correlationId = (string) Str::uuid();
-
-        $grant = $manager->propose(
-            subject: $subject,
-            capability: $capability,
-            policy: $policy,
-            scope: ScopePayload::fromArray(['resource_type' => $resourceType]),
-            conditions: ConditionsPayload::fromArray([]),
-            effect: GrantEffect::Allow,
-            source: GrantSource::Direct,
-            author: $author,
-            purpose: null,
-            roleTemplate: null,
-            sourceReference: null,
-            validFrom: now(),
-            validUntil: null,
-            correlationId: $correlationId,
-        );
-
-        return $manager->activate($grant, $author, $approver, $correlationId);
-    }
 
     public function test_a_guest_is_redirected_to_login(): void
     {
@@ -195,6 +142,53 @@ class ModerationOverviewRouteTest extends AdvertisingTestCase
             ->where('qualifiedEvents.items.0.qualified_event_id', $event->id)
             ->where('qualifiedEvents.items.0.reward_amount', 1_000)
             ->where('campaignApproval.access.allowed', false),
+        );
+    }
+
+    public function test_a_holder_of_campaign_moderate_sees_open_moderation_cases(): void
+    {
+        $staff = $this->makeRepresentative();
+        $this->grantStaffCapability($staff, 'campaign.moderate', 'advertising.campaign');
+
+        $advertiser = $this->makeAdvertiserProfile();
+        $campaign = $this->makeCampaign($advertiser);
+        $case = app(ModerationService::class)->openCase(
+            campaign: $campaign,
+            reason: 'contenu trompeur signalé',
+            severity: 'high',
+        );
+
+        $response = $this->actingAs($staff->user)->get('/admin/moderation');
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('admin/moderation')
+            ->where('moderationCases.access.allowed', true)
+            ->has('moderationCases.items', 1)
+            ->where('moderationCases.items.0.moderation_case_id', $case->id)
+            ->where('moderationCases.items.0.campaign_id', $campaign->id)
+            ->where('moderationCases.items.0.severity', 'high')
+            ->where('campaignApproval.access.allowed', false),
+        );
+    }
+
+    public function test_a_resolved_moderation_case_never_appears_in_the_open_queue(): void
+    {
+        $staff = $this->makeRepresentative();
+        $this->grantStaffCapability($staff, 'campaign.moderate', 'advertising.campaign');
+
+        $advertiser = $this->makeAdvertiserProfile();
+        $campaign = $this->makeCampaign($advertiser);
+        $service = app(ModerationService::class);
+        $case = $service->openCase(campaign: $campaign, reason: 'signalement', severity: 'low');
+        $service->recordDecision($case, ModerationDecision::NoViolationFound);
+
+        $response = $this->actingAs($staff->user)->get('/admin/moderation');
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('moderationCases.access.allowed', true)
+            ->where('moderationCases.items', []),
         );
     }
 

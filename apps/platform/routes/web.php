@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AccountOverviewController;
 use App\Http\Controllers\HealthController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminFinanceController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingAudiencesController;
@@ -98,6 +100,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Volontairement dans le groupe 'auth' : c'est un écran, pas un point
     // de terminaison API — même raisonnement que 'advertising'/'wallet'.
     Route::get('admin/moderation', [ModerationOverviewController::class, 'index'])->name('admin.moderation');
+
+    // P0-Admin : portail personnel Wasplex complet (UX-0001 §8
+    // « Administration Wasplex »). Deux destinations réellement backées
+    // au-delà de la file « à traiter » : Finance et rapprochement
+    // (campaign.fund) et Publicité et modération (campaign.approve /
+    // campaign.moderate). Les autres destinations décidées par le texte
+    // (Risques et incidents, Alertes et institutions, Fonds Social,
+    // Cartes et partenaires, Configurations, Accès, Audit) n'ont
+    // aujourd'hui aucun module ni capacité de lecture déclarée — jamais
+    // simulées, seulement annoncées indisponibles côté navigation
+    // (DS-0001 §23).
+    Route::get('admin/finance', [AdminFinanceController::class, 'index'])->name('admin.finance');
+    Route::get('admin/advertising-moderation', [AdminAdvertisingModerationController::class, 'index'])
+        ->name('admin.advertising-moderation');
 
     // W4 : « Mon espace » — cinquième destination de la navigation mobile,
     // restée désactivée depuis la refonte W4 faute d'écran. Équivalent

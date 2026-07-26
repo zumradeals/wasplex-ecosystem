@@ -1,31 +1,20 @@
 import { Head, router } from '@inertiajs/react';
+import { CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
-import Heading from '@/components/heading';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { AdminAccessGate } from '@/components/admin/admin-access-gate';
+import type { AdminAccess } from '@/components/admin/admin-access-gate';
+import { ModerationCaseDecisionForm } from '@/components/admin/moderation-case-decision-form';
+import { AdvertiserEmptyState } from '@/components/advertiser/empty-state';
+import AdminLayout from '@/layouts/admin-layout';
 import { postJson } from '@/lib/api';
-import admin from '@/routes/admin';
 import campaignVersions from '@/routes/advertising/campaign-versions';
 import funding from '@/routes/advertising/campaigns/funding';
 import qualifiedEvents from '@/routes/advertising/qualified-events';
-import type { BreadcrumbItem } from '@/types';
 
-type Access = {
-    allowed: boolean;
-    reason: string | null;
-};
+const amountFormatter = new Intl.NumberFormat('fr-FR');
 
 type Section<T> = {
-    access: Access;
+    access: AdminAccess;
     items: T[];
 };
 
@@ -56,28 +45,16 @@ type QualifiedEventItem = {
     submitted_at: string;
 };
 
-const amountFormatter = new Intl.NumberFormat('fr-FR');
-
-// Même discipline que les autres écrans (wallet/overview.tsx,
-// advertising/overview.tsx) : jamais le motif technique brut d'un refus
-// d'autorisation (ADR-0004 §"décision explicable").
-const ACCESS_DENIED_MESSAGES: Record<string, string> = {
-    no_active_grant: 'Vous ne détenez pas ce droit sur ce compte.',
-    subject_not_resolved:
-        "Votre session n'a pas pu être confirmée. Reconnectez-vous pour réessayer.",
+type ModerationCaseItem = {
+    moderation_case_id: string;
+    campaign_id: string;
+    campaign_code: string;
+    advertiser_legal_name: string;
+    reason: string;
+    severity: string;
+    observed_destination: string | null;
+    opened_at: string;
 };
-
-function AccessDenied({ access }: { access: Access }) {
-    return (
-        <Alert>
-            <AlertTitle>Section indisponible</AlertTitle>
-            <AlertDescription>
-                {ACCESS_DENIED_MESSAGES[access.reason ?? ''] ??
-                    "Cette section n'est pas disponible pour votre compte."}
-            </AlertDescription>
-        </Alert>
-    );
-}
 
 // `campaign.fund` et `event.accept` sont `risk_class = critical` : leur
 // activation exige une session « strong » (step-up mot de passe), en plus
@@ -86,9 +63,11 @@ function AccessDenied({ access }: { access: Access }) {
 // c'est une session à renforcer, jamais silencieusement contourné.
 function StepUpNotice() {
     return (
-        <Alert variant="destructive">
-            <AlertTitle>Confirmation de mot de passe requise</AlertTitle>
-            <AlertDescription>
+        <div className="rounded-lg border border-[var(--status-danger)]/30 bg-[var(--status-danger)]/10 px-4 py-3 text-sm text-[var(--status-danger)]">
+            <p className="font-semibold">
+                Confirmation de mot de passe requise
+            </p>
+            <p className="mt-1">
                 Cette action exige une session renforcée. Confirmez votre mot de
                 passe puis réessayez.{' '}
                 <a
@@ -97,8 +76,46 @@ function StepUpNotice() {
                 >
                     Confirmer mon mot de passe
                 </a>
-            </AlertDescription>
-        </Alert>
+            </p>
+        </div>
+    );
+}
+
+function SectionCard({
+    title,
+    description,
+    section,
+    emptyLabel,
+    children,
+}: {
+    title: string;
+    description: string;
+    section: Section<unknown>;
+    emptyLabel: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <section className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)]">
+            <div className="border-b border-[var(--border-default)] px-5 py-4">
+                <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+                    {title}
+                </h2>
+                <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
+                    {description}
+                </p>
+            </div>
+            <div className="p-5">
+                <AdminAccessGate access={section.access}>
+                    {section.items.length === 0 ? (
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            {emptyLabel}
+                        </p>
+                    ) : (
+                        <div className="space-y-3">{children}</div>
+                    )}
+                </AdminAccessGate>
+            </div>
+        </section>
     );
 }
 
@@ -133,58 +150,41 @@ function CampaignApprovalSection({
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Campagnes en revue</CardTitle>
-                <CardDescription>
-                    Versions soumises par leur auteur, en attente d'approbation.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {!section.access.allowed && (
-                    <AccessDenied access={section.access} />
-                )}
-
-                {section.access.allowed && error && (
-                    <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                )}
-
-                {section.access.allowed && section.items.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                        Aucune campagne en attente de revue.
-                    </p>
-                )}
-
-                {section.access.allowed &&
-                    section.items.map((item) => (
-                        <div
-                            key={item.campaign_version_id}
-                            className="flex items-center justify-between rounded-lg border p-4"
-                        >
-                            <div>
-                                <p className="font-medium">{item.headline}</p>
-                                <p className="text-sm text-muted-foreground">
-                                    {item.campaign_code} —{' '}
-                                    {item.advertiser_legal_name}
-                                </p>
-                            </div>
-                            <Button
-                                size="sm"
-                                onClick={() => approve(item)}
-                                disabled={
-                                    pendingId === item.campaign_version_id
-                                }
-                            >
-                                {pendingId === item.campaign_version_id
-                                    ? 'Approbation...'
-                                    : 'Approuver'}
-                            </Button>
-                        </div>
-                    ))}
-            </CardContent>
-        </Card>
+        <SectionCard
+            title="Campagnes en revue"
+            description="Versions soumises par leur auteur, en attente d'approbation."
+            section={section}
+            emptyLabel="Aucune campagne en attente de revue."
+        >
+            {error && (
+                <p className="text-sm text-[var(--status-danger)]">{error}</p>
+            )}
+            {section.items.map((item) => (
+                <div
+                    key={item.campaign_version_id}
+                    className="flex items-center justify-between rounded-lg border border-[var(--border-default)] p-4"
+                >
+                    <div className="min-w-0">
+                        <p className="truncate font-medium text-[var(--text-primary)]">
+                            {item.headline}
+                        </p>
+                        <p className="truncate text-sm text-[var(--text-secondary)]">
+                            {item.campaign_code} — {item.advertiser_legal_name}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => approve(item)}
+                        disabled={pendingId === item.campaign_version_id}
+                        className="shrink-0 rounded-lg bg-[var(--brand-blue)] px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                    >
+                        {pendingId === item.campaign_version_id
+                            ? 'Approbation...'
+                            : 'Approuver'}
+                    </button>
+                </div>
+            ))}
+        </SectionCard>
     );
 }
 
@@ -237,39 +237,43 @@ function FundCampaignForm({
         >
             {error === 'step_up' && <StepUpNotice />}
             {error === 'other' && (
-                <p className="w-full text-sm text-destructive">
+                <p className="w-full text-sm text-[var(--status-danger)]">
                     Le financement n'a pas abouti.
                 </p>
             )}
 
-            <div className="space-y-1">
-                <Label htmlFor={`amount-${item.campaign_id}`}>Montant</Label>
-                <Input
-                    id={`amount-${item.campaign_id}`}
+            <label className="space-y-1">
+                <span className="block text-xs font-medium text-[var(--text-primary)]">
+                    Montant
+                </span>
+                <input
                     type="number"
                     min={1}
-                    className="w-32"
                     value={amount}
                     onChange={(event) => setAmount(Number(event.target.value))}
+                    className="w-32 rounded-lg border border-[var(--border-default)] bg-[var(--bg-canvas)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--brand-blue)] focus:outline-none"
                 />
-            </div>
+            </label>
 
-            <div className="space-y-1">
-                <Label htmlFor={`ref-${item.campaign_id}`}>
+            <label className="space-y-1">
+                <span className="block text-xs font-medium text-[var(--text-primary)]">
                     Référence (optionnelle, démo)
-                </Label>
-                <Input
-                    id={`ref-${item.campaign_id}`}
-                    className="w-48"
+                </span>
+                <input
                     value={reference}
                     onChange={(event) => setReference(event.target.value)}
                     placeholder="virement-demo-001"
+                    className="w-48 rounded-lg border border-[var(--border-default)] bg-[var(--bg-canvas)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--brand-blue)] focus:outline-none"
                 />
-            </div>
+            </label>
 
-            <Button type="submit" size="sm" disabled={submitting}>
+            <button
+                type="submit"
+                disabled={submitting}
+                className="rounded-lg bg-[var(--brand-blue)] px-3 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+            >
                 {submitting ? 'Financement...' : 'Financer'}
-            </Button>
+            </button>
         </form>
     );
 }
@@ -280,51 +284,36 @@ function CampaignFundingSection({
     section: Section<CampaignFundingItem>;
 }) {
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Financement des campagnes</CardTitle>
-                <CardDescription>
-                    Enregistre un encaissement confirmé — démo : aucune
-                    passerelle de paiement réelle n'est encore branchée.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {!section.access.allowed && (
-                    <AccessDenied access={section.access} />
-                )}
-
-                {section.access.allowed && section.items.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                        Aucune campagne à financer.
-                    </p>
-                )}
-
-                {section.access.allowed &&
-                    section.items.map((item) => (
-                        <div
-                            key={item.campaign_id}
-                            className="space-y-3 rounded-lg border p-4"
-                        >
-                            <div>
-                                <p className="font-medium">{item.code}</p>
-                                <p className="text-sm text-muted-foreground">
-                                    {item.advertiser_legal_name} — disponible :{' '}
-                                    {amountFormatter.format(item.available)}{' '}
-                                    {item.currency}
-                                </p>
-                            </div>
-                            <FundCampaignForm
-                                item={item}
-                                onFunded={() =>
-                                    router.reload({
-                                        only: ['campaignFunding'],
-                                    })
-                                }
-                            />
-                        </div>
-                    ))}
-            </CardContent>
-        </Card>
+        <SectionCard
+            title="Financement des campagnes"
+            description="Enregistre un encaissement confirmé — démo : aucune passerelle de paiement réelle n'est encore branchée."
+            section={section}
+            emptyLabel="Aucune campagne à financer."
+        >
+            {section.items.map((item) => (
+                <div
+                    key={item.campaign_id}
+                    className="space-y-3 rounded-lg border border-[var(--border-default)] p-4"
+                >
+                    <div>
+                        <p className="font-medium text-[var(--text-primary)]">
+                            {item.code}
+                        </p>
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            {item.advertiser_legal_name} — disponible :{' '}
+                            {amountFormatter.format(item.available)}{' '}
+                            {item.currency}
+                        </p>
+                    </div>
+                    <FundCampaignForm
+                        item={item}
+                        onFunded={() =>
+                            router.reload({ only: ['campaignFunding'] })
+                        }
+                    />
+                </div>
+            ))}
+        </SectionCard>
     );
 }
 
@@ -356,7 +345,9 @@ function QualifiedEventsSection({
                   )
                 : await postJson<{ reason?: string }>(
                       qualifiedEvents.reject.url(item.qualified_event_id),
-                      { reason: 'moderation_dashboard_reject' },
+                      {
+                          reason: 'moderation_dashboard_reject',
+                      },
                   );
 
         setPendingId(null);
@@ -378,81 +369,102 @@ function QualifiedEventsSection({
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Événements qualifiés en attente</CardTitle>
-                <CardDescription>
-                    Preuves d'attention soumises, en attente de décision — c'est
-                    ce qui crédite réellement le Wallet.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {!section.access.allowed && (
-                    <AccessDenied access={section.access} />
-                )}
+        <SectionCard
+            title="Événements qualifiés en attente"
+            description="Preuves d'attention soumises, en attente de décision — c'est ce qui crédite réellement le Wallet."
+            section={section}
+            emptyLabel="Aucun événement en attente."
+        >
+            {section.items.map((item) => (
+                <div
+                    key={item.qualified_event_id}
+                    className="space-y-2 rounded-lg border border-[var(--border-default)] p-4"
+                >
+                    {error[item.qualified_event_id] === 'step_up' && (
+                        <StepUpNotice />
+                    )}
+                    {error[item.qualified_event_id] === 'other' && (
+                        <p className="text-sm text-[var(--status-danger)]">
+                            La décision n'a pas abouti.
+                        </p>
+                    )}
 
-                {section.access.allowed && section.items.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                        Aucun événement en attente.
-                    </p>
-                )}
-
-                {section.access.allowed &&
-                    section.items.map((item) => (
-                        <div
-                            key={item.qualified_event_id}
-                            className="space-y-2 rounded-lg border p-4"
-                        >
-                            {error[item.qualified_event_id] === 'step_up' && (
-                                <StepUpNotice />
-                            )}
-                            {error[item.qualified_event_id] === 'other' && (
-                                <p className="text-sm text-destructive">
-                                    La décision n'a pas abouti.
-                                </p>
-                            )}
-
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="font-medium">
-                                        {item.headline}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {item.campaign_code} —{' '}
-                                        {amountFormatter.format(
-                                            item.reward_amount,
-                                        )}{' '}
-                                        {item.currency}
-                                    </p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => decide(item, 'reject')}
-                                        disabled={
-                                            pendingId ===
-                                            item.qualified_event_id
-                                        }
-                                    >
-                                        Refuser
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        onClick={() => decide(item, 'accept')}
-                                        disabled={
-                                            pendingId ===
-                                            item.qualified_event_id
-                                        }
-                                    >
-                                        Accepter
-                                    </Button>
-                                </div>
-                            </div>
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                            <p className="truncate font-medium text-[var(--text-primary)]">
+                                {item.headline}
+                            </p>
+                            <p className="truncate text-sm text-[var(--text-secondary)]">
+                                {item.campaign_code} —{' '}
+                                {amountFormatter.format(item.reward_amount)}{' '}
+                                {item.currency}
+                            </p>
                         </div>
-                    ))}
-            </CardContent>
-        </Card>
+                        <div className="flex shrink-0 gap-2">
+                            <button
+                                type="button"
+                                onClick={() => decide(item, 'reject')}
+                                disabled={pendingId === item.qualified_event_id}
+                                className="rounded-lg border border-[var(--border-default)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-raised)] disabled:opacity-50"
+                            >
+                                Refuser
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => decide(item, 'accept')}
+                                disabled={pendingId === item.qualified_event_id}
+                                className="rounded-lg bg-[var(--brand-blue)] px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                            >
+                                Accepter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </SectionCard>
+    );
+}
+
+function ModerationCasesSection({
+    section,
+}: {
+    section: Section<ModerationCaseItem>;
+}) {
+    return (
+        <SectionCard
+            title="Signalements ouverts"
+            description="Dossiers de modération ouverts par signalement — un signalement seul ne prouve jamais la violation."
+            section={section}
+            emptyLabel="Aucun signalement ouvert."
+        >
+            {section.items.map((item) => (
+                <div
+                    key={item.moderation_case_id}
+                    className="space-y-3 rounded-lg border border-[var(--border-default)] p-4"
+                >
+                    <div>
+                        <p className="font-medium text-[var(--text-primary)]">
+                            {item.campaign_code} — {item.advertiser_legal_name}
+                        </p>
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            {item.reason} · gravité : {item.severity}
+                        </p>
+                        {item.observed_destination && (
+                            <p className="text-xs text-[var(--text-secondary)]">
+                                Destination observée :{' '}
+                                {item.observed_destination}
+                            </p>
+                        )}
+                    </div>
+                    <ModerationCaseDecisionForm
+                        moderationCaseId={item.moderation_case_id}
+                        onDecided={() =>
+                            router.reload({ only: ['moderationCases'] })
+                        }
+                    />
+                </div>
+            ))}
+        </SectionCard>
     );
 }
 
@@ -460,31 +472,44 @@ export default function ModerationOverview({
     campaignApproval,
     campaignFunding,
     qualifiedEvents: qualifiedEventsSection,
+    moderationCases,
 }: {
     campaignApproval: Section<CampaignApprovalItem>;
     campaignFunding: Section<CampaignFundingItem>;
     qualifiedEvents: Section<QualifiedEventItem>;
+    moderationCases: Section<ModerationCaseItem>;
 }) {
+    const totalPending =
+        campaignApproval.items.length +
+        campaignFunding.items.length +
+        qualifiedEventsSection.items.length +
+        moderationCases.items.length;
+
     return (
-        <>
-            <Head title="Modération" />
+        <AdminLayout
+            title="À traiter"
+            description="Tout ce qui attend une décision de votre part, selon vos droits."
+        >
+            <Head title="Personnel — À traiter" />
 
-            <div className="flex flex-1 flex-col gap-6 p-4">
-                <Heading
-                    title="Modération Wasplex"
-                    description="Les trois files qui ferment la boucle de gain : approbation, financement, acceptation/refus des preuves d'attention."
+            {totalPending === 0 &&
+            campaignApproval.access.allowed &&
+            campaignFunding.access.allowed &&
+            qualifiedEventsSection.access.allowed &&
+            moderationCases.access.allowed ? (
+                <AdvertiserEmptyState
+                    icon={CheckCircle2}
+                    title="Tout est traité"
+                    description="Aucune action en attente sur les files auxquelles vous avez accès."
                 />
-
-                <CampaignApprovalSection section={campaignApproval} />
-                <CampaignFundingSection section={campaignFunding} />
-                <QualifiedEventsSection section={qualifiedEventsSection} />
-            </div>
-        </>
+            ) : (
+                <div className="space-y-6">
+                    <CampaignApprovalSection section={campaignApproval} />
+                    <CampaignFundingSection section={campaignFunding} />
+                    <QualifiedEventsSection section={qualifiedEventsSection} />
+                    <ModerationCasesSection section={moderationCases} />
+                </div>
+            )}
+        </AdminLayout>
     );
 }
-
-ModerationOverview.layout = {
-    breadcrumbs: [
-        { title: 'Modération', href: admin.moderation() },
-    ] satisfies BreadcrumbItem[],
-};
