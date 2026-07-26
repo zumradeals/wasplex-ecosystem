@@ -3,6 +3,7 @@
 namespace App\Modules\Advertising\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Advertising\Enums\AcceptanceMode;
 use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Governance\Authorization\Contracts\ResourceContext;
@@ -73,11 +74,16 @@ class QualifiedEventAcceptanceController extends Controller
             return $this->failureResponder->forOutcome($exception);
         }
 
-        $event = $this->campaignBudgetService->acceptQualifiedEvent($qualifiedEvent);
+        // Décision humaine tracée comme telle (arbitrage Koné/SIRR
+        // 2026-07-26) — depuis l'acceptation automatique des soumissions
+        // propres, cette route est le chemin des cas suspects et des
+        // dérogations, l'exception et non le défaut.
+        $event = $this->campaignBudgetService->acceptQualifiedEvent($qualifiedEvent, AcceptanceMode::Manual);
 
         return response()->json([
             'qualified_event_id' => $event->id,
             'billing_status' => $event->billing_status->value,
+            'acceptance_mode' => $event->acceptance_mode?->value,
         ], 200);
     }
 

@@ -2,17 +2,21 @@
 
 namespace Tests\Feature\Modules\Advertising;
 
+use App\Modules\Advertising\Enums\AcceptanceMode;
+use App\Modules\Advertising\Enums\FraudDecision;
 use App\Modules\Advertising\Http\Requests\StoreSelfQualifiedEventRequest;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
 use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Services\CampaignVersionService;
+use App\Modules\Advertising\Services\QualifiedEventAutoAcceptancePolicy;
 use App\Modules\Governance\Configuration\Enums\ConfigurationLevel;
 use App\Modules\Governance\Configuration\Enums\DefinitionState;
 use App\Modules\Governance\Configuration\Enums\ValueType;
 use App\Modules\Governance\Configuration\Models\Definition;
 use App\Modules\Governance\Configuration\Services\ConfigurationValueManager;
 use App\Modules\Identity\Enums\LinkOrigin;
+use App\Modules\Wallet\Ledger\Models\LedgerTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -248,6 +252,159 @@ class QualifiedEventSelfSubmissionRouteTest extends AdvertisingTestCase
 
         $response->assertStatus(409);
         $this->assertSame('insufficient_budget', $response->json('reason'));
+    }
+
+    /**
+     * Active le quota journalier d'acceptation automatique
+     * ({@see QualifiedEventAutoAcceptancePolicy}) via le vrai cycle
+     * ConfigurationValueManager — même discipline que les prix.
+     */
+    private function activateAutoAcceptanceQuota(int $quota): void
+    {
+        $definition = Definition::create([
+            'stable_key' => QualifiedEventAutoAcceptancePolicy::RULES_CONFIGURATION_KEY,
+            'version' => 1,
+            'domain' => 'advertising',
+            'level' => ConfigurationLevel::C2,
+            'value_type' => ValueType::Integer,
+            'unit' => 'qualified_events_per_beneficiary_per_day',
+            'constraints' => ['minimum' => 0],
+            'description' => 'Test.',
+            'state' => DefinitionState::Active,
+        ]);
+
+        $author = $this->activeLinkFor($this->makeUser('quota-author-'.Str::uuid().'@example.com'));
+        $approver = $this->activeLinkFor($this->makeUser('quota-approver-'.Str::uuid().'@example.com'));
+        $manager = app(ConfigurationValueManager::class);
+
+        $version = $manager->propose($definition, $quota, 'Test.', $author);
+        $version = $manager->submitForReview($version);
+        $version = $manager->approve($version, $approver);
+        $manager->activate($version, $approver, (string) Str::uuid());
+    }
+
+    public function test_a_clean_submission_is_accepted_and_credited_in_the_same_request(): void
+    {
+        $this->activateAutoAcceptanceQuota(10);
+
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->approvedVersionWithPricing($campaign, priceValue: 1_000);
+
+        $user = $this->makeUser('auto-accepted-'.Str::uuid().'@example.com');
+
+        $response = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $this->payload());
+
+        $response->assertStatus(201);
+        $this->assertSame('accepted', $response->json('billing_status'));
+        $this->assertSame('automatic', $response->json('acceptance_mode'));
+        // Part utilisateur du ratio 50/50 exact (AMD-0002) : le gain
+        // annoncé au client est le montant réellement comptabilisé.
+        $this->assertSame(500, $response->json('credited_amount'));
+        $this->assertSame('XOF', $response->json('credited_currency'));
+        $this->assertSame(500, $response->json('wallet_available'));
+
+        $event = QualifiedEvent::query()->findOrFail($response->json('qualified_event_id'));
+        $this->assertSame(AcceptanceMode::Automatic, $event->acceptance_mode);
+        // Reconstruction d'audit sans ambiguïté : la version exacte des
+        // règles appliquées est épinglée sur l'événement lui-même.
+        $this->assertSame(QualifiedEventAutoAcceptancePolicy::RULES_CONFIGURATION_KEY, $event->acceptance_rules_configuration_key);
+        $this->assertSame(1, $event->acceptance_rules_configuration_version);
+        $this->assertNotNull($event->consumption_transaction_id);
+        $this->assertNotNull($event->distribution_transaction_id);
+    }
+
+    public function test_without_active_rules_the_event_stays_pending_for_human_review(): void
+    {
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->approvedVersionWithPricing($campaign);
+
+        $user = $this->makeUser('no-rules-'.Str::uuid().'@example.com');
+
+        $response = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $this->payload());
+
+        $response->assertStatus(201);
+        $this->assertSame('pending', $response->json('billing_status'));
+        $this->assertNull($response->json('acceptance_mode'));
+        $this->assertSame(QualifiedEventAutoAcceptancePolicy::HOLD_RULES_NOT_CONFIGURED, $response->json('review_reason'));
+        $this->assertNull($response->json('credited_amount'));
+    }
+
+    public function test_evidence_without_completion_attestation_stays_pending(): void
+    {
+        $this->activateAutoAcceptanceQuota(10);
+
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->approvedVersionWithPricing($campaign);
+
+        $user = $this->makeUser('incomplete-'.Str::uuid().'@example.com');
+
+        $response = $this->actingAs($user)->postJson(
+            "/advertising/campaign-versions/{$version->id}/qualified-events/self-submit",
+            [...$this->payload(), 'evidence' => ['completed' => false]],
+        );
+
+        $response->assertStatus(201);
+        $this->assertSame('pending', $response->json('billing_status'));
+        $this->assertSame(QualifiedEventAutoAcceptancePolicy::HOLD_COMPLETION_NOT_ATTESTED, $response->json('review_reason'));
+
+        $event = QualifiedEvent::query()->findOrFail($response->json('qualified_event_id'));
+        $this->assertSame(FraudDecision::None, $event->fraud_decision);
+        $this->assertNull($event->acceptance_mode);
+    }
+
+    public function test_reaching_the_daily_quota_holds_the_event_as_graded_anomaly(): void
+    {
+        $this->activateAutoAcceptanceQuota(1);
+
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->approvedVersionWithPricing($campaign, priceValue: 100);
+
+        $user = $this->makeUser('quota-reached-'.Str::uuid().'@example.com');
+
+        $first = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $this->payload());
+        $this->assertSame('accepted', $first->json('billing_status'));
+
+        $second = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $this->payload());
+
+        $second->assertStatus(201);
+        $this->assertSame('pending', $second->json('billing_status'));
+        $this->assertSame(QualifiedEventAutoAcceptancePolicy::HOLD_DAILY_QUOTA_REACHED, $second->json('review_reason'));
+
+        // Gradation AMD-0010 §10 : un dépassement de quota est une anomalie
+        // à examiner par un humain (`event.accept`), jamais un refus
+        // automatique (AMD-0010 §16).
+        $event = QualifiedEvent::query()->findOrFail($second->json('qualified_event_id'));
+        $this->assertSame(FraudDecision::Anomaly, $event->fraud_decision);
+        $this->assertSame('pending', $event->billing_status->value);
+    }
+
+    public function test_replaying_an_accepted_submission_credits_only_once(): void
+    {
+        $this->activateAutoAcceptanceQuota(10);
+
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->approvedVersionWithPricing($campaign, priceValue: 1_000);
+
+        $user = $this->makeUser('replay-'.Str::uuid().'@example.com');
+        $payload = $this->payload();
+
+        $first = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $payload);
+        $second = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $payload);
+
+        $second->assertStatus(201);
+        $this->assertSame($first->json('qualified_event_id'), $second->json('qualified_event_id'));
+        $this->assertSame('accepted', $second->json('billing_status'));
+        $this->assertSame(500, $second->json('credited_amount'));
+        // Le solde n'a pas bougé entre les deux réponses : une seule
+        // répartition comptabilisée pour une même preuve.
+        $this->assertSame(500, $second->json('wallet_available'));
+        $this->assertSame(1, QualifiedEvent::query()->count());
+        $this->assertSame(1, LedgerTransaction::query()->where('type', 'advertising_campaign_distribution')->count());
     }
 
     public function test_the_self_submission_route_is_registered(): void

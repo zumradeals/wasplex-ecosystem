@@ -2,6 +2,7 @@
 
 namespace App\Modules\Advertising\Models;
 
+use App\Modules\Advertising\Enums\AcceptanceMode;
 use App\Modules\Advertising\Enums\BillingStatus;
 use App\Modules\Advertising\Enums\FraudDecision;
 use App\Modules\Advertising\Services\CampaignBudgetService;
@@ -33,6 +34,9 @@ use Illuminate\Support\Str;
  * @property string|null $pricing_configuration_key
  * @property int|null $pricing_configuration_version
  * @property BillingStatus $billing_status
+ * @property AcceptanceMode|null $acceptance_mode
+ * @property string|null $acceptance_rules_configuration_key
+ * @property int|null $acceptance_rules_configuration_version
  * @property string $reservation_transaction_id
  * @property string|null $consumption_transaction_id
  * @property string|null $distribution_transaction_id
@@ -67,6 +71,8 @@ class QualifiedEvent extends Model
             'applied_price_amount' => 'integer',
             'pricing_configuration_version' => 'integer',
             'billing_status' => BillingStatus::class,
+            'acceptance_mode' => AcceptanceMode::class,
+            'acceptance_rules_configuration_version' => 'integer',
         ];
     }
 
