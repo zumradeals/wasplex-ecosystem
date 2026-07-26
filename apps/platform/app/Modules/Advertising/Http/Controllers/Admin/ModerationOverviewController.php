@@ -5,8 +5,10 @@ namespace App\Modules\Advertising\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Modules\Advertising\Enums\BillingStatus;
 use App\Modules\Advertising\Enums\CampaignVersionState;
+use App\Modules\Advertising\Enums\ModerationCaseStatus;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
+use App\Modules\Advertising\Models\ModerationCase;
 use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Governance\Authorization\Enums\GrantState;
@@ -68,6 +70,7 @@ class ModerationOverviewController extends Controller
         $canFund = $this->hasActiveGrant($link, 'campaign.fund');
         $canDecideEvents = $this->hasActiveGrant($link, 'event.accept')
             || $this->hasActiveGrant($link, 'event.reject');
+        $canModerate = $this->hasActiveGrant($link, 'campaign.moderate');
 
         return Inertia::render('admin/moderation', [
             'campaignApproval' => [
@@ -81,6 +84,10 @@ class ModerationOverviewController extends Controller
             'qualifiedEvents' => [
                 'access' => $this->accessFor($canDecideEvents),
                 'items' => $canDecideEvents ? $this->pendingQualifiedEvents() : [],
+            ],
+            'moderationCases' => [
+                'access' => $this->accessFor($canModerate),
+                'items' => $canModerate ? $this->openModerationCases() : [],
             ],
         ]);
     }
@@ -185,6 +192,30 @@ class ModerationOverviewController extends Controller
                 'reward_amount' => $event->applied_price_amount,
                 'currency' => $event->applied_price_currency,
                 'submitted_at' => $event->created_at->toIso8601String(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function openModerationCases(): array
+    {
+        return ModerationCase::query()
+            ->where('status', ModerationCaseStatus::Open)
+            ->with(['campaign.advertiserProfile'])
+            ->orderBy('created_at')
+            ->get()
+            ->map(fn (ModerationCase $case): array => [
+                'moderation_case_id' => $case->id,
+                'campaign_id' => $case->campaign->id,
+                'campaign_code' => $case->campaign->code,
+                'advertiser_legal_name' => $case->campaign->advertiserProfile->legal_name,
+                'reason' => $case->reason,
+                'severity' => $case->severity,
+                'observed_destination' => $case->observed_destination,
+                'opened_at' => $case->created_at->toIso8601String(),
             ])
             ->values()
             ->all();
