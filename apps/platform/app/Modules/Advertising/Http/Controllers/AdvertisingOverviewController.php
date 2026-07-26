@@ -3,38 +3,36 @@
 namespace App\Modules\Advertising\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Advertising\Models\AdvertiserProfile;
+use App\Modules\Advertising\Http\Controllers\Concerns\ResolvesAdvertiserWorkspace;
 use App\Modules\Advertising\Models\Campaign;
-use App\Modules\Advertising\Models\SectorClassification;
+use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
-use App\Modules\Governance\Authorization\Contracts\ResourceContext;
-use App\Modules\Governance\Authorization\Enums\Environment;
-use App\Modules\Governance\Authorization\Enums\Operation;
 use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
 use App\Modules\Governance\Authorization\Integration\AuthorizationRequestFactory;
-use App\Modules\Governance\Authorization\Integration\Exceptions\AuthorizationOutcomeException;
-use App\Modules\Governance\Authorization\Integration\Exceptions\SubjectResolutionFailedException;
 use App\Modules\Governance\Authorization\Integration\Http\AuthenticatedSubjectHttpResolver;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Tableau de bord annonceur (P007-W1, `A-001-01`/`A-002-01`) : consultation
- * par un représentant de ses propres campagnes et de leur budget projeté
- * — voir `campaign.view` (migration `2026_07_25_100013`), portée
- * exclusivement `self`.
+ * Vue d'ensemble du portail annonceur (P007-W2, UX-0001 §8 « Vue
+ * d'ensemble »). Panorama agrégé de tout ce que le dossier annonceur
+ * possède — jamais le détail d'une campagne (voir
+ * {@see AdvertisingCampaignsController}) : chaque nombre affiché ici est
+ * une somme ou un comptage reconstruit depuis des ressources réellement
+ * appartenant au représentant courant, jamais une estimation inventée
+ * (CLAUDE.md §6 « ne jamais inventer un succès »).
  *
  * Même discipline que {@see WalletOverviewController} :
- * un refus d'autorisation restitue un état d'écran, jamais une erreur JSON
- * brute (CLAUDE.md §6). L'absence de dossier annonceur n'est pas un refus
- * d'autorisation — `campaign.view` reste accordée (TD-0005-D, octroi
- * automatique `user.base`) — mais un état d'écran distinct invitant à
- * déclarer un dossier ({@see AdvertiserProfileController}).
+ * un refus d'autorisation ou l'absence de dossier restitue un état
+ * d'écran, jamais une erreur JSON brute.
  */
 class AdvertisingOverviewController extends Controller
 {
+    use ResolvesAdvertiserWorkspace;
+
     public function __construct(
         private readonly AuthenticatedSubjectHttpResolver $subjectResolver,
         private readonly AuthorizationRequestFactory $authorizationRequestFactory,
@@ -44,101 +42,74 @@ class AdvertisingOverviewController extends Controller
 
     public function index(Request $request): Response
     {
-        try {
-            $subject = $this->subjectResolver->resolve($request);
-        } catch (SubjectResolutionFailedException) {
-            return Inertia::render('advertising/overview', [
-                'access' => ['allowed' => false, 'reason' => 'subject_not_resolved'],
-                'advertiserProfile' => null,
-                'campaigns' => [],
-                'sectorClassifications' => [],
-            ]);
+        $workspace = $this->resolveAdvertiserWorkspace($request, 'advertising/overview', [
+            'campaignCounts' => [],
+            'budgetTotals' => [],
+            'eventTotals' => [],
+            'recentCampaigns' => [],
+        ]);
+
+        if ($workspace instanceof Response) {
+            return $workspace;
         }
 
-        $personId = $subject->personAccountLink->person_id;
-
-        $authorizationRequest = $this->authorizationRequestFactory->make(
-            subject: $subject,
-            capabilityKey: 'campaign.view',
-            operation: Operation::Read,
-            resource: new ResourceContext(
-                resourceType: 'advertising.campaign',
-                resourceId: null,
-                organizationId: null,
-                ownerPersonId: $personId,
-                countryCode: null,
-                territoryCodes: [],
-                environment: $this->currentEnvironment(),
-            ),
-            environment: $this->currentEnvironment(),
-        );
-
-        try {
-            $this->authorizationGate->authorize($authorizationRequest);
-        } catch (AuthorizationOutcomeException $exception) {
-            return Inertia::render('advertising/overview', [
-                'access' => ['allowed' => false, 'reason' => $exception->result->reason->code],
-                'advertiserProfile' => null,
-                'campaigns' => [],
-                'sectorClassifications' => [],
-            ]);
-        }
-
-        $advertiserProfile = AdvertiserProfile::query()
-            ->where('representative_person_account_link_id', $subject->personAccountLink->id)
-            ->first();
-
-        if ($advertiserProfile === null) {
-            return Inertia::render('advertising/overview', [
-                'access' => ['allowed' => true, 'reason' => null],
-                'advertiserProfile' => null,
-                'campaigns' => [],
-                'sectorClassifications' => [],
-            ]);
-        }
-
-        $sectorClassifications = SectorClassification::query()
-            ->where('state', 'active')
-            ->orderBy('sector')
-            ->get(['id', 'country_code', 'sector']);
+        $profile = $workspace['profile'];
 
         $campaigns = Campaign::query()
-            ->where('advertiser_profile_id', $advertiserProfile->id)
+            ->where('advertiser_profile_id', $profile->id)
             ->with(['availableAccount', 'reservedAccount', 'consumedAccount', 'versions' => function ($query): void {
                 $query->orderByDesc('version');
             }])
             ->orderByDesc('created_at')
             ->get();
 
+        // Sommé par devise : des campagnes en devises différentes ne
+        // partagent jamais un même total (une somme brute mélangerait des
+        // unités incomparables).
+        $budgetTotalsByCurrency = [];
+
+        foreach ($campaigns as $campaign) {
+            $currency = $campaign->currency;
+            $budgetTotalsByCurrency[$currency] ??= ['currency' => $currency, 'available' => 0, 'reserved' => 0, 'consumed' => 0];
+            $budgetTotalsByCurrency[$currency]['available'] += $this->budgetProjection->available($campaign);
+            $budgetTotalsByCurrency[$currency]['reserved'] += $this->budgetProjection->reserved($campaign);
+            $budgetTotalsByCurrency[$currency]['consumed'] += $this->budgetProjection->consumed($campaign);
+        }
+
+        $campaignCounts = $campaigns->countBy(fn (Campaign $campaign): string => $campaign->state->value)->all();
+
+        // `toBase()` : requête d'agrégation pure (comptages/sommes), jamais
+        // destinée à hydrater des modèles `QualifiedEvent` — les alias SQL
+        // (`event_count`, `amount_total`) ne sont pas des colonnes du
+        // modèle (ADR-0010 §3, cette table n'a pas vocation à exposer un
+        // total agrégé comme attribut).
+        $eventTotals = QualifiedEvent::query()
+            ->whereIn('campaign_id', $campaigns->pluck('id'))
+            ->select('billing_status', 'applied_price_currency', DB::raw('count(*) as event_count'), DB::raw('sum(applied_price_amount) as amount_total'))
+            ->groupBy('billing_status', 'applied_price_currency')
+            ->toBase()
+            ->get()
+            ->map(fn ($row): array => [
+                'billing_status' => $row->billing_status,
+                'currency' => $row->applied_price_currency,
+                'event_count' => (int) $row->event_count,
+                'amount_total' => (int) $row->amount_total,
+            ])
+            ->all();
+
         return Inertia::render('advertising/overview', [
             'access' => ['allowed' => true, 'reason' => null],
-            'advertiserProfile' => [
-                'id' => $advertiserProfile->id,
-                'legal_name' => $advertiserProfile->legal_name,
-                'status' => $advertiserProfile->status->value,
-            ],
-            'campaigns' => $campaigns->map(fn (Campaign $campaign): array => [
+            'advertiserProfile' => $this->advertiserProfilePayload($profile),
+            'campaignCounts' => $campaignCounts,
+            'budgetTotals' => array_values($budgetTotalsByCurrency),
+            'eventTotals' => $eventTotals,
+            'recentCampaigns' => $campaigns->take(5)->map(fn (Campaign $campaign): array => [
                 'id' => $campaign->id,
                 'code' => $campaign->code,
                 'currency' => $campaign->currency,
                 'state' => $campaign->state->value,
-                'latest_version_id' => $campaign->versions->first()?->id,
                 'latest_version_state' => $campaign->versions->first()?->state->value,
-                'budget' => [
-                    'available' => $this->budgetProjection->available($campaign),
-                    'reserved' => $this->budgetProjection->reserved($campaign),
-                    'consumed' => $this->budgetProjection->consumed($campaign),
-                ],
-            ])->all(),
-            'sectorClassifications' => $sectorClassifications->map(fn (SectorClassification $sector): array => [
-                'id' => $sector->id,
-                'label' => "{$sector->country_code} — {$sector->sector}",
             ])->all(),
         ]);
-    }
-
-    private function currentEnvironment(): Environment
-    {
-        return Environment::tryFrom(app()->environment()) ?? Environment::Production;
     }
 }

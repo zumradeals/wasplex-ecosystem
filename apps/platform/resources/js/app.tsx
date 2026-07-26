@@ -16,6 +16,7 @@ createInertiaApp({
             case name === 'dashboard':
             case name.startsWith('wallet/'):
             case name.startsWith('account/'):
+            case name.startsWith('advertising/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;

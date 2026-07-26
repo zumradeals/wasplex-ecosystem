@@ -4,7 +4,15 @@ use App\Http\Controllers\AccountOverviewController;
 use App\Http\Controllers\HealthController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingAudiencesController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingBillingController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingBudgetController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingCampaignCreateController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingCampaignsController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingCreationsController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingOrganizationController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingOverviewController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingReportsController;
 use App\Modules\Advertising\Http\Controllers\CampaignController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
@@ -57,6 +65,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // (redirection vers la connexion, jamais un 401 JSON) : c'est un écran,
     // pas un point de terminaison API — même raisonnement que 'wallet'.
     Route::get('advertising', [AdvertisingOverviewController::class, 'index'])->name('advertising.overview');
+
+    // P007-W2 : portail annonceur complet (UX-0001 §8 « Navigation
+    // professionnelle » — Annonceur) — chaque écran reprend la même
+    // autorisation campaign.view (portée self) que 'advertising'
+    // ci-dessus (voir Concerns\ResolvesAdvertiserWorkspace), un écran par
+    // destination de navigation décidée, jamais une route API.
+    Route::get('advertising/campaigns', [AdvertisingCampaignsController::class, 'index'])
+        ->name('advertising.campaigns.index');
+    Route::get('advertising/campaigns/create', [AdvertisingCampaignCreateController::class, 'create'])
+        ->name('advertising.campaigns.create');
+    Route::get('advertising/audiences', [AdvertisingAudiencesController::class, 'index'])
+        ->name('advertising.audiences');
+    Route::get('advertising/creations', [AdvertisingCreationsController::class, 'index'])
+        ->name('advertising.creations');
+    Route::get('advertising/budget', [AdvertisingBudgetController::class, 'index'])
+        ->name('advertising.budget');
+    Route::get('advertising/reports', [AdvertisingReportsController::class, 'index'])
+        ->name('advertising.reports');
+    Route::get('advertising/billing', [AdvertisingBillingController::class, 'index'])
+        ->name('advertising.billing');
+    Route::get('advertising/organization', [AdvertisingOrganizationController::class, 'index'])
+        ->name('advertising.organization');
 
     // Fermeture de la boucle de gain (P0, demande Koné 2026-07-26) : file
     // personnel Wasplex pour approuver une CampaignVersion
