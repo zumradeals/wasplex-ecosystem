@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HealthController;
+use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingOverviewController;
 use App\Modules\Advertising\Http\Controllers\CampaignController;
@@ -55,6 +56,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // (redirection vers la connexion, jamais un 401 JSON) : c'est un écran,
     // pas un point de terminaison API — même raisonnement que 'wallet'.
     Route::get('advertising', [AdvertisingOverviewController::class, 'index'])->name('advertising.overview');
+
+    // Fermeture de la boucle de gain (P0, demande Koné 2026-07-26) : file
+    // personnel Wasplex pour approuver une CampaignVersion
+    // (campaign.approve), financer une campagne (campaign.fund) et
+    // accepter/refuser un QualifiedEvent (event.accept/event.reject) — les
+    // trois actions qui étaient jusqu'ici backend-only, sans aucun écran
+    // (voir ModerationOverviewController). Chaque section reste gouvernée
+    // par sa propre capacité ; aucun rôle « admin » générique n'existe.
+    // Volontairement dans le groupe 'auth' : c'est un écran, pas un point
+    // de terminaison API — même raisonnement que 'advertising'/'wallet'.
+    Route::get('admin/moderation', [ModerationOverviewController::class, 'index'])->name('admin.moderation');
 });
 
 // Non protégée par le middleware 'auth' : une requête non authentifiée doit

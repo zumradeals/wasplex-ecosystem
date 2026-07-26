@@ -122,6 +122,7 @@ class AdvertisingOverviewController extends Controller
                 'code' => $campaign->code,
                 'currency' => $campaign->currency,
                 'state' => $campaign->state->value,
+                'latest_version_id' => $campaign->versions->first()?->id,
                 'latest_version_state' => $campaign->versions->first()?->state->value,
                 'budget' => [
                     'available' => $this->budgetProjection->available($campaign),
