@@ -282,7 +282,14 @@ class QualifiedEventLifecycleRouteTest extends AdvertisingTestCase
 
         $response->assertStatus(200);
         $this->assertSame('accepted', $response->json('billing_status'));
-        $this->assertSame(BillingStatus::Accepted, $event->fresh()->billing_status);
+        // Décision humaine tracée comme telle, requêtable (arbitrage
+        // Koné/SIRR 2026-07-26) — jamais confondue avec une acceptation
+        // automatique, qui exigerait une référence de règles épinglée.
+        $this->assertSame('manual', $response->json('acceptance_mode'));
+        $fresh = $event->fresh();
+        $this->assertSame(BillingStatus::Accepted, $fresh->billing_status);
+        $this->assertSame('manual', $fresh->acceptance_mode?->value);
+        $this->assertNull($fresh->acceptance_rules_configuration_key);
         $this->assertDatabaseHas('ledger.ledger_transactions', ['type' => 'advertising_campaign_distribution']);
     }
 

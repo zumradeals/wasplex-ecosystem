@@ -69,6 +69,7 @@ class AdvertisingDemoConfigurationSeeder extends Seeder
         $this->seedSectorClassification();
         $this->seedAudienceThreshold();
         $this->seedQualifiedEventBasePrice();
+        $this->seedDailyAutoAcceptanceQuota();
     }
 
     private function seedSectorClassification(): void
@@ -148,7 +149,55 @@ class AdvertisingDemoConfigurationSeeder extends Seeder
 
         $version = $manager->propose(
             $definition,
-            1,
+            // 10 et non 1 : la part utilisateur du ratio 50/50 (AMD-0002,
+            // intdiv) vaudrait 0 sur un prix de 1 — le crédit de
+            // démonstration serait invisible. Toujours pas un vrai prix.
+            10,
+            'DÉMONSTRATION — aucune valeur réelle décidée ; ne pas utiliser en production (voir AdvertisingDemoConfigurationSeeder).',
+            $author,
+        );
+        $version = $manager->submitForReview($version);
+        $version = $manager->approve($version, $approver, 'Démonstration.');
+        $manager->activate($version, $approver, (string) Str::uuid());
+    }
+
+    /**
+     * Quota journalier d'acceptation automatique des auto-soumissions
+     * (`QualifiedEventAutoAcceptancePolicy`, arbitrage Koné/SIRR
+     * 2026-07-26) — valeur DÉMONSTRATION, jamais un vrai plafond décidé.
+     * Sans configuration active, la politique échoue fermé : tout reste
+     * en attente d'examen humain, et le ressenti « crédit immédiat » du
+     * Feed de démonstration serait invisible. Même cycle réel
+     * propose → approbation → activation que le prix de base ci-dessus.
+     */
+    private function seedDailyAutoAcceptanceQuota(): void
+    {
+        $stableKey = 'advertising.self_submission.daily_auto_acceptance_quota';
+
+        if (Definition::query()->where('stable_key', $stableKey)->where('state', DefinitionState::Active)->exists()) {
+            return;
+        }
+
+        $definition = Definition::create([
+            'stable_key' => $stableKey,
+            'version' => 1,
+            'domain' => 'advertising',
+            'level' => ConfigurationLevel::C2,
+            'value_type' => ValueType::Integer,
+            'unit' => 'qualified_events_per_beneficiary_per_day',
+            'constraints' => ['minimum' => 0],
+            'description' => 'DÉMONSTRATION — plafond journalier d\'événements qualifiés acceptés automatiquement par bénéficiaire (QualifiedEventAutoAcceptancePolicy). Jamais un vrai quota décidé.',
+            'state' => DefinitionState::Active,
+        ]);
+
+        $author = $this->demoLink('demo-pricing-author@wasplex.internal', 'Démonstration Auteur Tarification');
+        $approver = $this->demoLink('demo-pricing-approver@wasplex.internal', 'Démonstration Approbateur Tarification');
+
+        $manager = app(ConfigurationValueManager::class);
+
+        $version = $manager->propose(
+            $definition,
+            50,
             'DÉMONSTRATION — aucune valeur réelle décidée ; ne pas utiliser en production (voir AdvertisingDemoConfigurationSeeder).',
             $author,
         );

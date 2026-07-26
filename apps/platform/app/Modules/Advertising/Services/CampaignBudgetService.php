@@ -2,6 +2,7 @@
 
 namespace App\Modules\Advertising\Services;
 
+use App\Modules\Advertising\Enums\AcceptanceMode;
 use App\Modules\Advertising\Enums\BillingStatus;
 use App\Modules\Advertising\Enums\CampaignState;
 use App\Modules\Advertising\Enums\FraudDecision;
@@ -178,9 +179,19 @@ class CampaignBudgetService
      * (ADR-0010 §8, hors périmètre) : le net distribuable égale ici le
      * prix appliqué. Rejoue sans second effet si l'événement est déjà
      * résolu (même preuve, même clé — ADR-0010 §7).
+     *
+     * Depuis l'arbitrage Koné/SIRR 2026-07-26, l'acceptation porte sa
+     * nature requêtable : `Manual` (décision humaine `event.accept`) ou
+     * `Automatic` (contrôles serveur), auquel cas la version exacte des
+     * règles appliquées est épinglée sur l'événement — exigence de schéma,
+     * voir migration `2026_07_26_100001`.
      */
-    public function acceptQualifiedEvent(QualifiedEvent $event): QualifiedEvent
-    {
+    public function acceptQualifiedEvent(
+        QualifiedEvent $event,
+        AcceptanceMode $acceptanceMode = AcceptanceMode::Manual,
+        ?string $rulesConfigurationKey = null,
+        ?int $rulesConfigurationVersion = null,
+    ): QualifiedEvent {
         if ($event->billing_status !== BillingStatus::Pending) {
             return $event->fresh();
         }
@@ -223,7 +234,23 @@ class CampaignBudgetService
             'beneficiary_person_account_link_id' => $event->beneficiary_person_account_link_id,
         ];
 
-        $beneficiaryAccount = $this->personAccounts->available($event->beneficiary->person_id, $campaign->currency);
+        // Le Ledger refuse toute ligne de montant nul (invariant
+        // structurel) : sur un montant de 1, la part utilisateur vaut 0
+        // (unité résiduelle absorbée par Wasplex, AMD-0002/ADR-0002 §5) —
+        // la ligne correspondante est alors simplement omise, la
+        // transaction restant équilibrée (débit = somme des crédits).
+        $distributionPostings = [
+            new PostingLine($campaign->consumed_account_id, PostingDirection::Debit, $amount, $campaign->currency, "Répartition — {$event->format}"),
+        ];
+
+        if ($userShare > 0) {
+            $beneficiaryAccount = $this->personAccounts->available($event->beneficiary->person_id, $campaign->currency);
+            $distributionPostings[] = new PostingLine($beneficiaryAccount->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}", $beneficiaryDimensions);
+        }
+
+        if ($wasplexShare > 0) {
+            $distributionPostings[] = new PostingLine($this->sharedAccounts->wasplexRevenue($campaign->currency)->id, PostingDirection::Credit, $wasplexShare, $campaign->currency, "Part Wasplex — {$event->format}", $beneficiaryDimensions);
+        }
 
         $distribution = $this->poster->post(new TransactionIntent(
             type: 'advertising_campaign_distribution',
@@ -235,20 +262,30 @@ class CampaignBudgetService
             idempotencyKey: $event->idempotency_key.'-distribution',
             correlationId: $event->correlation_id,
             authoredBy: 'advertising.campaign_budget_service',
-            postings: [
-                new PostingLine($campaign->consumed_account_id, PostingDirection::Debit, $amount, $campaign->currency, "Répartition — {$event->format}"),
-                new PostingLine($beneficiaryAccount->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}", $beneficiaryDimensions),
-                new PostingLine($this->sharedAccounts->wasplexRevenue($campaign->currency)->id, PostingDirection::Credit, $wasplexShare, $campaign->currency, "Part Wasplex — {$event->format}", $beneficiaryDimensions),
-            ],
+            postings: $distributionPostings,
         ));
 
         $event->forceFill([
             'billing_status' => BillingStatus::Accepted,
+            'acceptance_mode' => $acceptanceMode,
+            'acceptance_rules_configuration_key' => $rulesConfigurationKey,
+            'acceptance_rules_configuration_version' => $rulesConfigurationVersion,
             'consumption_transaction_id' => $consumption->id,
             'distribution_transaction_id' => $distribution->id,
         ])->save();
 
         return $event->fresh();
+    }
+
+    /**
+     * Part utilisateur du net distribuable d'un événement (AMD-0002,
+     * ratio 50/50 exact, unité résiduelle absorbée par Wasplex) — unique
+     * définition de ce calcul côté lecture, alignée sur les écritures de
+     * `acceptQualifiedEvent()`.
+     */
+    public function userShareOf(QualifiedEvent $event): int
+    {
+        return intdiv($event->applied_price_amount, 2);
     }
 
     /**
