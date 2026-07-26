@@ -26,7 +26,10 @@ const ACCESS_DENIED_MESSAGES: Record<string, string> = {
 
 type BalanceTone = 'available' | 'provisional' | 'reserved';
 
-const TONE_STYLES: Record<BalanceTone, { value: string; label: string; dot: string }> = {
+const TONE_STYLES: Record<
+    BalanceTone,
+    { value: string; label: string; dot: string }
+> = {
     available: {
         value: 'text-[#F2C14E]',
         label: 'text-[#A9B7C8]',
@@ -58,13 +61,20 @@ function BalanceRow({
     return (
         <div className="flex items-center justify-between rounded-xl border border-[#35506D] bg-[#0E2542] px-4 py-4">
             <div className="flex items-center gap-3">
-                <span className={`h-2.5 w-2.5 rounded-full ${styles.dot}`} aria-hidden="true" />
-                <span className={`text-sm font-medium ${styles.label}`}>{label}</span>
+                <span
+                    className={`h-2.5 w-2.5 rounded-full ${styles.dot}`}
+                    aria-hidden="true"
+                />
+                <span className={`text-sm font-medium ${styles.label}`}>
+                    {label}
+                </span>
             </div>
             <div className="text-right">
                 <p className={`text-lg font-bold tabular-nums ${styles.value}`}>
                     {amountFormatter.format(value)}
-                    <span className="ml-1 text-sm font-normal text-[#A9B7C8]">WP</span>
+                    <span className="ml-1 text-sm font-normal text-[#A9B7C8]">
+                        WP
+                    </span>
                 </p>
                 <p className="text-xs text-[#A9B7C8]">
                     ≈ {amountFormatter.format(value)} FCFA
@@ -85,12 +95,15 @@ export default function WalletOverview({
         <MobileLayout>
             <Head title="Wallet" />
 
-            <div className="p-4 space-y-6">
+            <div className="space-y-6 p-4">
                 {/* Header */}
                 <div>
-                    <h1 className="text-xl font-bold text-[#F5F8FC]">Votre Wallet</h1>
+                    <h1 className="text-xl font-bold text-[#F5F8FC]">
+                        Votre Wallet
+                    </h1>
                     <p className="mt-1 text-xs text-[#A9B7C8]">
-                        1 WP = 1 FCFA · solde reconstruit depuis le registre comptable
+                        1 WP = 1 FCFA · solde reconstruit depuis le registre
+                        comptable
                     </p>
                 </div>
 
@@ -100,7 +113,7 @@ export default function WalletOverview({
                         <p className="text-sm font-semibold text-[#FF9A3D]">
                             Consultation indisponible pour le moment
                         </p>
-                        <p className="mt-1.5 text-xs text-[#A9B7C8] leading-relaxed">
+                        <p className="mt-1.5 text-xs leading-relaxed text-[#A9B7C8]">
                             {ACCESS_DENIED_MESSAGES[access.reason ?? ''] ??
                                 "Cet écran n'est pas encore disponible pour votre compte."}
                         </p>
@@ -116,10 +129,11 @@ export default function WalletOverview({
                         <h3 className="mb-2 text-base font-semibold text-[#F5F8FC]">
                             Aucune opération enregistrée
                         </h3>
-                        <p className="text-sm text-[#A9B7C8] leading-relaxed">
+                        <p className="text-sm leading-relaxed text-[#A9B7C8]">
                             Vous n'avez encore reçu aucun droit WP.
                             <br />
-                            Cette page se mettra à jour dès la première rémunération créditée.
+                            Cette page se mettra à jour dès la première
+                            rémunération créditée.
                         </p>
                     </div>
                 )}
@@ -132,7 +146,7 @@ export default function WalletOverview({
                             aria-label={`Solde en ${balance.currency}`}
                             className="space-y-2"
                         >
-                            <p className="px-1 text-xs font-semibold uppercase tracking-widest text-[#A9B7C8]">
+                            <p className="px-1 text-xs font-semibold tracking-widest text-[#A9B7C8] uppercase">
                                 {balance.currency}
                             </p>
                             <BalanceRow

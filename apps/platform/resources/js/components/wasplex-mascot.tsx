@@ -19,7 +19,10 @@ export default function WasplexMascot({
             {...props}
         >
             {/* Queue pointée bas-gauche */}
-            <path d="M 46 112 L 18 138 L 38 128 L 22 148 L 50 130" fill="#0A4FAF" />
+            <path
+                d="M 46 112 L 18 138 L 38 128 L 22 148 L 50 130"
+                fill="#0A4FAF"
+            />
 
             {/* Corps principal (ovale bleu, légèrement incliné) */}
             <ellipse
@@ -55,7 +58,14 @@ export default function WasplexMascot({
             <path d="M 90 34 L 96 18 L 102 34" fill="#10233F" />
 
             {/* Tache jugulaire blanche */}
-            <ellipse cx="100" cy="68" rx="8" ry="6" fill="#E8F0FC" opacity="0.85" />
+            <ellipse
+                cx="100"
+                cy="68"
+                rx="8"
+                ry="6"
+                fill="#E8F0FC"
+                opacity="0.85"
+            />
 
             {/* Œil — blanc */}
             <circle cx="96" cy="52" r="7" fill="white" />
