@@ -82,14 +82,20 @@ class AdminFinanceController extends Controller
             ->get()
             ->map(function ($row): array {
                 $total = (int) $row->amount_total;
-                $userShare = intdiv($total, 2);
+                // AMD-0002 : ratio 50/50 exact ; unité résiduelle à
+                // l'utilisateur (décision du fondateur 2026-07-26,
+                // ADR-0010) — même règle que
+                // CampaignBudgetService::acceptQualifiedEvent(). Approximation
+                // agrégée (répartition du total, pas somme des répartitions
+                // par événement) : n'égale la somme réelle des parts
+                // individuelles que si aucun événement accepté n'a un
+                // montant impair isolé — suffisant pour un totalisateur de
+                // tableau de bord, jamais pour une écriture Ledger.
+                $userShare = intdiv($total + 1, 2);
 
                 return [
                     'currency' => $row->applied_price_currency,
                     'accepted_total' => $total,
-                    // AMD-0002 : ratio 50/50 exact, l'unité résiduelle sur un
-                    // montant impair est absorbée par la part Wasplex — même
-                    // règle d'arrondi que CampaignBudgetService::acceptQualifiedEvent().
                     'user_share' => $userShare,
                     'wasplex_share' => $total - $userShare,
                 ];

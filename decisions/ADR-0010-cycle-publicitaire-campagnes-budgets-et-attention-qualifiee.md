@@ -107,3 +107,18 @@ Formats publicitaires précis, prix unitaires, coefficients, méthodes anti-frau
 ## 10. Règle obligatoire
 
 > Aucune valeur publicitaire n'existe sans preuve acceptée, budget vérifié atomiquement et écriture Ledger équilibrée. Aucune campagne ne diffuse sans version approuvée immuable. Tout futur prompt concernant campagne, budget publicitaire, événement qualifié, segment ou modération doit citer cet ADR et les cinq documents de `ecosystem/publicite/`.
+
+## Amendement 2026-07-26 — Arrondi du partage égal (décision du fondateur)
+
+Le ratio 50/50 du partage égal (AMD-0002) est constitutionnel et exact ; sur un montant en unités entières non divisible par deux, une unité résiduelle doit néanmoins revenir quelque part. §4 laissait cette règle d'arrondi implicite dans le code (`intdiv($amount, 2)` pour la part utilisateur, le reste pour Wasplex — voir TD-0004-B). Le fondateur a tranché explicitement le 2026-07-26.
+
+**Règle :** sur un net distribuable impair, l'unité résiduelle revient à l'utilisateur, jamais à Wasplex.
+
+- Part utilisateur = `intdiv(montant + 1, 2)`
+- Part Wasplex = `intdiv(montant, 2)`
+- Sur un montant de 1 : utilisateur reçoit 1, Wasplex reçoit 0. La ligne de posting nulle correspondante est omise (le Ledger n'accepte aucune ligne de montant nul), la transaction de répartition reste équilibrée.
+- La conservation de la valeur (§7 : la somme des parts égale toujours exactement le montant appliqué) reste intacte — seul le sens de l'arrondi change.
+
+**Justification :** AMD-0002 protège le partage égal *envers les utilisateurs* — c'est la garantie constitutionnelle que cet amendement sert, pas une préférence arbitraire pour Wasplex. Quand l'égalité exacte est mathématiquement impossible en unités entières, l'ambiguïté résiduelle se résout en faveur de la partie que le texte constitutionnel protège, jamais en faveur de la plateforme elle-même. Ceci est cohérent avec CLAUDE.md §2 (« aucun rendement, gain ou disponibilité de campagne ne doit être garanti » ne s'applique pas ici — il ne s'agit pas d'un rendement inventé, mais de la résolution d'un cas limite arithmétique sur un droit déjà acquis) et avec la protection de l'utilisateur de bonne foi déjà posée en §6 de cet ADR.
+
+Cette règle est désormais normative et versionnée par ce texte — elle ferme TD-0004-B (objection initiale : « la règle n'est pas elle-même auditable indépendamment du code » ; elle l'est désormais, par cet amendement daté). Elle s'applique à `CampaignBudgetService::acceptQualifiedEvent()`, `CampaignBudgetService::userShareOf()`, et à tout calcul futur qui reproduit cette répartition (par exemple les totalisateurs agrégés du tableau de bord Finance et rapprochement).

@@ -85,8 +85,10 @@ class AdminFinanceRouteTest extends AdvertisingTestCase
             ->where('budgetTotals.0.consumed', 0)
             ->has('distributionTotals', 1)
             ->where('distributionTotals.0.accepted_total', 1_001)
-            ->where('distributionTotals.0.user_share', 500)
-            ->where('distributionTotals.0.wasplex_share', 501)
+            // Décision du fondateur 2026-07-26 (ADR-0010) : l'unité
+            // résiduelle sur un montant impair revient à l'utilisateur.
+            ->where('distributionTotals.0.user_share', 501)
+            ->where('distributionTotals.0.wasplex_share', 500)
             ->has('campaigns', 1)
             ->where('campaigns.0.campaign_id', $campaign->id)
             ->where('campaigns.0.advertiser_legal_name', $advertiser->legal_name),

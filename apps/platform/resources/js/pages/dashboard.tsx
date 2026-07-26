@@ -3,7 +3,11 @@ import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { toast } from 'sonner';
+import CampaignVersionFavoriteController from '@/actions/App/Modules/Advertising/Http/Controllers/CampaignVersionFavoriteController';
+import CampaignVersionLikeController from '@/actions/App/Modules/Advertising/Http/Controllers/CampaignVersionLikeController';
+import CampaignVersionShareController from '@/actions/App/Modules/Advertising/Http/Controllers/CampaignVersionShareController';
 import QualifiedEventSelfSubmissionController from '@/actions/App/Modules/Advertising/Http/Controllers/QualifiedEventSelfSubmissionController';
+import { SocialButtons } from '@/components/feed/social-buttons';
 import { WingFlight } from '@/components/feed/wing-flight';
 import WasplexMascot from '@/components/wasplex-mascot';
 import MobileLayout from '@/layouts/mobile-layout';
@@ -17,6 +21,11 @@ type Ad = {
     condition: string;
     reward_amount: number;
     currency: string;
+    likes_count: number;
+    favorites_count: number;
+    shares_count: number;
+    liked: boolean;
+    favorited: boolean;
 };
 
 type WalletBalance = { available: number; currency: string | null };
@@ -29,6 +38,10 @@ type SubmitResponse = {
     wallet_available?: number;
     review_reason?: string | null;
 };
+
+type LikeResponse = { liked: boolean; likes_count: number };
+type FavoriteResponse = { favorited: boolean; favorites_count: number };
+type ShareResponse = { shares_count: number };
 
 type WatchState =
     | { status: 'idle' }
@@ -279,6 +292,101 @@ function AdScreen({
     // ne pas mentir côté interface.
     const finishedRef = useRef(false);
 
+    // Signaux sociaux (Lot 3 Phase A, décision de Koné 2026-07-26) —
+    // initialisés par le backend, mis à jour optimistiquement au tap puis
+    // réconciliés avec la réponse serveur ; en cas d'échec (401/403…),
+    // l'état revient exactement à ce qu'il était avant le tap, jamais une
+    // valeur devinée. Purement social : aucun de ces boutons ne touche au
+    // Wallet ni au crédit de la publicité.
+    const [social, setSocial] = useState({
+        likes: ad.likes_count,
+        favorites: ad.favorites_count,
+        shares: ad.shares_count,
+        liked: ad.liked,
+        favorited: ad.favorited,
+    });
+
+    async function handleLike() {
+        const before = social;
+        const optimisticLiked = !before.liked;
+        setSocial((s) => ({
+            ...s,
+            liked: optimisticLiked,
+            likes: s.likes + (optimisticLiked ? 1 : -1),
+        }));
+
+        const result = await postJson<LikeResponse>(
+            CampaignVersionLikeController.store.url(ad.campaign_version_id),
+            {},
+        );
+
+        if (!result.ok) {
+            setSocial(before);
+
+            return;
+        }
+
+        setSocial((s) => ({
+            ...s,
+            liked: result.data.liked,
+            likes: result.data.likes_count,
+        }));
+    }
+
+    async function handleFavorite() {
+        const before = social;
+        const optimisticFavorited = !before.favorited;
+        setSocial((s) => ({
+            ...s,
+            favorited: optimisticFavorited,
+            favorites: s.favorites + (optimisticFavorited ? 1 : -1),
+        }));
+
+        const result = await postJson<FavoriteResponse>(
+            CampaignVersionFavoriteController.store.url(ad.campaign_version_id),
+            {},
+        );
+
+        if (!result.ok) {
+            setSocial(before);
+
+            return;
+        }
+
+        setSocial((s) => ({
+            ...s,
+            favorited: result.data.favorited,
+            favorites: result.data.favorites_count,
+        }));
+    }
+
+    async function handleShare() {
+        const before = social;
+        setSocial((s) => ({ ...s, shares: s.shares + 1 }));
+
+        const result = await postJson<ShareResponse>(
+            CampaignVersionShareController.store.url(ad.campaign_version_id),
+            {},
+        );
+
+        if (!result.ok) {
+            setSocial(before);
+
+            return;
+        }
+
+        setSocial((s) => ({ ...s, shares: result.data.shares_count }));
+
+        // Le partage effectif se produit hors plateforme (partage natif du
+        // système d'exploitation) — cette route ne fait que compter le
+        // geste (AMD-0001, AMD-0009).
+        if (typeof navigator !== 'undefined' && navigator.share) {
+            navigator
+                .share({ title: ad.headline, url: window.location.href })
+                .catch(() => {});
+        }
+    }
+
     async function submit() {
         finishedRef.current = true;
         onWatchProgress(null);
@@ -426,6 +534,20 @@ function AdScreen({
                         {rewardText}
                     </span>
                 )}
+
+            {/* Menu vertical du Feed — j'aime, favori, intention de partage
+                (Lot 3 Phase A, décision de Koné 2026-07-26). Signaux
+                sociaux purs, sans effet sur le crédit ci-dessus. */}
+            <SocialButtons
+                likes={social.likes}
+                favorites={social.favorites}
+                shares={social.shares}
+                liked={social.liked}
+                favorited={social.favorited}
+                onLike={() => void handleLike()}
+                onFavorite={() => void handleFavorite()}
+                onShare={() => void handleShare()}
+            />
 
             {/* « Créa » centrale — placeholder tant que le vrai média
                 n'existe pas (W5) */}

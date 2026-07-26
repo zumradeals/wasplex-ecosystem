@@ -19,6 +19,9 @@ use App\Modules\Advertising\Http\Controllers\CampaignController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
+use App\Modules\Advertising\Http\Controllers\CampaignVersionFavoriteController;
+use App\Modules\Advertising\Http\Controllers\CampaignVersionLikeController;
+use App\Modules\Advertising\Http\Controllers\CampaignVersionShareController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
 use App\Modules\Advertising\Http\Controllers\FeedController;
 use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
@@ -194,6 +197,21 @@ Route::middleware('web')->post('advertising/qualified-events/{qualifiedEvent}/ac
 
 Route::middleware('web')->post('advertising/qualified-events/{qualifiedEvent}/reject', [QualifiedEventRejectionController::class, 'store'])
     ->name('advertising.qualified-events.reject');
+
+// Lot 3 Phase A : menu vertical du Feed (j'aime, favori, intention de
+// partage — décision de Koné 2026-07-26). Signaux sociaux purs, aucun
+// effet financier (campaign_version.like/favorite/share, migrations
+// 2026_07_26_200004 à 200006). Même discipline que ci-dessus : groupe
+// 'web' hors du groupe 'auth', 401 JSON structuré pour un appel non
+// authentifié.
+Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/like', [CampaignVersionLikeController::class, 'store'])
+    ->name('advertising.campaign-versions.like');
+
+Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/favorite', [CampaignVersionFavoriteController::class, 'store'])
+    ->name('advertising.campaign-versions.favorite');
+
+Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/share', [CampaignVersionShareController::class, 'store'])
+    ->name('advertising.campaign-versions.share');
 
 // P006-A : première route sensible réelle du module Wallet — consultation
 // par une personne de son propre solde WP (ecosystem/wallet/01 §3, §7),

@@ -63,6 +63,13 @@ class GrantAutoIssuer
      */
     private const BROAD_RESOURCE_TYPE_CAPABILITIES = [
         'campaign.report' => 'advertising.campaign',
+        // Lot 3 Phase A (menu vertical du Feed, décision de Koné
+        // 2026-07-26) : un signal social s'exprime sur n'importe quelle
+        // publicité diffusée, jamais seulement les siennes — même
+        // raisonnement de portée que `campaign.report`.
+        'campaign_version.like' => 'advertising.campaign_version',
+        'campaign_version.favorite' => 'advertising.campaign_version',
+        'campaign_version.share' => 'advertising.campaign_version',
     ];
 
     public function __construct(

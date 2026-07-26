@@ -258,6 +258,51 @@ class FeedControllerTest extends AdvertisingTestCase
         );
     }
 
+    public function test_shows_zero_social_counts_and_false_viewer_state_by_default(): void
+    {
+        $this->eligibleCampaign();
+
+        $user = $this->makeUser('feed-social-zero-'.Str::uuid().'@example.com');
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('ads.0.likes_count', 0)
+            ->where('ads.0.favorites_count', 0)
+            ->where('ads.0.shares_count', 0)
+            ->where('ads.0.liked', false)
+            ->where('ads.0.favorited', false),
+        );
+    }
+
+    public function test_shows_real_social_counts_and_the_viewers_own_state(): void
+    {
+        $campaign = $this->eligibleCampaign();
+        $version = $campaign->versions()->firstOrFail();
+
+        $viewer = $this->makeUser('feed-social-viewer-'.Str::uuid().'@example.com');
+        $viewer->forceFill(['email_verified_at' => now()])->save();
+        $otherLiker = $this->activeLinkFor($this->makeUser('feed-social-other-'.Str::uuid().'@example.com'));
+
+        $this->actingAs($viewer)->postJson("/advertising/campaign-versions/{$version->id}/like")->assertStatus(200);
+        $this->actingAs($viewer)->postJson("/advertising/campaign-versions/{$version->id}/favorite")->assertStatus(200);
+        $this->actingAs($viewer)->postJson("/advertising/campaign-versions/{$version->id}/share")->assertStatus(201);
+        // Un deuxième compte aime aussi : le compteur agrège tout le monde,
+        // l'état viewer ne reflète que le sujet courant.
+        $this->actingAs($otherLiker->user)->postJson("/advertising/campaign-versions/{$version->id}/like")->assertStatus(200);
+
+        $response = $this->actingAs($viewer)->get('/dashboard');
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('ads.0.likes_count', 2)
+            ->where('ads.0.favorites_count', 1)
+            ->where('ads.0.shares_count', 1)
+            ->where('ads.0.liked', true)
+            ->where('ads.0.favorited', true),
+        );
+    }
+
     public function test_the_feed_route_is_registered(): void
     {
         $this->assertTrue(Route::has('dashboard'));

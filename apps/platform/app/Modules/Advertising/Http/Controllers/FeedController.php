@@ -8,11 +8,13 @@ use App\Modules\Advertising\Enums\CampaignVersionState;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
+use App\Modules\Advertising\Projections\SocialEngagementProjection;
 use App\Modules\Advertising\Services\Exceptions\PricingConfigurationNotResolvableException;
 use App\Modules\Advertising\Services\QualifiedEventPricingResolver;
 use App\Modules\Governance\Authorization\Contracts\ResourceContext;
 use App\Modules\Governance\Authorization\Enums\Environment;
 use App\Modules\Governance\Authorization\Enums\Operation;
+use App\Modules\Governance\Authorization\Integration\AuthenticatedSubject;
 use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
 use App\Modules\Governance\Authorization\Integration\AuthorizationRequestFactory;
 use App\Modules\Governance\Authorization\Integration\Exceptions\AuthorizationOutcomeException;
@@ -52,6 +54,7 @@ class FeedController extends Controller
         private readonly AuthorizationRequestFactory $authorizationRequestFactory,
         private readonly AuthorizationGate $authorizationGate,
         private readonly PersonBalanceProjection $balanceProjection,
+        private readonly SocialEngagementProjection $socialEngagementProjection,
     ) {}
 
     public function index(Request $request): Response
@@ -74,10 +77,57 @@ class FeedController extends Controller
             ->values()
             ->all();
 
+        // Résolu une seule fois, réutilisé pour le solde Wallet et les
+        // signaux sociaux — jamais deux résolutions du même sujet.
+        try {
+            $subject = $this->subjectResolver->resolve($request);
+        } catch (SubjectResolutionFailedException) {
+            $subject = null;
+        }
+
+        $ads = $this->withSocialEngagement($ads, $subject);
+
         return Inertia::render('dashboard', [
             'ads' => $ads,
-            'wallet_balance' => $this->walletBalanceFor($request),
+            'wallet_balance' => $this->walletBalanceFor($subject),
         ]);
+    }
+
+    /**
+     * Compteurs réels agrégés (jamais mockés) et état du sujet (a-t-il
+     * aimé / mis en favori ?) pour chaque publicité affichée — Lot 3 Phase
+     * A (décision de Koné 2026-07-26). Sans sujet résolvable, l'état
+     * viewer reste `false` partout (jamais deviné), les compteurs restent
+     * publics : voir le comportement par défaut, cohérent avec le reste du
+     * Feed qui reste un contenu de diffusion public.
+     *
+     * @param  array<int, array<string, mixed>>  $ads
+     * @return array<int, array<string, mixed>>
+     */
+    private function withSocialEngagement(array $ads, ?AuthenticatedSubject $subject): array
+    {
+        if ($ads === []) {
+            return $ads;
+        }
+
+        $versionIds = array_map(static fn (array $ad): string => $ad['campaign_version_id'], $ads);
+        $counts = $this->socialEngagementProjection->countsForMany($versionIds);
+        $viewerState = $subject !== null
+            ? $this->socialEngagementProjection->viewerStateForMany($versionIds, $subject->personAccountLink)
+            : [];
+
+        return array_map(function (array $ad) use ($counts, $viewerState): array {
+            $id = $ad['campaign_version_id'];
+
+            return [
+                ...$ad,
+                'likes_count' => $counts[$id]['likes'] ?? 0,
+                'favorites_count' => $counts[$id]['favorites'] ?? 0,
+                'shares_count' => $counts[$id]['shares'] ?? 0,
+                'liked' => $viewerState[$id]['liked'] ?? false,
+                'favorited' => $viewerState[$id]['favorited'] ?? false,
+            ];
+        }, $ads);
     }
 
     /**
@@ -89,11 +139,9 @@ class FeedController extends Controller
      *
      * @return array{available: int, currency: string|null}|null
      */
-    private function walletBalanceFor(Request $request): ?array
+    private function walletBalanceFor(?AuthenticatedSubject $subject): ?array
     {
-        try {
-            $subject = $this->subjectResolver->resolve($request);
-        } catch (SubjectResolutionFailedException) {
+        if ($subject === null) {
             return null;
         }
 
