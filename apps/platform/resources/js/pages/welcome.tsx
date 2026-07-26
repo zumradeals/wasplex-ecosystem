@@ -296,10 +296,7 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
                     <div className="flex flex-col items-center px-5 pt-10 pb-6 text-center">
                         {/* Mascotte + marque */}
                         <div className="mb-5 flex flex-col items-center gap-2">
-                            <WasplexMascot className="h-24 w-24 drop-shadow-lg" />
-                            <span className="text-2xl font-bold tracking-tight">
-                                Wasplex
-                            </span>
+                            <WasplexMascot className="h-28 w-28 drop-shadow-lg" />
                         </div>
 
                         {/* Accroche — fidèle à la Constitution art. 1 */}

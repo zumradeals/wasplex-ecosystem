@@ -96,15 +96,10 @@ export function AdvertiserSidebarNav({
                 className="flex items-center gap-2.5 px-5 py-5"
                 aria-label="Retour à Wasplex"
             >
-                <WasplexMascot className="h-8 w-8 shrink-0" />
-                <div className="min-w-0 leading-tight">
-                    <p className="truncate text-sm font-bold text-white">
-                        Wasplex
-                    </p>
-                    <p className="truncate text-[11px] font-medium text-[#8FA3BC]">
-                        Espace annonceur
-                    </p>
-                </div>
+                <WasplexMascot className="h-11 w-11 shrink-0" />
+                <p className="min-w-0 truncate text-xs font-medium text-[#8FA3BC]">
+                    Espace annonceur
+                </p>
             </Link>
 
             <div className="px-3">
