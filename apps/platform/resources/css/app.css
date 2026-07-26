@@ -61,75 +61,87 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/*
+ * DS-0001 §19 : « Annonceurs, institutions et administration partagent les
+ * fondations visuelles ». Ces variables (consommées par tous les
+ * composants shadcn — Button, Card, Input, Alert, Sidebar…) pilotent donc
+ * l'intégralité des portails professionnels ; elles reprenaient jusqu'ici
+ * la palette grise générique du kit de démarrage, jamais reliée aux tokens
+ * DS-0001 déjà déclarés plus bas (§6). Valeurs alignées sur ces tokens,
+ * pas devinées : bg.canvas/bg.surface/text.primary/border.default pour la
+ * neutralité, brand.blue pour l'action principale, brand.cyan pour la
+ * navigation active (§6.1 : « technologie, navigation active »),
+ * status.danger pour destructive.
+ */
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
+    --background: #f5f7fa;
+    --foreground: #10233f;
+    --card: #ffffff;
+    --card-foreground: #10233f;
+    --popover: #ffffff;
+    --popover-foreground: #10233f;
+    --primary: #075ccf;
+    --primary-foreground: #ffffff;
+    --secondary: #f8fafc;
+    --secondary-foreground: #10233f;
+    --muted: #f8fafc;
+    --muted-foreground: #53657d;
+    --accent: #f8fafc;
+    --accent-foreground: #10233f;
+    --destructive: #b42318;
+    --destructive-foreground: #ffffff;
+    --border: #cbd5e1;
+    --input: #cbd5e1;
+    --ring: #075ccf;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    --sidebar: #ffffff;
+    --sidebar-foreground: #10233f;
+    --sidebar-primary: #075ccf;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f5f7fa;
+    --sidebar-accent-foreground: #007f9f;
+    --sidebar-border: #cbd5e1;
+    --sidebar-ring: #075ccf;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
+    --background: #07182d;
+    --foreground: #f5f8fc;
+    --card: #0e2542;
+    --card-foreground: #f5f8fc;
+    --popover: #0e2542;
+    --popover-foreground: #f5f8fc;
+    --primary: #4fa3ff;
+    --primary-foreground: #07182d;
+    --secondary: #173251;
+    --secondary-foreground: #f5f8fc;
+    --muted: #173251;
+    --muted-foreground: #a9b7c8;
+    --accent: #173251;
+    --accent-foreground: #f5f8fc;
+    --destructive: #ff6b61;
+    --destructive-foreground: #07182d;
+    --border: #35506d;
+    --input: #35506d;
+    --ring: #70b7ff;
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar: #0e2542;
+    --sidebar-foreground: #f5f8fc;
+    --sidebar-primary: #4fa3ff;
+    --sidebar-primary-foreground: #07182d;
+    --sidebar-accent: #173251;
+    --sidebar-accent-foreground: #2bc4de;
+    --sidebar-border: #35506d;
+    --sidebar-ring: #70b7ff;
 }
 
 /*
