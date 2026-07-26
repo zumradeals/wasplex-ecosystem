@@ -149,7 +149,10 @@ class AdvertisingDemoConfigurationSeeder extends Seeder
 
         $version = $manager->propose(
             $definition,
-            1,
+            // 10 et non 1 : la part utilisateur du ratio 50/50 (AMD-0002,
+            // intdiv) vaudrait 0 sur un prix de 1 — le crédit de
+            // démonstration serait invisible. Toujours pas un vrai prix.
+            10,
             'DÉMONSTRATION — aucune valeur réelle décidée ; ne pas utiliser en production (voir AdvertisingDemoConfigurationSeeder).',
             $author,
         );

@@ -9,6 +9,7 @@ use App\Modules\Governance\Configuration\Enums\DefinitionState;
 use App\Modules\Governance\Configuration\Enums\ValueType;
 use App\Modules\Governance\Configuration\Models\Definition;
 use App\Modules\Governance\Configuration\Services\ConfigurationValueManager;
+use App\Modules\Identity\Enums\LinkOrigin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -193,6 +194,67 @@ class FeedControllerTest extends AdvertisingTestCase
             ->where('ads.0.currency', $campaign->currency)
             ->where('ads.0.format', 'banner')
             ->where('ads.0.condition', 'completion'),
+        );
+    }
+
+    public function test_shares_a_zero_wallet_balance_for_a_person_without_any_credit(): void
+    {
+        $user = $this->makeUser('feed-wallet-zero-'.Str::uuid().'@example.com');
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        // Un vrai zéro, pas une devise inventée (CLAUDE.md §6) : la devise
+        // n'existera qu'au premier crédit réel.
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('wallet_balance.available', 0)
+            ->where('wallet_balance.currency', null),
+        );
+    }
+
+    public function test_shares_the_real_balance_after_an_accepted_distribution(): void
+    {
+        $campaign = $this->eligibleCampaign(funding: 10_000, reward: 1_000);
+        $version = $campaign->versions()->firstOrFail();
+
+        $user = $this->makeUser('feed-wallet-credited-'.Str::uuid().'@example.com');
+        $user->forceFill(['email_verified_at' => now()])->save();
+        $link = $this->activeLinkFor($user);
+
+        $event = $this->budgetService()->submitQualifiedEvent(
+            campaign: $campaign,
+            version: $version,
+            beneficiary: $link,
+            format: 'banner',
+            evidence: ['completed' => true],
+            appliedPriceAmount: 1_000,
+            idempotencyKey: 'feed-balance-'.Str::uuid(),
+            correlationId: (string) Str::uuid(),
+        );
+        $this->budgetService()->acceptQualifiedEvent($event);
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        // Part utilisateur du ratio 50/50 exact (AMD-0002).
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('wallet_balance.available', 500)
+            ->where('wallet_balance.currency', $campaign->currency),
+        );
+    }
+
+    public function test_shares_no_wallet_balance_without_the_wallet_view_capability(): void
+    {
+        $user = $this->makeUser('feed-wallet-ungoverned-'.Str::uuid().'@example.com', LinkOrigin::Migration);
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        // Même gouvernance que GET /wallet/balance : sans `wallet.view`
+        // actif, aucun solde partagé — le Feed reste utilisable, le
+        // compteur est simplement absent, jamais un zéro trompeur.
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('wallet_balance', null),
         );
     }
 

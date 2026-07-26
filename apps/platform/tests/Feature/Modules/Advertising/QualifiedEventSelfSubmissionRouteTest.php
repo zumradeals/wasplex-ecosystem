@@ -382,6 +382,28 @@ class QualifiedEventSelfSubmissionRouteTest extends AdvertisingTestCase
         $this->assertSame('pending', $event->billing_status->value);
     }
 
+    public function test_a_one_unit_price_credits_zero_to_the_user_without_breaking_the_ledger(): void
+    {
+        $this->activateAutoAcceptanceQuota(10);
+
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->approvedVersionWithPricing($campaign, priceValue: 1);
+
+        $user = $this->makeUser('one-unit-'.Str::uuid().'@example.com');
+
+        $response = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $this->payload());
+
+        // AMD-0002/ADR-0002 §5 : sur un montant de 1, l'unité résiduelle
+        // va à Wasplex et la part utilisateur vaut 0 — la ligne de posting
+        // nulle est omise (le Ledger la refuserait), la transaction reste
+        // équilibrée et l'acceptation n'échoue jamais.
+        $response->assertStatus(201);
+        $this->assertSame('accepted', $response->json('billing_status'));
+        $this->assertSame(0, $response->json('credited_amount'));
+        $this->assertSame(0, $response->json('wallet_available'));
+    }
+
     public function test_replaying_an_accepted_submission_credits_only_once(): void
     {
         $this->activateAutoAcceptanceQuota(10);

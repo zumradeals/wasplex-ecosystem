@@ -10,6 +10,15 @@ use App\Modules\Advertising\Models\CampaignVersion;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Services\Exceptions\PricingConfigurationNotResolvableException;
 use App\Modules\Advertising\Services\QualifiedEventPricingResolver;
+use App\Modules\Governance\Authorization\Contracts\ResourceContext;
+use App\Modules\Governance\Authorization\Enums\Environment;
+use App\Modules\Governance\Authorization\Enums\Operation;
+use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
+use App\Modules\Governance\Authorization\Integration\AuthorizationRequestFactory;
+use App\Modules\Governance\Authorization\Integration\Exceptions\AuthorizationOutcomeException;
+use App\Modules\Governance\Authorization\Integration\Exceptions\SubjectResolutionFailedException;
+use App\Modules\Governance\Authorization\Integration\Http\AuthenticatedSubjectHttpResolver;
+use App\Modules\Wallet\Balance\Projections\PersonBalanceProjection;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -39,6 +48,10 @@ class FeedController extends Controller
     public function __construct(
         private readonly CampaignBudgetProjection $budgetProjection,
         private readonly QualifiedEventPricingResolver $pricingResolver,
+        private readonly AuthenticatedSubjectHttpResolver $subjectResolver,
+        private readonly AuthorizationRequestFactory $authorizationRequestFactory,
+        private readonly AuthorizationGate $authorizationGate,
+        private readonly PersonBalanceProjection $balanceProjection,
     ) {}
 
     public function index(Request $request): Response
@@ -61,7 +74,63 @@ class FeedController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('dashboard', ['ads' => $ads]);
+        return Inertia::render('dashboard', [
+            'ads' => $ads,
+            'wallet_balance' => $this->walletBalanceFor($request),
+        ]);
+    }
+
+    /**
+     * Solde WP propre de la personne pour le compteur du Feed — même
+     * gouvernance que `GET /wallet/balance` (`wallet.view`, portée self,
+     * inclus dans `user.base` à l'inscription) : un sujet non résolvable
+     * ou non habilité n'obtient simplement pas de compteur (null), jamais
+     * un solde inventé ni une erreur qui casse le Feed.
+     *
+     * @return array{available: int, currency: string|null}|null
+     */
+    private function walletBalanceFor(Request $request): ?array
+    {
+        try {
+            $subject = $this->subjectResolver->resolve($request);
+        } catch (SubjectResolutionFailedException) {
+            return null;
+        }
+
+        $personId = $subject->personAccountLink->person_id;
+        $environment = Environment::tryFrom(app()->environment()) ?? Environment::Production;
+
+        $authorizationRequest = $this->authorizationRequestFactory->make(
+            subject: $subject,
+            capabilityKey: 'wallet.view',
+            operation: Operation::Read,
+            resource: new ResourceContext(
+                resourceType: 'wallet.balance',
+                resourceId: $personId,
+                organizationId: null,
+                ownerPersonId: $personId,
+                countryCode: null,
+                territoryCodes: [],
+                environment: $environment,
+            ),
+            environment: $environment,
+        );
+
+        try {
+            $this->authorizationGate->authorize($authorizationRequest);
+        } catch (AuthorizationOutcomeException) {
+            return null;
+        }
+
+        $balances = $this->balanceProjection->forPerson($personId);
+        $first = $balances[0] ?? null;
+
+        // Aucune rémunération encore reçue : un vrai zéro, pas une devise
+        // inventée — la devise s'affichera dès le premier crédit réel.
+        return [
+            'available' => $first['available'] ?? 0,
+            'currency' => $first['currency'] ?? null,
+        ];
     }
 
     /**

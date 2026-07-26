@@ -234,7 +234,23 @@ class CampaignBudgetService
             'beneficiary_person_account_link_id' => $event->beneficiary_person_account_link_id,
         ];
 
-        $beneficiaryAccount = $this->personAccounts->available($event->beneficiary->person_id, $campaign->currency);
+        // Le Ledger refuse toute ligne de montant nul (invariant
+        // structurel) : sur un montant de 1, la part utilisateur vaut 0
+        // (unité résiduelle absorbée par Wasplex, AMD-0002/ADR-0002 §5) —
+        // la ligne correspondante est alors simplement omise, la
+        // transaction restant équilibrée (débit = somme des crédits).
+        $distributionPostings = [
+            new PostingLine($campaign->consumed_account_id, PostingDirection::Debit, $amount, $campaign->currency, "Répartition — {$event->format}"),
+        ];
+
+        if ($userShare > 0) {
+            $beneficiaryAccount = $this->personAccounts->available($event->beneficiary->person_id, $campaign->currency);
+            $distributionPostings[] = new PostingLine($beneficiaryAccount->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}", $beneficiaryDimensions);
+        }
+
+        if ($wasplexShare > 0) {
+            $distributionPostings[] = new PostingLine($this->sharedAccounts->wasplexRevenue($campaign->currency)->id, PostingDirection::Credit, $wasplexShare, $campaign->currency, "Part Wasplex — {$event->format}", $beneficiaryDimensions);
+        }
 
         $distribution = $this->poster->post(new TransactionIntent(
             type: 'advertising_campaign_distribution',
@@ -246,11 +262,7 @@ class CampaignBudgetService
             idempotencyKey: $event->idempotency_key.'-distribution',
             correlationId: $event->correlation_id,
             authoredBy: 'advertising.campaign_budget_service',
-            postings: [
-                new PostingLine($campaign->consumed_account_id, PostingDirection::Debit, $amount, $campaign->currency, "Répartition — {$event->format}"),
-                new PostingLine($beneficiaryAccount->id, PostingDirection::Credit, $userShare, $campaign->currency, "Part utilisateur — {$event->format}", $beneficiaryDimensions),
-                new PostingLine($this->sharedAccounts->wasplexRevenue($campaign->currency)->id, PostingDirection::Credit, $wasplexShare, $campaign->currency, "Part Wasplex — {$event->format}", $beneficiaryDimensions),
-            ],
+            postings: $distributionPostings,
         ));
 
         $event->forceFill([
