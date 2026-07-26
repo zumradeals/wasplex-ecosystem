@@ -23,6 +23,7 @@ import {
 import { postJson } from '@/lib/api';
 import advertising from '@/routes/advertising';
 import advertiserProfile from '@/routes/advertising/advertiser-profile';
+import campaignVersions from '@/routes/advertising/campaign-versions';
 import campaigns from '@/routes/advertising/campaigns';
 import type { BreadcrumbItem } from '@/types';
 
@@ -48,6 +49,7 @@ type Campaign = {
     code: string;
     currency: string;
     state: string;
+    latest_version_id: string | null;
     latest_version_state: string | null;
     budget: Budget;
 };
@@ -403,6 +405,53 @@ function CreateCampaignForm({
     );
 }
 
+function SubmitForReviewButton({
+    campaignVersionId,
+    onSubmitted,
+}: {
+    campaignVersionId: string;
+    onSubmitted: () => void;
+}) {
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    async function handleClick() {
+        setSubmitting(true);
+        setError(null);
+
+        const result = await postJson(
+            campaignVersions.submitForReview.url(campaignVersionId),
+            {},
+        );
+
+        setSubmitting(false);
+
+        if (!result.ok) {
+            setError(
+                "La soumission n'a pas abouti. Cette campagne n'est peut-être plus à l'état brouillon.",
+            );
+
+            return;
+        }
+
+        onSubmitted();
+    }
+
+    return (
+        <div className="space-y-2">
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button
+                size="sm"
+                variant="outline"
+                onClick={handleClick}
+                disabled={submitting}
+            >
+                {submitting ? 'Envoi...' : 'Soumettre pour revue'}
+            </Button>
+        </div>
+    );
+}
+
 export default function AdvertisingOverview({
     access,
     advertiserProfile: profile,
@@ -522,6 +571,21 @@ export default function AdvertisingOverview({
                                                 )}{' '}
                                                 {campaign.currency}
                                             </p>
+
+                                            {campaign.latest_version_state ===
+                                                'draft' &&
+                                                campaign.latest_version_id && (
+                                                    <div className="pt-2">
+                                                        <SubmitForReviewButton
+                                                            campaignVersionId={
+                                                                campaign.latest_version_id
+                                                            }
+                                                            onSubmitted={() =>
+                                                                router.reload()
+                                                            }
+                                                        />
+                                                    </div>
+                                                )}
                                         </CardContent>
                                     </Card>
                                 ))}
