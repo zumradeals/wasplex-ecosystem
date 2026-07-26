@@ -4,7 +4,9 @@ namespace Tests\Feature\Modules\Advertising;
 
 use App\Modules\Advertising\Enums\BillingStatus;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
+use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Advertising\Services\Exceptions\InsufficientBudgetException;
+use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
 use App\Modules\Wallet\Ledger\Enums\PostingDirection;
 use App\Modules\Wallet\Ledger\Models\LedgerTransaction;
 use App\Modules\Wallet\Ledger\Models\Posting;
@@ -117,7 +119,14 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
         $this->assertEqualsCanonicalizing([2_000, 2_000], $credits->pluck('amount')->all());
     }
 
-    public function test_the_fifty_fifty_split_sums_exactly_even_on_an_odd_amount(): void
+    /**
+     * Décision du fondateur 2026-07-26 (ADR-0010, « Amendement 2026-07-26
+     * — Arrondi du partage égal ») : sur un montant impair, l'unité
+     * résiduelle revient à l'utilisateur, jamais à Wasplex — l'ambiguïté
+     * de l'arrondi se résout en faveur de la partie qu'AMD-0002 protège.
+     * Ferme TD-0004-B.
+     */
+    public function test_the_fifty_fifty_split_gives_the_residual_unit_to_the_user_on_an_odd_amount(): void
     {
         $campaign = $this->makeCampaign();
         $this->fundCampaign($campaign, 10_001);
@@ -142,7 +151,130 @@ class CampaignBudgetCycleTest extends AdvertisingTestCase
             ->where('direction', PostingDirection::Credit)
             ->get();
 
+        // Conservation de la valeur : rien n'est créé ni perdu à l'arrondi.
         $this->assertSame(4_001, $credits->sum('amount'));
+
+        $beneficiaryAccount = app(PersonLedgerAccounts::class)->available($beneficiary->person_id, $campaign->currency);
+        $userCredit = $credits->firstWhere('account_id', $beneficiaryAccount->id);
+        $wasplexCredit = $credits->first(fn ($posting) => $posting->account_id !== $beneficiaryAccount->id);
+
+        $this->assertSame(2_001, $userCredit->amount);
+        $this->assertSame(2_000, $wasplexCredit->amount);
+    }
+
+    public function test_the_fifty_fifty_split_is_exactly_even_on_an_even_amount(): void
+    {
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
+
+        $event = $this->budgetService()->submitQualifiedEvent(
+            campaign: $campaign,
+            version: $version,
+            beneficiary: $beneficiary,
+            format: 'banner',
+            evidence: ['proof' => 'completion'],
+            appliedPriceAmount: 4_000,
+            idempotencyKey: (string) Str::uuid(),
+            correlationId: (string) Str::uuid(),
+        );
+
+        $accepted = $this->budgetService()->acceptQualifiedEvent($event);
+
+        $credits = Posting::query()
+            ->where('ledger_transaction_id', $accepted->distribution_transaction_id)
+            ->where('direction', PostingDirection::Credit)
+            ->get();
+
+        $beneficiaryAccount = app(PersonLedgerAccounts::class)->available($beneficiary->person_id, $campaign->currency);
+        $userCredit = $credits->firstWhere('account_id', $beneficiaryAccount->id);
+        $wasplexCredit = $credits->first(fn ($posting) => $posting->account_id !== $beneficiaryAccount->id);
+
+        $this->assertSame(2_000, $userCredit->amount);
+        $this->assertSame(2_000, $wasplexCredit->amount);
+        $this->assertSame(4_000, $credits->sum('amount'));
+    }
+
+    /**
+     * Cas limite explicitement couvert par l'arbitrage : sur un montant de
+     * 1, l'utilisateur reçoit l'unité entière et Wasplex ne reçoit rien —
+     * la ligne de posting nulle est omise (le Ledger la refuserait),
+     * jamais un blocage de l'acceptation.
+     */
+    public function test_a_one_unit_amount_credits_the_full_unit_to_the_user_and_nothing_to_wasplex(): void
+    {
+        $campaign = $this->makeCampaign();
+        $this->fundCampaign($campaign, 10_000);
+        $version = $this->proposeAndApproveVersion($campaign);
+        $beneficiary = $this->makeBeneficiary();
+
+        $event = $this->budgetService()->submitQualifiedEvent(
+            campaign: $campaign,
+            version: $version,
+            beneficiary: $beneficiary,
+            format: 'banner',
+            evidence: ['proof' => 'completion'],
+            appliedPriceAmount: 1,
+            idempotencyKey: (string) Str::uuid(),
+            correlationId: (string) Str::uuid(),
+        );
+
+        $accepted = $this->budgetService()->acceptQualifiedEvent($event);
+
+        $this->assertSame(BillingStatus::Accepted, $accepted->billing_status);
+        $this->assertSame(1, app(CampaignBudgetService::class)->userShareOf($accepted));
+
+        $credits = Posting::query()
+            ->where('ledger_transaction_id', $accepted->distribution_transaction_id)
+            ->where('direction', PostingDirection::Credit)
+            ->get();
+
+        // Une seule ligne de crédit (la part Wasplex nulle est omise), la
+        // transaction reste équilibrée (débit 1 = crédit 1).
+        $this->assertCount(1, $credits);
+        $this->assertSame(1, $credits->sum('amount'));
+
+        $beneficiaryAccount = app(PersonLedgerAccounts::class)->available($beneficiary->person_id, $campaign->currency);
+        $this->assertSame($beneficiaryAccount->id, $credits->first()->account_id);
+    }
+
+    /**
+     * Conservation de la valeur sur une plage de montants pairs et
+     * impairs, petits et grands : la somme des parts égale toujours le
+     * montant appliqué, quel que soit le sens de l'arrondi.
+     */
+    public function test_value_conservation_holds_across_even_and_odd_amounts(): void
+    {
+        foreach ([1, 2, 3, 4_001, 10_000, 9_999] as $index => $amount) {
+            $campaign = $this->makeCampaign();
+            $this->fundCampaign($campaign, $amount);
+            // Une classification par itération : `makeSectorClassification()`
+            // fige `version: 1`, une deuxième valeur pour le même (pays,
+            // secteur) violerait l'unicité (country_code, sector, version).
+            $version = $this->proposeAndApproveVersion($campaign, $this->makeSectorClassification('retail-conservation-'.$index));
+            $beneficiary = $this->makeBeneficiary();
+
+            $event = $this->budgetService()->submitQualifiedEvent(
+                campaign: $campaign,
+                version: $version,
+                beneficiary: $beneficiary,
+                format: 'banner',
+                evidence: ['proof' => 'completion'],
+                appliedPriceAmount: $amount,
+                idempotencyKey: (string) Str::uuid(),
+                correlationId: (string) Str::uuid(),
+            );
+
+            $accepted = $this->budgetService()->acceptQualifiedEvent($event);
+
+            $credits = Posting::query()
+                ->where('ledger_transaction_id', $accepted->distribution_transaction_id)
+                ->where('direction', PostingDirection::Credit)
+                ->get();
+
+            $this->assertSame($amount, $credits->sum('amount'), "conservation en défaut pour le montant {$amount}");
+        }
     }
 
     public function test_a_rejected_reservation_releases_exactly_the_reserved_amount(): void

@@ -382,7 +382,7 @@ class QualifiedEventSelfSubmissionRouteTest extends AdvertisingTestCase
         $this->assertSame('pending', $event->billing_status->value);
     }
 
-    public function test_a_one_unit_price_credits_zero_to_the_user_without_breaking_the_ledger(): void
+    public function test_a_one_unit_price_credits_the_full_unit_to_the_user_without_breaking_the_ledger(): void
     {
         $this->activateAutoAcceptanceQuota(10);
 
@@ -394,14 +394,15 @@ class QualifiedEventSelfSubmissionRouteTest extends AdvertisingTestCase
 
         $response = $this->actingAs($user)->postJson("/advertising/campaign-versions/{$version->id}/qualified-events/self-submit", $this->payload());
 
-        // AMD-0002/ADR-0002 §5 : sur un montant de 1, l'unité résiduelle
-        // va à Wasplex et la part utilisateur vaut 0 — la ligne de posting
-        // nulle est omise (le Ledger la refuserait), la transaction reste
-        // équilibrée et l'acceptation n'échoue jamais.
+        // Décision du fondateur 2026-07-26 (ADR-0010) : sur un montant de
+        // 1, l'unité résiduelle va à l'utilisateur — la part Wasplex vaut
+        // 0, sa ligne de posting nulle est omise (le Ledger la
+        // refuserait), la transaction reste équilibrée et l'acceptation
+        // n'échoue jamais.
         $response->assertStatus(201);
         $this->assertSame('accepted', $response->json('billing_status'));
-        $this->assertSame(0, $response->json('credited_amount'));
-        $this->assertSame(0, $response->json('wallet_available'));
+        $this->assertSame(1, $response->json('credited_amount'));
+        $this->assertSame(1, $response->json('wallet_available'));
     }
 
     public function test_replaying_an_accepted_submission_credits_only_once(): void

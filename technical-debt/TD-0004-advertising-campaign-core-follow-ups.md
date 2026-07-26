@@ -28,6 +28,17 @@ Sur un montant impair, `CampaignBudgetService::acceptQualifiedEvent()` fait abso
 **Mesure temporaire :** documentée en commentaire à l'endroit exact du calcul.
 **Porte de reprise :** avant un volume réel de production, formaliser cette règle d'arrondi comme une valeur versionnée du futur registre ADR-0002, référencée par `reward_configuration_key`/`version` plutôt qu'implicite.
 
+**Statut : fermé (2026-07-26).** Le fondateur a tranché le sens de l'arrondi
+lui-même — voir ADR-0010, section « Amendement 2026-07-26 — Arrondi du
+partage égal (décision du fondateur) » : sur un montant impair, l'unité
+résiduelle revient à l'utilisateur (`intdiv($amount + 1, 2)` pour la part
+utilisateur), jamais à Wasplex. La règle est désormais une décision
+normative écrite et datée, non plus un choix de code implicite — ce qui
+répond à l'objection initiale de ce point (« la règle n'est pas elle-même
+auditable indépendamment du code »). La formalisation en valeur versionnée
+du registre ADR-0002 reste, elle, différée (aucune urgence : le sens de
+l'arrondi est fixe et écrit, pas un paramètre commercial appelé à varier).
+
 ### TD-0004-C — Aucune taxe ni frais externe modélisés dans le net distribuable
 
 `net distribuable = prix appliqué` dans ce noyau (`02-cycle-financier-campagne.md` §7 n'est pas implémenté au-delà du cas sans déduction) : aucun compte de taxe, aucun frais externe. ADR-0010 §8 exclut explicitement « prix unitaires, coefficients » de ce lot.

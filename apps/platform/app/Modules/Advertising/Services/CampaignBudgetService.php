@@ -216,12 +216,14 @@ class CampaignBudgetService
         ));
 
         // Ratio 50/50 constitutionnel exact (AMD-0002) : sur un montant
-        // impair, l'unité résiduelle est absorbée par la part Wasplex —
-        // règle d'arrondi explicite (ADR-0002 §5), en l'absence d'un
-        // registre de configuration central pour la porter formellement
-        // (TD-0004).
-        $userShare = intdiv($amount, 2);
-        $wasplexShare = $amount - $userShare;
+        // impair, l'unité résiduelle revient à l'utilisateur, jamais à
+        // Wasplex — décision du fondateur 2026-07-26 (ADR-0010, section
+        // « Amendement 2026-07-26 — Arrondi du partage égal ») : quand
+        // l'égalité exacte est impossible en unités entières, l'ambiguïté
+        // se résout en faveur de la partie qu'AMD-0002 protège. Ferme
+        // TD-0004-B.
+        $userShare = intdiv($amount + 1, 2);
+        $wasplexShare = intdiv($amount, 2);
 
         // Dimensions conservées pour retrouver, par requête directe sur les
         // postings, l'événement qualifié précis à l'origine de ce crédit —
@@ -235,10 +237,11 @@ class CampaignBudgetService
         ];
 
         // Le Ledger refuse toute ligne de montant nul (invariant
-        // structurel) : sur un montant de 1, la part utilisateur vaut 0
-        // (unité résiduelle absorbée par Wasplex, AMD-0002/ADR-0002 §5) —
-        // la ligne correspondante est alors simplement omise, la
-        // transaction restant équilibrée (débit = somme des crédits).
+        // structurel) : sur un montant de 1, la part Wasplex vaut 0
+        // (unité résiduelle à l'utilisateur, décision du fondateur
+        // 2026-07-26 ci-dessus) — la ligne correspondante est alors
+        // simplement omise, la transaction restant équilibrée (débit =
+        // somme des crédits).
         $distributionPostings = [
             new PostingLine($campaign->consumed_account_id, PostingDirection::Debit, $amount, $campaign->currency, "Répartition — {$event->format}"),
         ];
@@ -279,13 +282,13 @@ class CampaignBudgetService
 
     /**
      * Part utilisateur du net distribuable d'un événement (AMD-0002,
-     * ratio 50/50 exact, unité résiduelle absorbée par Wasplex) — unique
-     * définition de ce calcul côté lecture, alignée sur les écritures de
-     * `acceptQualifiedEvent()`.
+     * ratio 50/50 exact, unité résiduelle à l'utilisateur — décision du
+     * fondateur 2026-07-26, ADR-0010) — unique définition de ce calcul
+     * côté lecture, alignée sur les écritures de `acceptQualifiedEvent()`.
      */
     public function userShareOf(QualifiedEvent $event): int
     {
-        return intdiv($event->applied_price_amount, 2);
+        return intdiv($event->applied_price_amount + 1, 2);
     }
 
     /**
