@@ -288,169 +288,178 @@ export default function Welcome({ passwordRules }: { passwordRules?: string }) {
         <>
             <Head title="Wasplex — La publicité qui te paie" />
 
-            <div className="flex min-h-svh flex-col bg-[#07182D] text-white">
-                {/* ── Héros ─────────────────────────────────────────── */}
-                <div className="flex flex-col items-center px-5 pt-10 pb-6 text-center">
-                    {/* Mascotte + marque */}
-                    <div className="mb-5 flex flex-col items-center gap-2">
-                        <WasplexMascot className="h-24 w-24 drop-shadow-lg" />
-                        <span className="text-2xl font-bold tracking-tight">
-                            Wasplex
-                        </span>
-                    </div>
-
-                    {/* Accroche — fidèle à la Constitution art. 1 */}
-                    <p className="max-w-xs text-base leading-snug font-medium text-[#4FA3FF]">
-                        La publicité qui te paie directement sur ton mobile
-                    </p>
-                </div>
-
-                {/* ── 3 badges clés ─────────────────────────────────── */}
-                <div className="mb-6 grid grid-cols-3 gap-2 px-5">
-                    {[
-                        { label: 'Gratuit', sub: 'Inscription simple' },
-                        { label: '1 WP', sub: '= 1 FCFA garanti' },
-                        { label: 'Cash', sub: 'Mobile Money' },
-                    ].map(({ label, sub }) => (
-                        <div
-                            key={label}
-                            className="flex flex-col items-center rounded-2xl border border-[#35506D] bg-[#0E2542] p-3 text-center"
-                        >
-                            <span className="text-sm font-bold text-white">
-                                {label}
-                            </span>
-                            <span className="mt-0.5 text-[11px] leading-tight text-[#A9B7C8]">
-                                {sub}
+            <div className="min-h-svh bg-[#07182D]">
+                {/* DS-0001 §13 : desktop n'étire pas le mobile — colonne
+                    contenue, centrée, fond identique au reste de l'écran. */}
+                <div className="mx-auto flex min-h-svh w-full max-w-[480px] flex-col text-white">
+                    {/* ── Héros ─────────────────────────────────────────── */}
+                    <div className="flex flex-col items-center px-5 pt-10 pb-6 text-center">
+                        {/* Mascotte + marque */}
+                        <div className="mb-5 flex flex-col items-center gap-2">
+                            <WasplexMascot className="h-24 w-24 drop-shadow-lg" />
+                            <span className="text-2xl font-bold tracking-tight">
+                                Wasplex
                             </span>
                         </div>
-                    ))}
-                </div>
 
-                {/* ── Grille 2×2 features ───────────────────────────── */}
-                <div className="mb-8 grid grid-cols-2 gap-3 px-5">
-                    {features.map((f) => {
-                        const Icon = f.icon;
+                        {/* Accroche — fidèle à la Constitution art. 1 */}
+                        <p className="max-w-xs text-base leading-snug font-medium text-[#4FA3FF]">
+                            La publicité qui te paie directement sur ton mobile
+                        </p>
+                    </div>
 
-                        return (
+                    {/* ── 3 badges clés ─────────────────────────────────── */}
+                    <div className="mb-6 grid grid-cols-3 gap-2 px-5">
+                        {[
+                            { label: 'Gratuit', sub: 'Inscription simple' },
+                            { label: '1 WP', sub: '= 1 FCFA garanti' },
+                            { label: 'Cash', sub: 'Mobile Money' },
+                        ].map(({ label, sub }) => (
                             <div
-                                key={f.title}
-                                className="flex flex-col gap-2 rounded-2xl border border-[#35506D] bg-[#0E2542] p-4"
+                                key={label}
+                                className="flex flex-col items-center rounded-2xl border border-[#35506D] bg-[#0E2542] p-3 text-center"
                             >
-                                <span
-                                    className="flex h-9 w-9 items-center justify-center rounded-xl"
-                                    style={{ backgroundColor: `${f.color}18` }}
-                                >
-                                    <Icon
-                                        size={18}
-                                        style={{ color: f.color }}
-                                    />
+                                <span className="text-sm font-bold text-white">
+                                    {label}
                                 </span>
-                                <p className="text-sm leading-snug font-semibold text-white">
-                                    {f.title}
-                                </p>
-                                <p className="text-[12px] leading-relaxed text-[#A9B7C8]">
-                                    {f.body}
-                                </p>
+                                <span className="mt-0.5 text-[11px] leading-tight text-[#A9B7C8]">
+                                    {sub}
+                                </span>
                             </div>
-                        );
-                    })}
-                </div>
+                        ))}
+                    </div>
 
-                {/* ── Connexion rapide ───────────────────────────────── */}
-                <div className="px-5 pb-10">
-                    <p className="mb-3 text-center text-[11px] font-semibold tracking-widest text-[#FF9A3D] uppercase">
-                        Connexion rapide
-                    </p>
+                    {/* ── Grille 2×2 features ───────────────────────────── */}
+                    <div className="mb-8 grid grid-cols-2 gap-3 px-5">
+                        {features.map((f) => {
+                            const Icon = f.icon;
 
-                    {/* Accordéon Utilisateur */}
-                    <div className="mb-3 overflow-hidden rounded-2xl border border-[#35506D]">
-                        <button
-                            onClick={() => toggle('user')}
-                            aria-expanded={open === 'user'}
-                            className="flex w-full items-center justify-between bg-[#075CCF] px-5 py-4 text-left"
-                        >
-                            <span className="flex items-center gap-3 font-semibold text-white">
-                                <Smartphone size={20} />
-                                Connexion Utilisateur
-                            </span>
-                            {open === 'user' ? (
-                                <ChevronUp
-                                    size={20}
-                                    className="text-white/70"
-                                />
-                            ) : (
+                            return (
+                                <div
+                                    key={f.title}
+                                    className="flex flex-col gap-2 rounded-2xl border border-[#35506D] bg-[#0E2542] p-4"
+                                >
+                                    <span
+                                        className="flex h-9 w-9 items-center justify-center rounded-xl"
+                                        style={{
+                                            backgroundColor: `${f.color}18`,
+                                        }}
+                                    >
+                                        <Icon
+                                            size={18}
+                                            style={{ color: f.color }}
+                                        />
+                                    </span>
+                                    <p className="text-sm leading-snug font-semibold text-white">
+                                        {f.title}
+                                    </p>
+                                    <p className="text-[12px] leading-relaxed text-[#A9B7C8]">
+                                        {f.body}
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* ── Connexion rapide ───────────────────────────────── */}
+                    <div className="px-5 pb-10">
+                        <p className="mb-3 text-center text-[11px] font-semibold tracking-widest text-[#FF9A3D] uppercase">
+                            Connexion rapide
+                        </p>
+
+                        {/* Accordéon Utilisateur */}
+                        <div className="mb-3 overflow-hidden rounded-2xl border border-[#35506D]">
+                            <button
+                                onClick={() => toggle('user')}
+                                aria-expanded={open === 'user'}
+                                className="flex w-full items-center justify-between bg-[#075CCF] px-5 py-4 text-left"
+                            >
+                                <span className="flex items-center gap-3 font-semibold text-white">
+                                    <Smartphone size={20} />
+                                    Connexion Utilisateur
+                                </span>
+                                {open === 'user' ? (
+                                    <ChevronUp
+                                        size={20}
+                                        className="text-white/70"
+                                    />
+                                ) : (
+                                    <ChevronDown
+                                        size={20}
+                                        className="text-white/70"
+                                    />
+                                )}
+                            </button>
+
+                            {open === 'user' && (
+                                <div className="bg-[#0E2542] px-5 py-5">
+                                    {/* Onglets Connexion / Inscription */}
+                                    <div className="mb-5 flex border-b border-[#35506D]">
+                                        <button
+                                            onClick={() => setTab('login')}
+                                            className={[
+                                                'flex-1 pb-2.5 text-sm font-semibold transition',
+                                                tab === 'login'
+                                                    ? 'border-b-2 border-white text-white'
+                                                    : 'text-[#A9B7C8] hover:text-white',
+                                            ].join(' ')}
+                                        >
+                                            Connexion
+                                        </button>
+                                        <button
+                                            onClick={() => setTab('register')}
+                                            className={[
+                                                'flex-1 pb-2.5 text-sm font-semibold transition',
+                                                tab === 'register'
+                                                    ? 'border-b-2 border-white text-white'
+                                                    : 'text-[#A9B7C8] hover:text-white',
+                                            ].join(' ')}
+                                        >
+                                            Inscription
+                                        </button>
+                                    </div>
+
+                                    {tab === 'login' ? (
+                                        <LoginForm />
+                                    ) : (
+                                        <RegisterForm
+                                            passwordRules={passwordRules}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Accordéon Annonceur */}
+                        <div className="overflow-hidden rounded-2xl border border-[#35506D]">
+                            <Link
+                                href="/advertiser"
+                                className="flex w-full items-center justify-between bg-[#C75100] px-5 py-4 text-left"
+                            >
+                                <span className="flex items-center gap-3 font-semibold text-white">
+                                    <Megaphone size={20} />
+                                    Espace Annonceur
+                                </span>
                                 <ChevronDown
                                     size={20}
                                     className="text-white/70"
                                 />
-                            )}
-                        </button>
+                            </Link>
+                        </div>
 
-                        {open === 'user' && (
-                            <div className="bg-[#0E2542] px-5 py-5">
-                                {/* Onglets Connexion / Inscription */}
-                                <div className="mb-5 flex border-b border-[#35506D]">
-                                    <button
-                                        onClick={() => setTab('login')}
-                                        className={[
-                                            'flex-1 pb-2.5 text-sm font-semibold transition',
-                                            tab === 'login'
-                                                ? 'border-b-2 border-white text-white'
-                                                : 'text-[#A9B7C8] hover:text-white',
-                                        ].join(' ')}
-                                    >
-                                        Connexion
-                                    </button>
-                                    <button
-                                        onClick={() => setTab('register')}
-                                        className={[
-                                            'flex-1 pb-2.5 text-sm font-semibold transition',
-                                            tab === 'register'
-                                                ? 'border-b-2 border-white text-white'
-                                                : 'text-[#A9B7C8] hover:text-white',
-                                        ].join(' ')}
-                                    >
-                                        Inscription
-                                    </button>
-                                </div>
-
-                                {tab === 'login' ? (
-                                    <LoginForm />
-                                ) : (
-                                    <RegisterForm
-                                        passwordRules={passwordRules}
-                                    />
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Accordéon Annonceur */}
-                    <div className="overflow-hidden rounded-2xl border border-[#35506D]">
-                        <Link
-                            href="/advertiser"
-                            className="flex w-full items-center justify-between bg-[#C75100] px-5 py-4 text-left"
-                        >
-                            <span className="flex items-center gap-3 font-semibold text-white">
-                                <Megaphone size={20} />
-                                Espace Annonceur
+                        {/* Footer légal — UX-0001 §4 */}
+                        <p className="mt-6 text-center text-[12px] text-[#53657D]">
+                            En continuant, tu acceptes les{' '}
+                            <span className="text-[#4FA3FF]">
+                                Conditions Wasplex
+                            </span>{' '}
+                            et la{' '}
+                            <span className="text-[#4FA3FF]">
+                                Politique de confidentialité
                             </span>
-                            <ChevronDown size={20} className="text-white/70" />
-                        </Link>
+                            .
+                        </p>
                     </div>
-
-                    {/* Footer légal — UX-0001 §4 */}
-                    <p className="mt-6 text-center text-[12px] text-[#53657D]">
-                        En continuant, tu acceptes les{' '}
-                        <span className="text-[#4FA3FF]">
-                            Conditions Wasplex
-                        </span>{' '}
-                        et la{' '}
-                        <span className="text-[#4FA3FF]">
-                            Politique de confidentialité
-                        </span>
-                        .
-                    </p>
                 </div>
             </div>
         </>

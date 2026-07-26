@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Bell, HandHeart, Tv2, User, Wallet } from 'lucide-react';
+import { toast } from 'sonner';
 import { dashboard } from '@/routes';
 import wallet from '@/routes/wallet';
 
@@ -69,7 +70,7 @@ export default function MobileBottomNav() {
     return (
         <nav
             aria-label="Navigation principale"
-            className="pb-safe fixed right-0 bottom-0 left-0 z-50 border-t border-[#35506D] bg-[#0E2542]"
+            className="pb-safe fixed right-0 bottom-0 left-0 z-50 mx-auto w-full max-w-[480px] border-t border-[#35506D] bg-[#0E2542]"
             style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
             <ul className="flex h-16 items-stretch">
@@ -124,11 +125,21 @@ export default function MobileBottomNav() {
                                 key={item.key}
                                 className="flex flex-1 items-center justify-center"
                             >
+                                {/* DS-0001 §23 : un onglet indisponible explique
+                                    la condition — `title` seul ne s'affiche
+                                    jamais au tactile, donc pas de `disabled`
+                                    natif (qui bloquerait le tap) : on garde le
+                                    bouton actionnable et on confirme au tap. */}
                                 <button
-                                    disabled
+                                    type="button"
+                                    aria-disabled="true"
                                     aria-label={`${item.label} — bientôt disponible`}
-                                    title="Bientôt disponible"
-                                    className="flex cursor-not-allowed flex-col items-center gap-0.5 py-2 opacity-40"
+                                    onClick={() =>
+                                        toast(
+                                            `${item.label} — bientôt disponible`,
+                                        )
+                                    }
+                                    className="flex flex-col items-center gap-0.5 py-2 opacity-40"
                                 >
                                     <Icon
                                         size={22}
