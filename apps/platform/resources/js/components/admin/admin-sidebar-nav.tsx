@@ -20,13 +20,13 @@ import admin from '@/routes/admin';
  * Navigation par files de responsabilité (UX-0001 §8 « Administration
  * Wasplex »), dans l'ordre du texte. Écrans réellement construits au jour
  * de ce lot : « À traiter », « Finance et rapprochement »,
- * « Publicité et modération » et « Configurations ». Les autres
- * destinations que le texte décide n'ont aujourd'hui aucun module ni
- * capacité de lecture déclarée (Fonds Social, Cartes, Institutions,
- * Alertes, Accès, Audit) : elles restent visibles — la navigation ne
- * cache jamais ce qui est prévu — mais désactivées et annoncées comme
- * telles (DS-0001 §23 « un onglet indisponible explique la condition »),
- * jamais simulées avec de fausses données.
+ * « Publicité et modération », « Configurations » et « Accès ». Les
+ * autres destinations que le texte décide n'ont aujourd'hui aucun module
+ * ni capacité de lecture déclarée (Fonds Social, Cartes, Institutions,
+ * Alertes, Audit) : elles restent visibles — la navigation ne cache
+ * jamais ce qui est prévu — mais désactivées et annoncées comme telles
+ * (DS-0001 §23 « un onglet indisponible explique la condition »), jamais
+ * simulées avec de fausses données.
  */
 const AVAILABLE_ITEMS = [
     {
@@ -53,6 +53,12 @@ const AVAILABLE_ITEMS = [
         href: admin.configurations().url,
         icon: Settings,
     },
+    {
+        key: 'access',
+        label: 'Accès',
+        href: admin.access().url,
+        icon: KeyRound,
+    },
 ] as const;
 
 const UNAVAILABLE_ITEMS = [
@@ -60,7 +66,6 @@ const UNAVAILABLE_ITEMS = [
     { key: 'alerts', label: 'Alertes et institutions', icon: FileWarning },
     { key: 'social-fund', label: 'Fonds Social', icon: Building2 },
     { key: 'cards', label: 'Cartes et partenaires', icon: Wallet },
-    { key: 'access', label: 'Accès', icon: KeyRound },
     { key: 'audit', label: 'Audit', icon: ScrollText },
 ] as const;
 
