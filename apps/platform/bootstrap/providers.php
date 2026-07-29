@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Advertising\AdvertisingServiceProvider;
+use App\Modules\Alerts\AlertsServiceProvider;
 use App\Modules\Governance\Authorization\AuthorizationServiceProvider;
 use App\Modules\Governance\Configuration\ConfigurationServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
@@ -18,4 +19,5 @@ return [
     WalletLedgerServiceProvider::class,
     WalletBalanceServiceProvider::class,
     AdvertisingServiceProvider::class,
+    AlertsServiceProvider::class,
 ];

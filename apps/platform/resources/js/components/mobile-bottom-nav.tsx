@@ -3,6 +3,7 @@ import { Bell, HandHeart, Tv2, User, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { dashboard } from '@/routes';
 import account from '@/routes/account';
+import alerts from '@/routes/alerts';
 import wallet from '@/routes/wallet';
 
 /**
@@ -12,6 +13,7 @@ import wallet from '@/routes/wallet';
  * Wallet central en orange — DS-0001 §14.
  * Les onglets sans route active affichent leur état indisponible (DS-0001 §23 :
  * « un onglet indisponible explique la condition »).
+ * « Alertes » branché sur le vrai module (P008-A) depuis ce lot.
  */
 
 type NavItem = {
@@ -46,8 +48,8 @@ const items: NavItem[] = [
     {
         key: 'alertes',
         label: 'Alertes',
+        href: alerts.index().url,
         icon: Bell,
-        disabled: true,
     },
     {
         key: 'espace',
