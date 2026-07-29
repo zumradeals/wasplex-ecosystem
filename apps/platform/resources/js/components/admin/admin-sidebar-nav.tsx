@@ -20,13 +20,13 @@ import admin from '@/routes/admin';
  * Navigation par files de responsabilité (UX-0001 §8 « Administration
  * Wasplex »), dans l'ordre du texte. Écrans réellement construits au jour
  * de ce lot : « À traiter », « Finance et rapprochement »,
- * « Publicité et modération », « Configurations » et « Accès ». Les
- * autres destinations que le texte décide n'ont aujourd'hui aucun module
- * ni capacité de lecture déclarée (Fonds Social, Cartes, Institutions,
- * Alertes, Audit) : elles restent visibles — la navigation ne cache
- * jamais ce qui est prévu — mais désactivées et annoncées comme telles
- * (DS-0001 §23 « un onglet indisponible explique la condition »), jamais
- * simulées avec de fausses données.
+ * « Publicité et modération », « Configurations », « Accès » et
+ * « Alertes et institutions » (P008-A). Les autres destinations que le
+ * texte décide n'ont aujourd'hui aucun module ni capacité de lecture
+ * déclarée (Fonds Social, Cartes, Audit) : elles restent visibles — la
+ * navigation ne cache jamais ce qui est prévu — mais désactivées et
+ * annoncées comme telles (DS-0001 §23 « un onglet indisponible explique
+ * la condition »), jamais simulées avec de fausses données.
  */
 const AVAILABLE_ITEMS = [
     {
@@ -48,6 +48,12 @@ const AVAILABLE_ITEMS = [
         icon: Megaphone,
     },
     {
+        key: 'alerts',
+        label: 'Alertes et institutions',
+        href: admin.alerts().url,
+        icon: FileWarning,
+    },
+    {
         key: 'settings',
         label: 'Configurations',
         href: admin.configurations().url,
@@ -63,7 +69,6 @@ const AVAILABLE_ITEMS = [
 
 const UNAVAILABLE_ITEMS = [
     { key: 'risks', label: 'Risques et incidents', icon: ShieldAlert },
-    { key: 'alerts', label: 'Alertes et institutions', icon: FileWarning },
     { key: 'social-fund', label: 'Fonds Social', icon: Building2 },
     { key: 'cards', label: 'Cartes et partenaires', icon: Wallet },
     { key: 'audit', label: 'Audit', icon: ScrollText },

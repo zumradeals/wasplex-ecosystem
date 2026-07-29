@@ -11,6 +11,7 @@ use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Projections\SocialEngagementProjection;
 use App\Modules\Advertising\Services\Exceptions\PricingConfigurationNotResolvableException;
 use App\Modules\Advertising\Services\QualifiedEventPricingResolver;
+use App\Modules\Alerts\Projections\PublicAlertFeedProjection;
 use App\Modules\Governance\Authorization\Contracts\ResourceContext;
 use App\Modules\Governance\Authorization\Enums\Environment;
 use App\Modules\Governance\Authorization\Enums\Operation;
@@ -44,6 +45,17 @@ use Inertia\Response;
  * montre toute campagne active, approuvée, financée et dont le prix est
  * résolvable, sans encore filtrer par pertinence d'audience ni limiter la
  * fréquence par utilisateur (ADR-0002 §3.3, quotas différés).
+ *
+ * P008-A (mission §15) : reçoit aussi une petite surface d'alertes
+ * communautaires publiées (`alerts.publications`, lecture seule via
+ * {@see PublicAlertFeedProjection}) — jamais mêlée aux `ads` elles-mêmes.
+ * Une alerte n'est jamais comptée comme vue publicitaire, ne consomme
+ * aucun quota et ne déclenche aucun événement qualifié : elle est rendue
+ * par une surface compacte séparée côté React, jamais insérée dans le
+ * flux de lecture vidéo. L'interleaving à cadence configurable (« toutes
+ * les 5 ou 10 publicités ») décrit par la mission reste différé — voir la
+ * dette technique du dossier final ; ce lot branche uniquement la lecture,
+ * jamais une simulation.
  */
 class FeedController extends Controller
 {
@@ -55,6 +67,7 @@ class FeedController extends Controller
         private readonly AuthorizationGate $authorizationGate,
         private readonly PersonBalanceProjection $balanceProjection,
         private readonly SocialEngagementProjection $socialEngagementProjection,
+        private readonly PublicAlertFeedProjection $publicAlertFeed,
     ) {}
 
     public function index(Request $request): Response
@@ -87,9 +100,20 @@ class FeedController extends Controller
 
         $ads = $this->withSocialEngagement($ads, $subject);
 
+        $communityAlerts = $this->publicAlertFeed->published(countryCode: null, limit: 5)
+            ->map(fn ($publication): array => [
+                'publication_id' => $publication->id,
+                'title' => $publication->title,
+                'summary' => $publication->summary,
+                'approximate_zone' => $publication->approximate_zone,
+            ])
+            ->values()
+            ->all();
+
         return Inertia::render('dashboard', [
             'ads' => $ads,
             'wallet_balance' => $this->walletBalanceFor($subject),
+            'community_alerts' => $communityAlerts,
         ]);
     }
 

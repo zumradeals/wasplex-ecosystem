@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
@@ -12,6 +12,7 @@ import { WingFlight } from '@/components/feed/wing-flight';
 import WasplexMascot from '@/components/wasplex-mascot';
 import MobileLayout from '@/layouts/mobile-layout';
 import { postJson } from '@/lib/api';
+import alerts from '@/routes/alerts';
 
 type Ad = {
     campaign_version_id: string;
@@ -26,6 +27,14 @@ type Ad = {
     shares_count: number;
     liked: boolean;
     favorited: boolean;
+};
+
+// P008-A : jamais une publicité — ni quota, ni WP, ni SocialButtons.
+type CommunityAlert = {
+    publication_id: string;
+    title: string;
+    summary: string;
+    approximate_zone: string | null;
 };
 
 type WalletBalance = { available: number; currency: string | null };
@@ -100,13 +109,25 @@ const CONDITION_LABELS: Record<string, string> = {
 };
 
 /**
- * Onglets de session du Feed — UX-0001 §9. Seul « Pour toi » est actif :
- * « Alertes » et « Explorer » annoncent leur indisponibilité au tap
- * (DS-0001 §23 — un onglet indisponible explique la condition).
+ * Onglets de session du Feed — UX-0001 §9. « Pour toi » reste la
+ * destination courante ; « Alertes » navigue réellement vers le module
+ * Alertes (P008-A) depuis ce lot — l'onglet Feed lui-même ne réimplémente
+ * pas une seconde liste d'alertes, il pointe vers `/alerts`. « Explorer »
+ * annonce toujours son indisponibilité au tap (DS-0001 §23).
  */
-const FEED_TABS: { key: string; label: string; available: boolean }[] = [
+const FEED_TABS: {
+    key: string;
+    label: string;
+    available: boolean;
+    href?: string;
+}[] = [
     { key: 'pour-toi', label: 'Pour toi', available: true },
-    { key: 'alertes', label: 'Alertes', available: false },
+    {
+        key: 'alertes',
+        label: 'Alertes',
+        available: true,
+        href: alerts.index().url,
+    },
     { key: 'explorer', label: 'Explorer', available: false },
 ];
 
@@ -162,12 +183,14 @@ function FeedTopBar({
     logoRef,
     walletRef,
     progressRef,
+    communityAlerts,
 }: {
     balance: WalletBalance | null;
     walletPulse: boolean;
     logoRef: RefObject<HTMLSpanElement | null>;
     walletRef: RefObject<HTMLDivElement | null>;
     progressRef: RefObject<HTMLDivElement | null>;
+    communityAlerts: CommunityAlert[];
 }) {
     const displayedAvailable = useCountUp(balance?.available ?? 0);
 
@@ -202,21 +225,31 @@ function FeedTopBar({
                             key={tab.key}
                             type="button"
                             aria-disabled={!tab.available}
-                            aria-current={tab.available ? 'page' : undefined}
-                            onClick={() =>
-                                tab.available
-                                    ? undefined
-                                    : toast(`${tab.label} — bientôt disponible`)
+                            aria-current={
+                                tab.key === 'pour-toi' ? 'page' : undefined
                             }
+                            onClick={() => {
+                                if (tab.href) {
+                                    router.visit(tab.href);
+
+                                    return;
+                                }
+
+                                if (!tab.available) {
+                                    toast(`${tab.label} — bientôt disponible`);
+                                }
+                            }}
                             className={[
                                 'relative pb-1.5 text-sm font-semibold whitespace-nowrap transition-colors',
-                                tab.available
+                                tab.key === 'pour-toi'
                                     ? 'text-white'
-                                    : 'text-[#A9B7C8]/60',
+                                    : tab.available
+                                      ? 'text-[#A9B7C8]'
+                                      : 'text-[#A9B7C8]/60',
                             ].join(' ')}
                         >
                             {tab.label}
-                            {tab.available && (
+                            {tab.key === 'pour-toi' && (
                                 <span className="absolute bottom-0 left-1/2 h-0.5 w-7 -translate-x-1/2 rounded-full bg-white" />
                             )}
                         </button>
@@ -247,6 +280,26 @@ function FeedTopBar({
                     <span className="w-9 shrink-0" aria-hidden="true" />
                 )}
             </div>
+
+            {/* Surface compacte d'alertes communautaires (mission P008-A
+                §15) : jamais mêlée aux publicités, ne consomme aucun quota
+                et ne crédite aucun WP — un simple lien vers `/alerts`.
+                L'interleaving à cadence configurable entre publicités reste
+                différé (dette technique). */}
+            {communityAlerts.length > 0 && (
+                <a
+                    href={alerts.index().url}
+                    className="pointer-events-auto mt-2 flex items-center gap-2 rounded-lg bg-[#0E2542]/90 px-3 py-2 text-xs text-white backdrop-blur-sm"
+                >
+                    <span
+                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#4FA3FF]"
+                        aria-hidden="true"
+                    />
+                    <span className="truncate">
+                        Alerte communautaire — {communityAlerts[0].title}
+                    </span>
+                </a>
+            )}
         </div>
     );
 }
@@ -730,7 +783,13 @@ type Flight = {
     currency: string | null;
 };
 
-export default function Dashboard({ ads }: { ads: Ad[] }) {
+export default function Dashboard({
+    ads,
+    community_alerts: communityAlerts,
+}: {
+    ads: Ad[];
+    community_alerts: CommunityAlert[];
+}) {
     const page = usePage<{ wallet_balance?: WalletBalance | null }>();
     const scrollRef = useRef<HTMLDivElement>(null);
     const logoRef = useRef<HTMLSpanElement>(null);
@@ -843,6 +902,7 @@ export default function Dashboard({ ads }: { ads: Ad[] }) {
                     logoRef={logoRef}
                     walletRef={walletRef}
                     progressRef={progressRef}
+                    communityAlerts={communityAlerts}
                 />
 
                 <div

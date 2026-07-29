@@ -1,12 +1,12 @@
 # Constitution de l'écosystème Wasplex
 
-**Statut :** Constitution v1.5 adoptée  
+**Statut :** Constitution v1.7 adoptée  
 **Autorité :** constitutionnelle  
 **Date d'adoption :** 2026-07-22  
 **Propriétaire de la vision :** le fondateur de Wasplex  
 **Source fondatrice :** `sources/2026-07-21-entretien-fondateur-01.md`  
 **Décision d'adoption initiale :** `decisions/CON-0001-adoption-noyau-constitutionnel-v0.2.md`  
-**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`, `amendments/AMD-0012-gouvernance-limitee-configuration-versionnee-et-audit.md`, `amendments/AMD-0013-publicite-compatible-avec-la-dignite-et-la-securite.md`, `amendments/AMD-0014-live-volontaire-qualifie-et-sur.md`
+**Amendements adoptés :** `amendments/AMD-0001-donnee-personnelle-jamais-produit.md`, `amendments/AMD-0002-partage-egal-net-publicitaire.md`, `amendments/AMD-0003-parite-wp-fcfa.md`, `amendments/AMD-0004-abonnement-service-sans-rendement.md`, `amendments/AMD-0005-fonds-social-solidarite-encadree.md`, `amendments/AMD-0006-institutions-acces-finalise-preuve.md`, `amendments/AMD-0007-alertes-securite-verite-et-protection.md`, `amendments/AMD-0008-cartes-wasplex-participation-economique-reelle.md`, `amendments/AMD-0009-donnees-consentement-et-profilage-protege.md`, `amendments/AMD-0010-identite-proportionnee-et-antifraude-equitable.md`, `amendments/AMD-0011-wallet-couvert-separe-et-reconstructible.md`, `amendments/AMD-0012-gouvernance-limitee-configuration-versionnee-et-audit.md`, `amendments/AMD-0013-publicite-compatible-avec-la-dignite-et-la-securite.md`, `amendments/AMD-0014-live-volontaire-qualifie-et-sur.md`, `amendments/AMD-0016-protection-sante-integration-cloisonnee-des-urgences.md`
 
 ## Préambule adopté
 
@@ -387,6 +387,17 @@ Wasplex mesure sa réussite par sa capacité à :
 
 Le chiffre d'affaires ne constitue pas, à lui seul, la mesure suprême de la réussite.
 
+## Article 23 — Protection, Santé et intégration cloisonnée des urgences
+
+1. Wasplex Alertes et le futur Wasplex Santé forment un système intégré de protection de la personne. Ils peuvent partager une expérience utilisateur et des parcours d'urgence, mais conservent des données, permissions, responsabilités, rétentions et journaux distincts.
+2. Cette intégration ne fusionne jamais les schémas de données, les permissions, les finalités, les durées de conservation ni les journaux métier d'Alertes et de Santé. Chaque domaine reste propriétaire de ses propres tables.
+3. Alertes ne reçoit jamais le dossier médical longitudinal. Il ne peut demander à Santé qu'une capsule médicale d'urgence minimale — groupe sanguin vérifié, allergies critiques, pathologies critiques pertinentes, traitements vitaux, contact d'urgence, provenance et niveau de vérification — jamais un historique judiciaire, un profil publicitaire, une généalogie ou toute information sans pertinence immédiate pour les secours.
+4. Toute lecture de la capsule médicale exige une capacité critique dédiée, une finalité d'urgence réelle, une durée courte, une justification, un journal append-only et une revue a posteriori. Cette capacité peut être documentée par anticipation mais ne doit être ni auto-attribuée ni activée artificiellement avant qu'un besoin réel et vérifié existe.
+5. Aucune fiche ne réunit santé, casier judiciaire, publicité, situation financière ou généalogie d'une personne. Police, gendarmerie, secours et santé ne disposent jamais d'une recherche générale dans l'ensemble de la vie d'une personne.
+6. Les données médicales, de sécurité, de SOS ou d'alerte ne sont jamais utilisées à des fins publicitaires, de ciblage ou de profilage commercial.
+7. Le terme métier « Agent » demeure interdit. Un témoin de restitution reste un participant ou attestateur nominatif d'un dossier, jamais un nouvel acteur constitutionnel.
+8. Le dossier médical longitudinal, les comptes professionnels de santé complets, les laboratoires, prescriptions, médicaments, assurances, dons de sang et la coordination réglementée des greffes constituent un chantier distinct, non construit par le présent article et soumis à ses propres conditions préalables (gouvernance juridique, sécurité, validation institutionnelle) avant toute donnée médicale réelle.
+
 ## Règles de rédaction
 
 1. Aucun comportement métier n'est adopté sans explication de sa finalité.
@@ -406,4 +417,4 @@ Les chapitres annonceurs, identité visuelle, architecture et qualité ont été
 
 ## Registre d'adoption
 
-Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 22 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007, l'article 15 intègre AMD-0008, l'article 16 intègre AMD-0010, l'article 17 intègre AMD-0011, l'article 18 intègre AMD-0012, l'article 19 intègre AMD-0013 et l'article 20 intègre AMD-0014. AMD-0014 a été validé le 2026-07-22 ; les amendements antérieurs demeurent adoptés selon leur registre. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.
+Le fondateur a confirmé le 2026-07-21 que cette transcription traduit exactement sa vision de Wasplex. Les articles 1 à 23 constituent le noyau adopté. L'article 8 intègre AMD-0001 et sa révision AMD-0009, l'article 9 intègre AMD-0002, l'article 10 intègre AMD-0003, l'article 11 intègre AMD-0004, l'article 12 intègre AMD-0005, l'article 13 intègre AMD-0006, l'article 14 intègre AMD-0007, l'article 15 intègre AMD-0008, l'article 16 intègre AMD-0010, l'article 17 intègre AMD-0011, l'article 18 intègre AMD-0012, l'article 19 intègre AMD-0013, l'article 20 intègre AMD-0014 et l'article 23 intègre AMD-0016. AMD-0016 a été validé le 2026-07-29 ; les amendements antérieurs demeurent adoptés selon leur registre. AMD-0015 (Fonds Social, prélèvement composite), validé le 2026-07-23, reste adopté mais son intégration rédactionnelle à l'article 12 n'a pas encore été reportée dans ce corps de texte — écart préexistant à P008-A, non traité par ce lot. Les sections indiquées « à instruire » restent ouvertes et devront respecter ce noyau.

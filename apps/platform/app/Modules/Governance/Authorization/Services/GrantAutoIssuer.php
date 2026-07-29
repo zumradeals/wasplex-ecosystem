@@ -51,6 +51,12 @@ class GrantAutoIssuer
         'campaign.view',
         'advertiser_profile.create',
         'event.self_submit',
+        // P008-A : soumettre son propre dossier Alertes, consulter ses
+        // propres déclarations, proposer sa propre correspondance — même
+        // raisonnement que `campaign.create`/`wallet.view`.
+        'alert_case.submit',
+        'alert_case.view_self',
+        'alert_match.propose',
     ];
 
     /**

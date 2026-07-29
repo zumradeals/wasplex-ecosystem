@@ -29,6 +29,16 @@ use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSelfSubmissionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
+use App\Modules\Alerts\Http\Controllers\Admin\AdminAlertsController;
+use App\Modules\Alerts\Http\Controllers\Admin\AdminCaseDecisionController;
+use App\Modules\Alerts\Http\Controllers\Admin\AdminCorrespondenceDecisionController;
+use App\Modules\Alerts\Http\Controllers\AlertCaseController;
+use App\Modules\Alerts\Http\Controllers\AlertCaseSubmissionController;
+use App\Modules\Alerts\Http\Controllers\AlertsOverviewController;
+use App\Modules\Alerts\Http\Controllers\CorrespondenceReportController;
+use App\Modules\Alerts\Http\Controllers\Institutional\DispatchDecisionController;
+use App\Modules\Alerts\Http\Controllers\Institutional\InstitutionalPortalController;
+use App\Modules\Alerts\Http\Controllers\SosReportController;
 use App\Modules\Governance\Authorization\Http\Controllers\Admin\AdminAccessController;
 use App\Modules\Governance\Configuration\Http\Controllers\Admin\AdminConfigurationController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
@@ -50,6 +60,28 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/health', HealthController::class)->name('health');
+
+// P008-A : détail public d'un dossier Alertes (AMD-0007 §1 : « les
+// fonctions essentielles de sécurité, de SOS, de disparition et de
+// consultation des alertes critiques restent accessibles gratuitement »).
+// Volontairement hors du groupe 'auth' — `AlertCaseController::show`
+// résout le sujet de façon tolérante et ne montre le dossier source qu'à
+// son auteur, jamais à un visiteur anonyme.
+Route::get('alerts/{case}', [AlertCaseController::class, 'show'])->name('alerts.show');
+
+// P008-A : destination mobile « Alertes » (UX-0001 §19, §22) — alertes
+// publiées et « Mes déclarations ». Corrigée hors du groupe 'auth' (control
+// de navigateur réel, dossier final) : un SOS ne peut être créé sans
+// authentification complète (AMD-0007 §2 ; Constitution article 14.2) que
+// si l'écran qui porte son formulaire est lui-même atteignable sans
+// connexion — le laisser dans 'auth' aurait silencieusement contredit
+// `alerts/sos` (public, voir plus bas) en redirigeant tout visiteur non
+// connecté vers la page de connexion avant qu'il n'atteigne le bouton SOS.
+// `AlertsOverviewController::index` résout déjà le sujet de façon
+// tolérante (`my_declarations` reste vide pour un visiteur anonyme) ; la
+// déclaration communautaire, elle, exige un compte (`alert_case.submit`,
+// portée self) et le reste — seul l'écran qui la porte devient public.
+Route::get('alerts', [AlertsOverviewController::class, 'index'])->name('alerts.index');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // W4 (L03) : le Feed remplace le placeholder générique du kit de
@@ -110,19 +142,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // « Administration Wasplex »). Destinations réellement backées :
     // Finance et rapprochement (campaign.fund), Publicité et modération
     // (campaign.approve / campaign.moderate), Configurations
-    // (configuration.view, lecture seule) et Accès (access.view, lecture
-    // seule — voir chaque migration de déclaration pour ce qui reste
-    // volontairement hors périmètre). Les autres destinations décidées
-    // par le texte (Risques et incidents, Alertes et institutions, Fonds
-    // Social, Cartes et partenaires, Audit) n'ont aujourd'hui aucun
+    // (configuration.view, lecture seule), Accès (access.view, lecture
+    // seule) et Alertes et institutions (P008-A — voir chaque migration de
+    // déclaration pour ce qui reste volontairement hors périmètre). Les
+    // autres destinations décidées par le texte (Risques et incidents,
+    // Fonds Social, Cartes et partenaires, Audit) n'ont aujourd'hui aucun
     // module ni capacité de lecture déclarée — jamais simulées, seulement
     // annoncées indisponibles côté navigation (DS-0001 §23).
     Route::get('admin/finance', [AdminFinanceController::class, 'index'])->name('admin.finance');
     Route::get('admin/advertising-moderation', [AdminAdvertisingModerationController::class, 'index'])
         ->name('admin.advertising-moderation');
+    Route::get('admin/alerts', [AdminAlertsController::class, 'index'])->name('admin.alerts');
     Route::get('admin/configurations', [AdminConfigurationController::class, 'index'])
         ->name('admin.configurations');
     Route::get('admin/access', [AdminAccessController::class, 'index'])->name('admin.access');
+
+    // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
+    // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne
+    // sans appartenance institutionnelle active voit un état refusé
+    // honnête, jamais une redirection silencieuse.
+    Route::get('institutions/alerts', [InstitutionalPortalController::class, 'index'])
+        ->name('institutions.alerts.index');
 
     // W4 : « Mon espace » — cinquième destination de la navigation mobile,
     // restée désactivée depuis la refonte W4 faute d'écran. Équivalent
@@ -226,5 +266,44 @@ Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/
 // structuré pour un appel non authentifié.
 Route::middleware('web')->get('wallet/balance', [WalletBalanceController::class, 'show'])
     ->name('wallet.balance.show');
+
+// P008-A : déclaration communautaire (alert_case.submit, portée self).
+// Même discipline que ci-dessus : groupe 'web' hors du groupe 'auth', 401
+// JSON structuré pour un appel non authentifié.
+Route::middleware('web')->post('alerts/community', [AlertCaseSubmissionController::class, 'store'])
+    ->name('alerts.community.store');
+
+// P008-A : SOS (AMD-0007 §2 ; ecosystem/alertes/02 §2, §22) — aucune
+// authentification requise, aucune capacité. Seule protection : une
+// limite de fréquence par adresse IP (`throttle`), en plus de la
+// validation de forme. Volontairement dans le groupe 'web' (session/CSRF
+// disponibles pour un visiteur déjà connecté) mais jamais dans le groupe
+// 'auth' : un SOS anonyme ne doit jamais être redirigé vers la connexion.
+Route::middleware(['web', 'throttle:5,1'])->post('alerts/sos', [SosReportController::class, 'store'])
+    ->name('alerts.sos.store');
+
+// P008-A : correspondance proposée sur un dossier publié
+// (alert_match.propose, portée self). Même discipline que ci-dessus :
+// groupe 'web' hors du groupe 'auth', 401 JSON structuré pour un appel non
+// authentifié.
+Route::middleware('web')->post('alerts/{case}/correspondence', [CorrespondenceReportController::class, 'store'])
+    ->name('alerts.correspondence.store');
+
+// P008-A : décision institutionnelle sur une transmission
+// (ecosystem/institutions/01 §6). Même discipline que ci-dessus : groupe
+// 'web' hors du groupe 'auth', 401 JSON structuré pour un appel non
+// authentifié.
+Route::middleware('web')->post('institutions/alerts/dispatches/{dispatch}/decisions', [DispatchDecisionController::class, 'store'])
+    ->name('institutions.alerts.dispatches.decisions.store');
+
+// P008-A : décisions de modération admin sur un dossier communautaire et
+// sur une correspondance (mission §17). Même discipline que ci-dessus :
+// groupe 'web' hors du groupe 'auth', 401 JSON structuré pour un appel non
+// authentifié.
+Route::middleware('web')->post('admin/alerts/cases/{case}/decisions', [AdminCaseDecisionController::class, 'store'])
+    ->name('admin.alerts.cases.decisions.store');
+
+Route::middleware('web')->post('admin/alerts/correspondence-reports/{correspondenceReport}/decisions', [AdminCorrespondenceDecisionController::class, 'store'])
+    ->name('admin.alerts.correspondence-reports.decisions.store');
 
 require __DIR__.'/settings.php';
