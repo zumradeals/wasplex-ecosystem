@@ -29,6 +29,7 @@ use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSelfSubmissionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
+use App\Modules\Governance\Configuration\Http\Controllers\Admin\AdminConfigurationController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
 use Illuminate\Support\Facades\Route;
@@ -105,18 +106,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/moderation', [ModerationOverviewController::class, 'index'])->name('admin.moderation');
 
     // P0-Admin : portail personnel Wasplex complet (UX-0001 §8
-    // « Administration Wasplex »). Deux destinations réellement backées
-    // au-delà de la file « à traiter » : Finance et rapprochement
-    // (campaign.fund) et Publicité et modération (campaign.approve /
-    // campaign.moderate). Les autres destinations décidées par le texte
-    // (Risques et incidents, Alertes et institutions, Fonds Social,
-    // Cartes et partenaires, Configurations, Accès, Audit) n'ont
-    // aujourd'hui aucun module ni capacité de lecture déclarée — jamais
-    // simulées, seulement annoncées indisponibles côté navigation
+    // « Administration Wasplex »). Destinations réellement backées :
+    // Finance et rapprochement (campaign.fund), Publicité et modération
+    // (campaign.approve / campaign.moderate), et Configurations
+    // (configuration.view, lecture seule — voir sa migration de
+    // déclaration pour ce qui reste volontairement hors périmètre :
+    // proposer/approuver/activer une valeur). Les autres destinations
+    // décidées par le texte (Risques et incidents, Alertes et
+    // institutions, Fonds Social, Cartes et partenaires, Accès, Audit)
+    // n'ont aujourd'hui aucun module ni capacité de lecture déclarée —
+    // jamais simulées, seulement annoncées indisponibles côté navigation
     // (DS-0001 §23).
     Route::get('admin/finance', [AdminFinanceController::class, 'index'])->name('admin.finance');
     Route::get('admin/advertising-moderation', [AdminAdvertisingModerationController::class, 'index'])
         ->name('admin.advertising-moderation');
+    Route::get('admin/configurations', [AdminConfigurationController::class, 'index'])
+        ->name('admin.configurations');
 
     // W4 : « Mon espace » — cinquième destination de la navigation mobile,
     // restée désactivée depuis la refonte W4 faute d'écran. Équivalent
