@@ -9,11 +9,14 @@ sans trace reproductible (pas de crontab, pas de systemd timer, pas de
 script). `deploy.sh` remplace cette procédure implicite par une séquence
 versionnée, explicite et qui s'arrête au premier échec.
 
-Ce script ne s'auto-exécute jamais. Il n'est déclenché par aucun cron, aucun
-hook, aucun webhook. Il se lance à la main, par une personne autorisée, après
-lecture de son contenu — conformément à CLAUDE.md §5 (« aucun déploiement,
-migration de production, activation pays, traitement réel ou communication
-externe sans instruction distincte et explicite »).
+Ce script n'est déclenché par aucun cron, aucun hook, aucun webhook : il ne
+s'exécute jamais tout seul à la fusion d'une PR. Conformément au mode allégé
+adopté par le fondateur (CLAUDE.md §5, réversible à tout moment), Claude Code
+peut le lancer lui-même juste après avoir fusionné dans `main` un lot dont la
+mission prévoit explicitement le déploiement, sans redemander une instruction
+distincte à chaque fois — ce mode redevient caduc dès qu'une donnée
+utilisateur réelle ou un mouvement financier réel existe en production,
+moment auquel une instruction explicite redevient nécessaire par défaut.
 
 ## Prérequis
 
