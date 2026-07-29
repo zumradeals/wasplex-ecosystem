@@ -2,6 +2,26 @@
 
 Ce fichier gouverne toute intervention de Claude Code dans ce dépôt et dans le futur dépôt applicatif Wasplex. Il complète les règles humaines ; il ne remplace aucune décision du Grand Livre.
 
+## 0. Règle supérieure de conduite — exécuter sans blocage documentaire
+
+La décision `decisions/EXE-0001-primaute-execution-veto-dirigeant.md` gouverne l’ordre et la continuité des travaux.
+
+Lorsqu’un résultat est clairement ordonné par le dirigeant :
+
+```text
+comprendre → inspecter → implémenter → tester honnêtement → signaler → documenter ensuite ou en parallèle
+```
+
+- Aucun amendement manquant, texte inachevé, état documentaire, absence d’adoption préalable ou refus d’écriture dans un chemin documentaire ne doit bloquer le code.
+- Si un texte ne peut pas être écrit, conserver le chemin et l’erreur exacts, ne créer aucun placeholder, restituer le contenu complet dans le dossier de validation et poursuivre tout le travail technique possible.
+- Ne jamais substituer une note, un acte ou une dissertation normative à l’implémentation demandée.
+- Ne jamais demander une autorisation déjà donnée.
+- Une instruction claire telle que « Véto du dirigeant exceptionnel », « codez maintenant » ou « poursuivez sans attendre les textes » lève immédiatement les obstacles procéduraux et documentaires dans le périmètre désigné.
+- Le Véto gouverne l’action, jamais la vérité : tests, erreurs, risques et éléments non vérifiés restent rapportés exactement.
+- Un arrêt reste légitime uniquement pour une ambiguïté métier substantielle entre résultats incompatibles, un accès réellement indispensable, une action destructive non autorisée, une contradiction matérielle avec un invariant produit adopté ou l’obligation d’inventer une donnée, un droit, une formule financière ou une preuve.
+
+Cette règle ne modifie aucun invariant métier de Wasplex. La Constitution gouverne le produit ; EXE-0001 gouverne la conduite et la cadence du travail.
+
 ## 1. Autorité et lecture préalable
 
 Avant toute conception ou modification, lire dans cet ordre :
@@ -13,7 +33,7 @@ Avant toute conception ou modification, lire dans cet ordre :
 5. le contrat d'écran ou le lot demandé ;
 6. le code et les tests existants.
 
-En cas de contradiction, appliquer la source supérieure, arrêter la partie concernée et signaler précisément les deux passages incompatibles. Ne jamais résoudre silencieusement une contradiction normative.
+En cas de contradiction substantielle portant sur le comportement du produit, appliquer la source supérieure, arrêter uniquement la partie réellement concernée et signaler précisément les deux passages incompatibles. Une absence de texte, un texte inachevé ou un refus d’écriture documentaire ne constitue pas une contradiction et ne bloque pas l’exécution régie par EXE-0001.
 
 ## 2. Règles absolues du produit
 
@@ -91,7 +111,7 @@ Arrêter et demander une décision si la tâche exige :
 - de supprimer des données, réécrire l'historique Git ou lancer une action irréversible ;
 - de contourner un test, un gate ou une règle de sécurité pour terminer plus vite.
 
-Une question bloquante doit contenir : le fait observé, les sources consultées, les options sûres et l'impact de chacune.
+Ces arrêts concernent un obstacle substantiel réel ; ils ne permettent pas de substituer une production documentaire à un travail clairement ordonné. Une question bloquante doit contenir : le fait observé, les sources consultées, les options sûres et l'impact de chacune.
 
 ## 8. Format de compte rendu
 
