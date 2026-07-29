@@ -5,6 +5,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | ID | Sujet | État |
 |---|---|---|
 | CON-0001 | Adoption du noyau constitutionnel v0.2 | Adopté |
+| EXE-0001 | Primauté de l’exécution et Véto du dirigeant exceptionnel | Adopté par instruction du dirigeant — entrée en vigueur par fusion |
 | AMD-0001 | La donnée personnelle n'est jamais un produit | Adopté et intégré à la v0.3 |
 | AMD-0002 | Partage égal du net publicitaire distribuable | Adopté et intégré à la v0.4 |
 | AMD-0003 | Nature du WasPoint et parité 1 WP = 1 FCFA | Adopté et intégré à la v0.4 |
