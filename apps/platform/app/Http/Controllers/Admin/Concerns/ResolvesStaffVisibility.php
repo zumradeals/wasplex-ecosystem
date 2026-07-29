@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Advertising\Http\Controllers\Admin\Concerns;
+namespace App\Http\Controllers\Admin\Concerns;
 
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Governance\Authorization\Enums\GrantState;

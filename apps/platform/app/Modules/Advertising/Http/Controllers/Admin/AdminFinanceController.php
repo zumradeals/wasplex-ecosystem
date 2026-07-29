@@ -2,9 +2,9 @@
 
 namespace App\Modules\Advertising\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ResolvesStaffVisibility;
 use App\Http\Controllers\Controller;
 use App\Modules\Advertising\Enums\BillingStatus;
-use App\Modules\Advertising\Http\Controllers\Admin\Concerns\ResolvesStaffVisibility;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
