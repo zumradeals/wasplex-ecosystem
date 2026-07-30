@@ -19,6 +19,7 @@ use App\Modules\Advertising\Http\Controllers\AdvertisingCreationsController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingOrganizationController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingReportsController;
+use App\Modules\Advertising\Http\Controllers\AudienceEstimateController;
 use App\Modules\Advertising\Http\Controllers\CampaignController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingInitiationController;
@@ -253,6 +254,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // une page de connexion (P005-B).
 Route::middleware('web')->post('advertising/campaigns', [CampaignController::class, 'store'])
     ->name('advertising.campaigns.store');
+
+// Lot 3 (véto du dirigeant) : aperçu en direct de la taille d'audience
+// avant création de campagne — même discipline que ci-dessus (groupe
+// 'web' hors du groupe 'auth', 401 JSON structuré). Ne crée jamais rien.
+Route::middleware('web')->post('advertising/audience-estimate', [AudienceEstimateController::class, 'store'])
+    ->name('advertising.audience-estimate.store');
 
 // P007-W1 : déclaration par une personne authentifiée de son propre
 // dossier annonceur (advertiser_profile.create, migration

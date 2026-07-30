@@ -61,9 +61,13 @@ class StoreCampaignRequest extends FormRequest
             'pricing_configuration_key' => ['required', 'string'],
             'pricing_configuration_version' => ['required', 'integer', 'min:1'],
 
+            // Lot 3 (véto du dirigeant) : la taille d'audience n'est plus
+            // saisie par l'annonceur — `CampaignController::store()` la
+            // calcule côté serveur depuis `audience.criteria`
+            // (`AudienceSegmentGuard::computeSize()`), jamais une valeur
+            // déclarée.
             'audience' => ['required', 'array'],
             'audience.criteria' => ['required', 'array'],
-            'audience.estimated_size' => ['required', 'integer', 'min:0'],
         ];
     }
 }

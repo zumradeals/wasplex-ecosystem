@@ -5,6 +5,7 @@ namespace App\Modules\Advertising\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Advertising\Http\Controllers\Concerns\ResolvesAdvertiserWorkspace;
 use App\Modules\Advertising\Models\AudienceSegmentSizeThreshold;
+use App\Modules\Advertising\Models\InterestTaxonomyEntry;
 use App\Modules\Advertising\Models\SectorClassification;
 use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
 use App\Modules\Governance\Authorization\Integration\AuthorizationRequestFactory;
@@ -38,6 +39,7 @@ class AdvertisingCampaignCreateController extends Controller
         $workspace = $this->resolveAdvertiserWorkspace($request, 'advertising/campaign-create', [
             'sectorClassifications' => [],
             'audienceSizeThreshold' => null,
+            'interestTaxonomy' => [],
         ]);
 
         if ($workspace instanceof Response) {
@@ -65,6 +67,11 @@ class AdvertisingCampaignCreateController extends Controller
                 'warnings' => $sector->warnings,
             ])->all(),
             'audienceSizeThreshold' => $threshold?->minimum_size,
+            'interestTaxonomy' => InterestTaxonomyEntry::query()
+                ->where('state', 'active')
+                ->orderBy('label')
+                ->get(['code', 'label'])
+                ->toArray(),
         ]);
     }
 }

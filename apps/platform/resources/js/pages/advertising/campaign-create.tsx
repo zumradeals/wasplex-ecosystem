@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, Info } from 'lucide-react';
-import { useState } from 'react';
+import { Info } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { AdvertiserAccessGate } from '@/components/advertiser/advertiser-access-gate';
 import type {
     AdvertiserAccess,
@@ -29,16 +29,80 @@ type SectorOption = {
 const PRICING_CONFIGURATION_KEY = 'advertising.qualified_event_base_price';
 const PRICING_CONFIGURATION_VERSION = 1;
 
+// Lot 3 (véto du dirigeant) : construit `audience.criteria` à partir des
+// champs de ciblage — fonction pure, hors du composant, pour rester
+// utilisable telle quelle à la fois dans l'aperçu en direct (useEffect) et
+// à la soumission, sans dépendance instable dans un tableau de deps.
+function buildAudienceCriteria(params: {
+    targetCountry: string;
+    targetCity: string;
+    targetNeighborhood: string;
+    ageBrackets: string[];
+    genders: string[];
+    interests: string[];
+}): Record<string, unknown> {
+    const criteria: Record<string, unknown> = {};
+
+    const countryCodes = params.targetCountry
+        .split(',')
+        .map((value) => value.trim().toUpperCase())
+        .filter(Boolean);
+
+    if (countryCodes.length > 0) {
+        criteria.country = countryCodes;
+    }
+
+    if (params.targetCity.trim()) {
+        criteria.city = params.targetCity.trim();
+    }
+
+    if (params.targetNeighborhood.trim()) {
+        criteria.neighborhood = params.targetNeighborhood.trim();
+    }
+
+    if (params.ageBrackets.length > 0) {
+        criteria.age_bracket = params.ageBrackets;
+    }
+
+    if (params.genders.length > 0) {
+        criteria.gender = params.genders;
+    }
+
+    if (params.interests.length > 0) {
+        criteria.interests = params.interests;
+    }
+
+    return criteria;
+}
+
+const AGE_BRACKETS = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
+
+const GENDERS: Record<string, string> = {
+    woman: 'Femme',
+    man: 'Homme',
+    other: 'Autre',
+    prefer_not_to_say: 'Je préfère ne pas préciser',
+};
+
+type InterestOption = { code: string; label: string };
+
+type AudienceEstimate = {
+    estimated_size: number | null;
+    below_threshold: boolean;
+};
+
 export default function AdvertisingCampaignCreate({
     access,
     advertiserProfile,
     sectorClassifications,
     audienceSizeThreshold,
+    interestTaxonomy,
 }: {
     access: AdvertiserAccess;
     advertiserProfile: AdvertiserProfileSummary | null;
     sectorClassifications: SectorOption[];
     audienceSizeThreshold: number | null;
+    interestTaxonomy: InterestOption[];
 }) {
     const [code, setCode] = useState('');
     const [currency, setCurrency] = useState('XOF');
@@ -51,17 +115,87 @@ export default function AdvertisingCampaignCreate({
     const [headline, setHeadline] = useState('');
     const [format, setFormat] = useState('');
     const [destinationUrl, setDestinationUrl] = useState('');
-    const [estimatedSize, setEstimatedSize] = useState(0);
+
+    // Lot 3 (véto du dirigeant) : ciblage réel — pays cible (indépendant
+    // du territoire de diffusion ci-dessus, qui reste une contrainte
+    // légale/sectorielle), ville et quartier (texte libre, comme le
+    // profil publicitaire), tranche d'âge/genre/centres d'intérêt à
+    // cocher. `estimatedSize` n'est plus saisi : calculé par le serveur.
+    const [targetCountry, setTargetCountry] = useState('');
+    const [targetCity, setTargetCity] = useState('');
+    const [targetNeighborhood, setTargetNeighborhood] = useState('');
+    const [ageBrackets, setAgeBrackets] = useState<string[]>([]);
+    const [genders, setGenders] = useState<string[]>([]);
+    const [interests, setInterests] = useState<string[]>([]);
+    const [estimate, setEstimate] = useState<AudienceEstimate | null>(null);
+    const [estimating, setEstimating] = useState(false);
+
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const sector =
         sectorClassifications.find((candidate) => candidate.id === sectorId) ??
         null;
-    const belowThreshold =
-        audienceSizeThreshold !== null &&
-        estimatedSize > 0 &&
-        estimatedSize < audienceSizeThreshold;
+
+    const criteria = buildAudienceCriteria({
+        targetCountry,
+        targetCity,
+        targetNeighborhood,
+        ageBrackets,
+        genders,
+        interests,
+    });
+    const hasCriteria = Object.keys(criteria).length > 0;
+
+    useEffect(() => {
+        // `hasCriteria` gouverne déjà l'affichage ci-dessous (le message
+        // "aucun critère" prime sur `estimate` obsolète) : pas besoin de
+        // réinitialiser l'état ici, ce qui éviterait un rendu en cascade.
+        if (!advertiserProfile || !hasCriteria) {
+            return;
+        }
+
+        const timeout = setTimeout(async () => {
+            setEstimating(true);
+
+            const result = await postJson<AudienceEstimate>(
+                '/advertising/audience-estimate',
+                {
+                    advertiser_profile_id: advertiserProfile.id,
+                    criteria,
+                },
+            );
+
+            setEstimating(false);
+
+            if (result.ok) {
+                setEstimate(result.data);
+            }
+        }, 500);
+
+        return () => clearTimeout(timeout);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        advertiserProfile,
+        targetCountry,
+        targetCity,
+        targetNeighborhood,
+        ageBrackets,
+        genders,
+        interests,
+    ]);
+
+    function toggleFromList(
+        list: string[],
+        setList: (value: string[]) => void,
+        value: string,
+    ) {
+        setList(
+            list.includes(value)
+                ? list.filter((entry) => entry !== value)
+                : [...list, value],
+        );
+    }
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
@@ -91,13 +225,7 @@ export default function AdvertisingCampaignCreate({
             pricing_configuration_key: PRICING_CONFIGURATION_KEY,
             pricing_configuration_version: PRICING_CONFIGURATION_VERSION,
             audience: {
-                criteria: {
-                    country: territory
-                        .split(',')
-                        .map((value) => value.trim().toUpperCase())
-                        .filter(Boolean),
-                },
-                estimated_size: estimatedSize,
+                criteria,
             },
         });
 
@@ -310,42 +438,181 @@ export default function AdvertisingCampaignCreate({
                                     />
                                 </Field>
 
-                                <Field label="Taille d'audience estimée">
-                                    <input
-                                        required
-                                        type="number"
-                                        min={0}
-                                        value={estimatedSize}
-                                        onChange={(event) =>
-                                            setEstimatedSize(
-                                                Number(event.target.value),
-                                            )
-                                        }
-                                        className={inputClass}
-                                    />
-                                </Field>
+                                <h3 className="text-xs font-semibold tracking-wide text-[var(--text-secondary)] uppercase">
+                                    Ciblage (facultatif)
+                                </h3>
 
-                                {audienceSizeThreshold !== null && (
-                                    <p className="text-xs text-[var(--text-secondary)]">
-                                        Seuil minimal actuellement actif :{' '}
-                                        {audienceSizeThreshold}. En dessous, la
-                                        taille du segment ne vous sera pas
-                                        communiquée (AMD-0009 §13).
-                                    </p>
-                                )}
-
-                                {belowThreshold && (
-                                    <div className="flex gap-2 rounded-lg bg-[var(--status-warning)]/10 px-3 py-2.5 text-xs text-[var(--status-warning)]">
-                                        <AlertTriangle
-                                            size={14}
-                                            className="mt-0.5 shrink-0"
+                                <div className="grid gap-4 sm:grid-cols-3">
+                                    <Field label="Pays ciblé (codes séparés par virgules)">
+                                        <input
+                                            value={targetCountry}
+                                            onChange={(event) =>
+                                                setTargetCountry(
+                                                    event.target.value,
+                                                )
+                                            }
+                                            placeholder="CI"
+                                            className={inputClass}
                                         />
-                                        <p>
-                                            La taille indiquée est sous le seuil
-                                            minimal actif.
-                                        </p>
+                                    </Field>
+                                    <Field label="Ville ciblée">
+                                        <input
+                                            value={targetCity}
+                                            onChange={(event) =>
+                                                setTargetCity(
+                                                    event.target.value,
+                                                )
+                                            }
+                                            placeholder="Abidjan"
+                                            className={inputClass}
+                                        />
+                                    </Field>
+                                    <Field label="Quartier ciblé">
+                                        <input
+                                            value={targetNeighborhood}
+                                            onChange={(event) =>
+                                                setTargetNeighborhood(
+                                                    event.target.value,
+                                                )
+                                            }
+                                            placeholder="Abobo"
+                                            className={inputClass}
+                                        />
+                                    </Field>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <span className="text-xs font-medium text-[var(--text-primary)]">
+                                        Tranche d'âge
+                                    </span>
+                                    <div className="flex flex-wrap gap-2">
+                                        {AGE_BRACKETS.map((bracket) => (
+                                            <button
+                                                key={bracket}
+                                                type="button"
+                                                onClick={() =>
+                                                    toggleFromList(
+                                                        ageBrackets,
+                                                        setAgeBrackets,
+                                                        bracket,
+                                                    )
+                                                }
+                                                className={
+                                                    ageBrackets.includes(
+                                                        bracket,
+                                                    )
+                                                        ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                                                        : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                }
+                                            >
+                                                {bracket}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <span className="text-xs font-medium text-[var(--text-primary)]">
+                                        Genre
+                                    </span>
+                                    <div className="flex flex-wrap gap-2">
+                                        {Object.entries(GENDERS).map(
+                                            ([value, label]) => (
+                                                <button
+                                                    key={value}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        toggleFromList(
+                                                            genders,
+                                                            setGenders,
+                                                            value,
+                                                        )
+                                                    }
+                                                    className={
+                                                        genders.includes(
+                                                            value,
+                                                        )
+                                                            ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                                                            : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                    }
+                                                >
+                                                    {label}
+                                                </button>
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+
+                                {interestTaxonomy.length > 0 && (
+                                    <div className="space-y-1.5">
+                                        <span className="text-xs font-medium text-[var(--text-primary)]">
+                                            Centres d'intérêt
+                                        </span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {interestTaxonomy.map(
+                                                (option) => (
+                                                    <button
+                                                        key={option.code}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            toggleFromList(
+                                                                interests,
+                                                                setInterests,
+                                                                option.code,
+                                                            )
+                                                        }
+                                                        className={
+                                                            interests.includes(
+                                                                option.code,
+                                                            )
+                                                                ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                                                                : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                        }
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                ),
+                                            )}
+                                        </div>
                                     </div>
                                 )}
+
+                                <div className="rounded-lg bg-[var(--bg-raised)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
+                                    {!hasCriteria ? (
+                                        <p>
+                                            Aucun critère de ciblage choisi :
+                                            l'audience calculée portera sur
+                                            l'ensemble des profils
+                                            publicitaires consentis.
+                                        </p>
+                                    ) : estimating ? (
+                                        <p>Calcul de l'audience…</p>
+                                    ) : estimate?.below_threshold ? (
+                                        <p>
+                                            Sous le seuil minimal actif
+                                            {audienceSizeThreshold !== null
+                                                ? ` (${audienceSizeThreshold})`
+                                                : ''}
+                                            : la taille ne vous sera pas
+                                            communiquée (AMD-0009 §13).
+                                        </p>
+                                    ) : estimate?.estimated_size !== null &&
+                                      estimate?.estimated_size !==
+                                          undefined ? (
+                                        <p>
+                                            Audience estimée :{' '}
+                                            <span className="font-semibold text-[var(--text-primary)]">
+                                                {estimate.estimated_size}
+                                            </span>{' '}
+                                            profil(s) correspondant(s)
+                                            (calculée depuis les profils
+                                            publicitaires consentis, jamais
+                                            devinée).
+                                        </p>
+                                    ) : (
+                                        <p>—</p>
+                                    )}
+                                </div>
                             </section>
 
                             <button

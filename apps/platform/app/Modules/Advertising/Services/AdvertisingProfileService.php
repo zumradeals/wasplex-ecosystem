@@ -21,9 +21,11 @@ class AdvertisingProfileService
      * Bumpée manuellement si le texte de finalité présenté à la personne
      * change matériellement (AMD-0009 §4 : « Un consentement général ne
      * remplace pas les choix séparés » — un consentement donné sous un
-     * texte antérieur reste tracé sous sa propre version).
+     * texte antérieur reste tracé sous sa propre version). Passée à 2
+     * (Lot 3, véto du dirigeant) : ajout du pays, préalable au calcul réel
+     * d'audience.
      */
-    private const CURRENT_CONSENT_VERSION = 1;
+    private const CURRENT_CONSENT_VERSION = 2;
 
     /**
      * @param  array<int, string>  $interests
@@ -32,6 +34,9 @@ class AdvertisingProfileService
      */
     public function grantConsentAndUpdate(
         string $personId,
+        ?string $countryCode,
+        ?string $city,
+        ?string $neighborhood,
         ?string $ageBracket,
         ?string $gender,
         array $interests,
@@ -41,6 +46,9 @@ class AdvertisingProfileService
         $profile = PersonAdvertisingProfile::query()->firstOrNew(['person_id' => $personId]);
 
         $profile->forceFill([
+            'country_code' => $countryCode,
+            'city' => $city,
+            'neighborhood' => $neighborhood,
             'age_bracket' => $ageBracket,
             'gender' => $gender,
             'interests' => array_values($interests),
@@ -67,6 +75,9 @@ class AdvertisingProfileService
         }
 
         $profile->forceFill([
+            'country_code' => null,
+            'city' => null,
+            'neighborhood' => null,
             'age_bracket' => null,
             'gender' => null,
             'interests' => [],

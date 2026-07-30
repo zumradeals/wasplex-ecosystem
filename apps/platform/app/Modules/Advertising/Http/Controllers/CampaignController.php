@@ -103,11 +103,13 @@ class CampaignController extends Controller
                 pricingConfigurationVersion: $request->validated('pricing_configuration_version'),
             );
 
-            $this->audienceSegmentGuard->createSegment(
-                $version,
-                $request->validated('audience.criteria'),
-                $request->validated('audience.estimated_size'),
-            );
+            // Lot 3 (véto du dirigeant) : la taille est calculée depuis le
+            // profil publicitaire consenti, jamais fournie par l'annonceur
+            // (`estimated_size` n'existe plus dans la requête validée).
+            $criteria = $request->validated('audience.criteria');
+            $estimatedSize = $this->audienceSegmentGuard->computeSize($criteria);
+
+            $this->audienceSegmentGuard->createSegment($version, $criteria, $estimatedSize);
 
             return [$campaign, $version];
         });
