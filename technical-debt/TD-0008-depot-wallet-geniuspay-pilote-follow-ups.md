@@ -40,16 +40,16 @@ Ce lot livre un premier parcours de dépôt réel de bout en bout (initiation, c
 
 **Statut :** partiellement clos le 2026-07-30 (véto d'exécution du dirigeant, décision en conversation).
 
-Un écran admin de supervision existe désormais (`AdminWalletDepositController`, page `admin/wallet-deposits`, gouverné par la capacité `wallet_deposit.review` — migration `2026_07_30_100006`, ajoutée au bootstrap `GrantStaffCapability`) : il expose en lecture seule les dépôts `unknown_reconciliation` et les webhooks GeniusPay à signature invalide, rattaché à la destination existante « Finance et rapprochement » (lien depuis `admin/finance`, sans nouvelle entrée de menu — UX-0001 §8 fixe une liste fermée de destinations).
+Un écran admin de supervision existe désormais (`AdminWalletDepositController`, page `admin/wallet-deposits`, gouverné par la capacité `wallet_deposit.review` — migration `2026_07_30_100006`, ajoutée au bootstrap `GrantStaffCapability`) : il expose en lecture seule les dépôts `unknown_reconciliation` et les webhooks GeniusPay à signature invalide, rattaché à la destination existante « Finance et rapprochement » (lien depuis `admin/finance`, sans nouvelle entrée de menu — UX-0001 §8 fixe une liste fermée de destinations). Les deux files sont paginées à 50 éléments, indexées par état/date, et chaque consultation passe par le moteur d'autorisation audité.
 
 Reste volontairement hors périmètre :
 
 - aucune action de résolution (contre-écriture, relance provider `GET /payments/{reference}`, transition manuelle d'état) — consultation seule ;
 - aucune détection des webhooks « répétés » : la seule notion de répétition observable aujourd'hui (rejeu idempotent, §4 point 4) est un comportement normal, pas une anomalie — en définir une exigerait un seuil de suspicion qu'aucune décision adoptée ne fixe ;
-- `purpose_required` reste `false` sur cette capacité alors qu'ADR-0004 §8 qualifierait en principe cet accès de sensible à finalité obligatoire : `ResolvesStaffVisibility::hasActiveStaffGrant()`, seul mécanisme d'application de tout ce portail de supervision, ne vérifie aucune finalité à ce jour (même écart, déjà assumé, sur `alert_case.review`/`access.view`/`configuration.view`).
+- `purpose_required` reste `false` alors qu'ADR-0004 §8 qualifierait en principe cet accès sensible de finalisé : l'écran passe désormais par le moteur d'autorisation complet (portée, période, politique, assurance et audit), mais aucune finalité versionnée de rapprochement financier n'est encore déclarée ni liée à cette capacité ; cet écart doit être fermé avant l'ouverture à une équipe finance élargie.
 
-**Risque résiduel :** aucun à ce stade, aucun volume réel n'existe. La résolution effective d'un dépôt en litige reste manuelle, hors application (accès direct `ledger.wallet_deposits`/`ledger.wallet_deposit_webhook_events`).
-**Mesure temporaire :** aucune.
+**Risque résiduel :** l'accès sensible n'est pas encore associé à une finalité versionnée ; aucun volume réel n'existe à ce stade. La résolution effective d'un dépôt en litige reste manuelle, hors application (accès direct `ledger.wallet_deposits`/`ledger.wallet_deposit_webhook_events`).
+**Mesure temporaire :** réserver `wallet_deposit.review` au compte Fondateur/Administrateur Système tant que la finalité de rapprochement financier n'est pas déclarée et liée.
 **Porte de reprise :** avant un volume réel de dépôts, construire les actions de résolution (contre-écriture, relance provider) et, plus largement pour tout ce portail de supervision, formaliser l'application réelle d'une finalité déclarée (ADR-0004 §8) — porte commune, pas propre à cette seule capacité.
 
 ### TD-0008-E — Financement de campagne par le wallet annonceur reste hors périmètre
