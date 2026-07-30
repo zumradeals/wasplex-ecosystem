@@ -5,10 +5,17 @@ namespace App\Modules\Wallet\Deposit\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\Concerns\ResolvesStaffVisibility;
 use App\Http\Controllers\Controller;
 use App\Modules\Alerts\Http\Controllers\Admin\AdminAlertsController;
+use App\Modules\Governance\Authorization\Contracts\ResourceContext;
+use App\Modules\Governance\Authorization\Enums\AuthorizationDecision;
+use App\Modules\Governance\Authorization\Enums\Environment;
+use App\Modules\Governance\Authorization\Enums\Operation;
+use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
+use App\Modules\Governance\Authorization\Integration\AuthorizationRequestFactory;
 use App\Modules\Governance\Authorization\Integration\Http\AuthenticatedSubjectHttpResolver;
 use App\Modules\Wallet\Deposit\Enums\DepositState;
 use App\Modules\Wallet\Deposit\Models\Deposit;
 use App\Modules\Wallet\Deposit\Models\DepositWebhookEvent;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,26 +31,28 @@ use Inertia\Response;
  * documentée pour « Contestations de restitution »
  * ({@see AdminAlertsController}).
  *
- * Ne détecte volontairement pas les webhooks « répétés » : la seule notion
- * de répétition disponible aujourd'hui (rejeu idempotent d'un webhook déjà
- * traité, §4 point 4) est un comportement normal et attendu, pas une
- * anomalie — en détecter une exigerait de définir un seuil de suspicion
- * qu'aucune décision adoptée ne fixe (TD-0008-D reste ouvert pour cette
- * seule nuance).
+ * La lecture passe par le moteur d'autorisation complet : portée, période,
+ * politique, assurance de session et audit sont appliqués avant toute donnée.
+ * Les files sont paginées pour qu'un afflux de webhooks invalides ne puisse
+ * jamais produire une réponse Inertia non bornée.
  */
 class AdminWalletDepositController extends Controller
 {
     use ResolvesStaffVisibility;
 
+    private const PER_PAGE = 50;
+
     public function __construct(
         private readonly AuthenticatedSubjectHttpResolver $subjectResolver,
+        private readonly AuthorizationRequestFactory $authorizationRequestFactory,
+        private readonly AuthorizationGate $authorizationGate,
     ) {}
 
     public function index(Request $request): Response
     {
         $deniedProps = fn (string $reason): array => [
-            'disputedDeposits' => ['access' => ['allowed' => false, 'reason' => $reason], 'items' => []],
-            'invalidWebhooks' => ['access' => ['allowed' => false, 'reason' => $reason], 'items' => []],
+            'disputedDeposits' => $this->emptySection($reason),
+            'invalidWebhooks' => $this->emptySection($reason),
         ];
 
         $resolved = $this->resolveStaffSubject($request, 'admin/wallet-deposits', $deniedProps);
@@ -52,29 +61,58 @@ class AdminWalletDepositController extends Controller
             return $resolved;
         }
 
-        $canReview = $this->hasActiveStaffGrant($resolved['link'], 'wallet_deposit.review');
+        $environment = $this->currentEnvironment();
+        $authorization = $this->authorizationGate->evaluate(
+            $this->authorizationRequestFactory->make(
+                subject: $resolved['subject'],
+                capabilityKey: 'wallet_deposit.review',
+                operation: Operation::Read,
+                resource: new ResourceContext(
+                    resourceType: 'wallet.deposit',
+                    resourceId: null,
+                    organizationId: null,
+                    ownerPersonId: null,
+                    countryCode: null,
+                    territoryCodes: [],
+                    environment: $environment,
+                ),
+                environment: $environment,
+            ),
+        );
+
+        // Un effet masked ne peut pas être appliqué honnêtement à cet écran
+        // tant qu'un contrat de masquage champ par champ n'est pas défini :
+        // refus fermé plutôt qu'exposition complète par défaut.
+        $canReview = in_array($authorization->decision, [
+            AuthorizationDecision::Allowed,
+            AuthorizationDecision::AllowedReadOnly,
+        ], true);
+
+        if (! $canReview) {
+            return Inertia::render('admin/wallet-deposits', $deniedProps($authorization->reason->code));
+        }
+
+        $access = ['allowed' => true, 'reason' => null];
 
         return Inertia::render('admin/wallet-deposits', [
-            'disputedDeposits' => [
-                'access' => $this->staffAccessFor($canReview),
-                'items' => $canReview ? $this->disputedDeposits() : [],
-            ],
-            'invalidWebhooks' => [
-                'access' => $this->staffAccessFor($canReview),
-                'items' => $canReview ? $this->invalidSignatureWebhooks() : [],
-            ],
+            'disputedDeposits' => ['access' => $access, ...$this->disputedDeposits()],
+            'invalidWebhooks' => ['access' => $access, ...$this->invalidSignatureWebhooks()],
         ]);
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int|string|null>}
      */
     private function disputedDeposits(): array
     {
-        return Deposit::query()
+        $paginator = Deposit::query()
             ->where('state', DepositState::UnknownReconciliation->value)
             ->orderBy('created_at')
-            ->get()
+            ->orderBy('id')
+            ->paginate(self::PER_PAGE, ['*'], 'deposit_page')
+            ->withQueryString();
+
+        $items = collect($paginator->items())
             ->map(fn (Deposit $deposit): array => [
                 'deposit_id' => $deposit->id,
                 'person_id' => $deposit->person_id,
@@ -91,17 +129,23 @@ class AdminWalletDepositController extends Controller
             ])
             ->values()
             ->all();
+
+        return ['items' => $items, 'pagination' => $this->pagination($paginator)];
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int|string|null>}
      */
     private function invalidSignatureWebhooks(): array
     {
-        return DepositWebhookEvent::query()
+        $paginator = DepositWebhookEvent::query()
             ->where('signature_valid', false)
             ->orderBy('received_at')
-            ->get()
+            ->orderBy('id')
+            ->paginate(self::PER_PAGE, ['*'], 'webhook_page')
+            ->withQueryString();
+
+        $items = collect($paginator->items())
             ->map(fn (DepositWebhookEvent $event): array => [
                 'webhook_event_id' => $event->id,
                 'provider' => $event->provider,
@@ -112,5 +156,46 @@ class AdminWalletDepositController extends Controller
             ])
             ->values()
             ->all();
+
+        return ['items' => $items, 'pagination' => $this->pagination($paginator)];
+    }
+
+    /**
+     * @return array{access: array{allowed: false, reason: string}, items: array<never>, pagination: array<string, int|string|null>}
+     */
+    private function emptySection(string $reason): array
+    {
+        return [
+            'access' => ['allowed' => false, 'reason' => $reason],
+            'items' => [],
+            'pagination' => [
+                'current_page' => 1,
+                'last_page' => 1,
+                'per_page' => self::PER_PAGE,
+                'total' => 0,
+                'previous_url' => null,
+                'next_url' => null,
+            ],
+        ];
+    }
+
+    /**
+     * @return array{current_page: int, last_page: int, per_page: int, total: int, previous_url: ?string, next_url: ?string}
+     */
+    private function pagination(LengthAwarePaginator $paginator): array
+    {
+        return [
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'per_page' => $paginator->perPage(),
+            'total' => $paginator->total(),
+            'previous_url' => $paginator->previousPageUrl(),
+            'next_url' => $paginator->nextPageUrl(),
+        ];
+    }
+
+    private function currentEnvironment(): Environment
+    {
+        return Environment::tryFrom(app()->environment()) ?? Environment::Production;
     }
 }
