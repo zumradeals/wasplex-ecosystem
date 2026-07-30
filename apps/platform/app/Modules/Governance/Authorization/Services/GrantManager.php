@@ -442,5 +442,4 @@ class GrantManager
                 $query->whereNull('valid_until')->orWhere('valid_until', '>', $now);
             });
     }
-
 }
