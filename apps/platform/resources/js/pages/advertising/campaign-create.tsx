@@ -1,14 +1,32 @@
 import { Head, router } from '@inertiajs/react';
-import { Image as ImageIcon, Info } from 'lucide-react';
+import { Eye, Image as ImageIcon, Info, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AdvertiserAccessGate } from '@/components/advertiser/advertiser-access-gate';
 import type {
     AdvertiserAccess,
     AdvertiserProfileSummary,
 } from '@/components/advertiser/advertiser-access-gate';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
 import AdvertiserLayout from '@/layouts/advertiser-layout';
 import { FORMAT_LABELS } from '@/lib/advertising-labels';
 import { postFormData, postJson } from '@/lib/api';
+import { COUNTRIES } from '@/lib/countries';
 import campaigns from '@/routes/advertising/campaigns';
 
 type SectorOption = {
@@ -33,8 +51,10 @@ const PRICING_CONFIGURATION_VERSION = 1;
 // champs de ciblage — fonction pure, hors du composant, pour rester
 // utilisable telle quelle à la fois dans l'aperçu en direct (useEffect) et
 // à la soumission, sans dépendance instable dans un tableau de deps.
+// Lot 7 : `targetCountries` est désormais une liste de codes déjà propres
+// (choisis via menu déroulant), plus une chaîne CSV à analyser.
 function buildAudienceCriteria(params: {
-    targetCountry: string;
+    targetCountries: string[];
     targetCity: string;
     targetNeighborhood: string;
     ageBrackets: string[];
@@ -43,10 +63,7 @@ function buildAudienceCriteria(params: {
 }): Record<string, unknown> {
     const criteria: Record<string, unknown> = {};
 
-    const countryCodes = params.targetCountry
-        .split(',')
-        .map((value) => value.trim().toUpperCase())
-        .filter(Boolean);
+    const countryCodes = params.targetCountries.filter(Boolean);
 
     if (countryCodes.length > 0) {
         criteria.country = countryCodes;
@@ -99,6 +116,38 @@ const GENDERS: Record<string, string> = {
     prefer_not_to_say: 'Je préfère ne pas préciser',
 };
 
+// Lot 7 : quelques suggestions de saisie réelles et non exhaustives
+// (grandes villes ivoiriennes, communes d'Abidjan déjà citées dans le
+// code existant) — un simple confort via `<datalist>`, jamais une liste
+// fermée : toute autre valeur (n'importe quel pays) reste acceptée.
+const CITY_SUGGESTIONS = [
+    'Abidjan',
+    'Bouaké',
+    'Yamoussoukro',
+    'San-Pédro',
+    'Korhogo',
+    'Daloa',
+];
+
+const NEIGHBORHOOD_SUGGESTIONS = [
+    'Abobo',
+    'Adjamé',
+    'Attécoubé',
+    'Cocody',
+    'Koumassi',
+    'Marcory',
+    'Plateau',
+    'Port-Bouët',
+    'Treichville',
+    'Yopougon',
+];
+
+const STEP_LABELS = [
+    'Votre publicité',
+    'Qui doit la voir',
+    'Vérifier et publier',
+];
+
 type InterestOption = { code: string; label: string };
 
 type AudienceEstimate = {
@@ -136,14 +185,19 @@ export default function AdvertisingCampaignCreate({
     interestTaxonomy: InterestOption[];
     videoDurationBounds: VideoDurationBounds | null;
 }) {
+    const [step, setStep] = useState(0);
+
     const [code, setCode] = useState('');
     const [currency, setCurrency] = useState('XOF');
     const [sectorId, setSectorId] = useState(
         sectorClassifications[0]?.id ?? '',
     );
-    const [territory, setTerritory] = useState(
+    // Lot 7 : le territoire de diffusion devient une liste de menus
+    // déroulants (un pays par ligne) plutôt qu'un texte libre CSV — un
+    // non-tech n'a plus à connaître les codes ISO à deux lettres.
+    const [territories, setTerritories] = useState<string[]>([
         sectorClassifications[0]?.country_code ?? 'CI',
-    );
+    ]);
     const [headline, setHeadline] = useState('');
     const [format, setFormat] = useState('');
     const [destinationUrl, setDestinationUrl] = useState('');
@@ -153,7 +207,7 @@ export default function AdvertisingCampaignCreate({
     // légale/sectorielle), ville et quartier (texte libre, comme le
     // profil publicitaire), tranche d'âge/genre/centres d'intérêt à
     // cocher. `estimatedSize` n'est plus saisi : calculé par le serveur.
-    const [targetCountry, setTargetCountry] = useState('');
+    const [targetCountries, setTargetCountries] = useState<string[]>([]);
     const [targetCity, setTargetCity] = useState('');
     const [targetNeighborhood, setTargetNeighborhood] = useState('');
     const [ageBrackets, setAgeBrackets] = useState<string[]>([]);
@@ -181,7 +235,7 @@ export default function AdvertisingCampaignCreate({
         null;
 
     const criteria = buildAudienceCriteria({
-        targetCountry,
+        targetCountries,
         targetCity,
         targetNeighborhood,
         ageBrackets,
@@ -196,6 +250,18 @@ export default function AdvertisingCampaignCreate({
     const previewFormat = format || sector?.allowed_formats[0] || 'banner';
     const previewFormatLabel = FORMAT_LABELS[previewFormat] ?? previewFormat;
     const previewDestinationHost = destinationHost(destinationUrl);
+
+    // Lot 7 : navigation par étapes — validée directement sur l'état React
+    // (jamais une validation HTML5 sur des champs masqués d'une autre
+    // étape, un piège classique des formulaires en plusieurs pages).
+    const step1Valid = Boolean(
+        code.trim() &&
+        currency.trim().length === 3 &&
+        headline.trim() &&
+        destinationUrl.trim() &&
+        sectorId,
+    );
+    const step2Valid = territories.length > 0 && territories.every(Boolean);
 
     useEffect(() => {
         // `hasCriteria` gouverne déjà l'affichage ci-dessous (le message
@@ -227,7 +293,7 @@ export default function AdvertisingCampaignCreate({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         advertiserProfile,
-        targetCountry,
+        targetCountries,
         targetCity,
         targetNeighborhood,
         ageBrackets,
@@ -301,7 +367,7 @@ export default function AdvertisingCampaignCreate({
     // champ « Média » — le type du fichier choisi détermine la route
     // d'upload et la vérification appliquée. Le rejet d'un type non
     // reconnu ici n'est qu'un confort d'UX : le serveur reste la seule
-    // autorité (mimetypes validés à nouveau côté requête).
+    // autorité.
     async function handleMediaSelected(
         event: React.ChangeEvent<HTMLInputElement>,
     ) {
@@ -365,10 +431,7 @@ export default function AdvertisingCampaignCreate({
                 condition: 'completion',
             },
             destination: { url: destinationUrl },
-            territory: territory
-                .split(',')
-                .map((value) => value.trim().toUpperCase())
-                .filter(Boolean),
+            territory: territories.filter(Boolean),
             pricing_configuration_key: PRICING_CONFIGURATION_KEY,
             pricing_configuration_version: PRICING_CONFIGURATION_VERSION,
             audience: {
@@ -394,6 +457,17 @@ export default function AdvertisingCampaignCreate({
         router.visit('/advertising/budget');
     }
 
+    const previewCard = (
+        <AdPreviewCard
+            advertiserName={advertiserProfile?.legal_name ?? null}
+            headline={headline}
+            formatLabel={previewFormatLabel}
+            video={video}
+            image={image}
+            destinationHost={previewDestinationHost}
+        />
+    );
+
     return (
         <AdvertiserLayout
             title="Nouvelle campagne"
@@ -412,437 +486,669 @@ export default function AdvertisingCampaignCreate({
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        <form
-                            onSubmit={handleSubmit}
-                            className="space-y-5 lg:col-span-2"
-                        >
+                        <div className="space-y-5 lg:col-span-2">
                             {error && (
                                 <div className="rounded-lg border border-[var(--status-danger)]/30 bg-[var(--status-danger)]/10 px-4 py-3 text-sm text-[var(--status-danger)]">
                                     {error}
                                 </div>
                             )}
 
-                            <section className="space-y-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-                                <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-                                    Identité
-                                </h2>
+                            <StepIndicator step={step} />
 
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <Field label="Code de la campagne">
-                                        <input
-                                            required
-                                            value={code}
-                                            onChange={(event) =>
-                                                setCode(event.target.value)
-                                            }
-                                            className={inputClass}
-                                        />
-                                    </Field>
-                                    <Field label="Devise (3 lettres)">
-                                        <input
-                                            required
-                                            maxLength={3}
-                                            value={currency}
-                                            onChange={(event) =>
-                                                setCurrency(
-                                                    event.target.value.toUpperCase(),
-                                                )
-                                            }
-                                            className={`${inputClass} uppercase`}
-                                        />
-                                    </Field>
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                <div
+                                    className={
+                                        step === 0 ? 'space-y-5' : 'hidden'
+                                    }
+                                >
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>
+                                                Votre publicité
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="grid gap-4 sm:grid-cols-2">
+                                                <Field label="Code de la campagne">
+                                                    <input
+                                                        value={code}
+                                                        onChange={(event) =>
+                                                            setCode(
+                                                                event.target
+                                                                    .value,
+                                                            )
+                                                        }
+                                                        placeholder="ex. rentree-2026"
+                                                        className={inputClass}
+                                                    />
+                                                </Field>
+                                                <Field label="Devise (3 lettres)">
+                                                    <input
+                                                        maxLength={3}
+                                                        value={currency}
+                                                        onChange={(event) =>
+                                                            setCurrency(
+                                                                event.target.value.toUpperCase(),
+                                                            )
+                                                        }
+                                                        className={`${inputClass} uppercase`}
+                                                    />
+                                                </Field>
+                                            </div>
+
+                                            <Field label="Titre de la création">
+                                                <input
+                                                    value={headline}
+                                                    onChange={(event) =>
+                                                        setHeadline(
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="Ce que vous annoncez"
+                                                    className={inputClass}
+                                                />
+                                            </Field>
+
+                                            <Field label="URL de destination">
+                                                <input
+                                                    type="url"
+                                                    value={destinationUrl}
+                                                    onChange={(event) =>
+                                                        setDestinationUrl(
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    placeholder="https://…"
+                                                    className={inputClass}
+                                                />
+                                            </Field>
+
+                                            <Field label="Secteur">
+                                                <Select
+                                                    value={
+                                                        sectorId || undefined
+                                                    }
+                                                    onValueChange={setSectorId}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Choisir un secteur" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {sectorClassifications.map(
+                                                            (option) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        option.id
+                                                                    }
+                                                                    value={
+                                                                        option.id
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        option.label
+                                                                    }
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                            </Field>
+
+                                            {sector &&
+                                                (sector.allowed_formats.length >
+                                                    0 ||
+                                                    sector.minimum_age ||
+                                                    sector.warnings.length >
+                                                        0) && (
+                                                    <div className="flex gap-2 rounded-lg bg-[var(--bg-raised)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
+                                                        <Info
+                                                            size={14}
+                                                            className="mt-0.5 shrink-0"
+                                                        />
+                                                        <div className="space-y-1">
+                                                            {sector
+                                                                .allowed_formats
+                                                                .length > 0 && (
+                                                                <p>
+                                                                    Formats
+                                                                    autorisés
+                                                                    pour ce
+                                                                    secteur :{' '}
+                                                                    {sector.allowed_formats
+                                                                        .map(
+                                                                            (
+                                                                                value,
+                                                                            ) =>
+                                                                                FORMAT_LABELS[
+                                                                                    value
+                                                                                ] ??
+                                                                                value,
+                                                                        )
+                                                                        .join(
+                                                                            ', ',
+                                                                        )}
+                                                                </p>
+                                                            )}
+                                                            {sector.minimum_age && (
+                                                                <p>
+                                                                    Âge minimal
+                                                                    requis :{' '}
+                                                                    {
+                                                                        sector.minimum_age
+                                                                    }{' '}
+                                                                    ans
+                                                                </p>
+                                                            )}
+                                                            {sector.warnings
+                                                                .length > 0 && (
+                                                                <p>
+                                                                    Avertissements
+                                                                    :{' '}
+                                                                    {sector.warnings.join(
+                                                                        ', ',
+                                                                    )}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                            <Field label="Format de la publicité">
+                                                <Select
+                                                    value={format || undefined}
+                                                    onValueChange={setFormat}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Choisir un format" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {(sector
+                                                            ?.allowed_formats
+                                                            .length
+                                                            ? sector.allowed_formats
+                                                            : Object.keys(
+                                                                  FORMAT_LABELS,
+                                                              )
+                                                        ).map((value) => (
+                                                            <SelectItem
+                                                                key={value}
+                                                                value={value}
+                                                            >
+                                                                {FORMAT_LABELS[
+                                                                    value
+                                                                ] ?? value}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </Field>
+
+                                            <p className="text-xs text-[var(--text-secondary)]">
+                                                Condition de crédit : vue
+                                                complète requise — la seule
+                                                condition prise en charge
+                                                aujourd'hui.
+                                            </p>
+
+                                            <Field
+                                                label={`Média (facultatif — vidéo${videoDurationBounds ? ` ${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s` : ''} ou image verticale)`}
+                                            >
+                                                <input
+                                                    type="file"
+                                                    accept="video/mp4,image/jpeg,image/png,image/webp"
+                                                    onChange={
+                                                        handleMediaSelected
+                                                    }
+                                                    disabled={
+                                                        mediaUploading ||
+                                                        !advertiserProfile
+                                                    }
+                                                    className={inputClass}
+                                                />
+                                            </Field>
+
+                                            {mediaUploading && (
+                                                <p className="text-xs text-[var(--text-secondary)]">
+                                                    Envoi et vérification en
+                                                    cours…
+                                                </p>
+                                            )}
+
+                                            {mediaError && (
+                                                <p className="text-xs text-[var(--status-danger)]">
+                                                    {mediaError}
+                                                </p>
+                                            )}
+
+                                            {video && (
+                                                <p className="text-xs text-[var(--status-success)]">
+                                                    Vidéo acceptée —{' '}
+                                                    {video.duration_seconds}{' '}
+                                                    secondes. Visible dans
+                                                    l'aperçu.
+                                                </p>
+                                            )}
+
+                                            {image && (
+                                                <p className="text-xs text-[var(--status-success)]">
+                                                    Image acceptée —{' '}
+                                                    {image.width}×{image.height}
+                                                    . Visible dans l'aperçu.
+                                                </p>
+                                            )}
+                                        </CardContent>
+                                    </Card>
                                 </div>
 
-                                <Field label="Titre de la création">
-                                    <input
-                                        required
-                                        value={headline}
-                                        onChange={(event) =>
-                                            setHeadline(event.target.value)
-                                        }
-                                        placeholder="Ce que vous annoncez"
-                                        className={inputClass}
-                                    />
-                                </Field>
-
-                                <Field label="URL de destination">
-                                    <input
-                                        required
-                                        type="url"
-                                        value={destinationUrl}
-                                        onChange={(event) =>
-                                            setDestinationUrl(
-                                                event.target.value,
-                                            )
-                                        }
-                                        placeholder="https://…"
-                                        className={inputClass}
-                                    />
-                                </Field>
-
-                                <Field
-                                    label={`Média (facultatif — vidéo${videoDurationBounds ? ` ${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s` : ''} ou image verticale)`}
+                                <div
+                                    className={
+                                        step === 1 ? 'space-y-5' : 'hidden'
+                                    }
                                 >
-                                    <input
-                                        type="file"
-                                        accept="video/mp4,image/jpeg,image/png,image/webp"
-                                        onChange={handleMediaSelected}
-                                        disabled={
-                                            mediaUploading || !advertiserProfile
-                                        }
-                                        className={inputClass}
-                                    />
-                                </Field>
-
-                                {mediaUploading && (
-                                    <p className="text-xs text-[var(--text-secondary)]">
-                                        Envoi et vérification en cours…
-                                    </p>
-                                )}
-
-                                {mediaError && (
-                                    <p className="text-xs text-[var(--status-danger)]">
-                                        {mediaError}
-                                    </p>
-                                )}
-
-                                {video && (
-                                    <p className="text-xs text-[var(--status-success)]">
-                                        Vidéo acceptée —{' '}
-                                        {video.duration_seconds} secondes.
-                                        Visible dans l'aperçu ci-contre.
-                                    </p>
-                                )}
-
-                                {image && (
-                                    <p className="text-xs text-[var(--status-success)]">
-                                        Image acceptée — {image.width}×
-                                        {image.height}. Visible dans l'aperçu
-                                        ci-contre.
-                                    </p>
-                                )}
-                            </section>
-
-                            <section className="space-y-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-                                <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-                                    Secteur et conformité
-                                </h2>
-
-                                <Field label="Secteur">
-                                    <select
-                                        value={sectorId}
-                                        onChange={(event) =>
-                                            setSectorId(event.target.value)
-                                        }
-                                        className={inputClass}
-                                    >
-                                        {sectorClassifications.map((option) => (
-                                            <option
-                                                key={option.id}
-                                                value={option.id}
-                                            >
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </Field>
-
-                                {sector &&
-                                    (sector.allowed_formats.length > 0 ||
-                                        sector.minimum_age ||
-                                        sector.warnings.length > 0) && (
-                                        <div className="flex gap-2 rounded-lg bg-[var(--bg-raised)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
-                                            <Info
-                                                size={14}
-                                                className="mt-0.5 shrink-0"
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>
+                                                Territoire de diffusion
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <CountrySelectList
+                                                label="Pays où la campagne peut être diffusée (obligatoire)"
+                                                values={territories}
+                                                onChange={setTerritories}
+                                                minRows={1}
                                             />
-                                            <div className="space-y-1">
-                                                {sector.allowed_formats.length >
-                                                    0 && (
-                                                    <p>
-                                                        Formats autorisés pour
-                                                        ce secteur :{' '}
-                                                        {sector.allowed_formats
-                                                            .map(
-                                                                (value) =>
-                                                                    FORMAT_LABELS[
-                                                                        value
-                                                                    ] ?? value,
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>
+                                                Ciblage précis (facultatif)
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <p className="text-xs text-[var(--text-secondary)]">
+                                                Différent du territoire de
+                                                diffusion ci-dessus : ici, vous
+                                                choisissez qui, parmi les
+                                                personnes de ce territoire,
+                                                devrait voir votre publicité en
+                                                priorité. Laissez vide pour
+                                                toucher tout le monde.
+                                            </p>
+
+                                            <CountrySelectList
+                                                label="Pays ciblé"
+                                                values={targetCountries}
+                                                onChange={setTargetCountries}
+                                            />
+
+                                            <div className="grid gap-4 sm:grid-cols-2">
+                                                <Field label="Ville ciblée (ex. Abidjan)">
+                                                    <input
+                                                        value={targetCity}
+                                                        onChange={(event) =>
+                                                            setTargetCity(
+                                                                event.target
+                                                                    .value,
                                                             )
-                                                            .join(', ')}
-                                                    </p>
+                                                        }
+                                                        list="campaign-create-city-suggestions"
+                                                        placeholder="Abidjan"
+                                                        className={inputClass}
+                                                    />
+                                                </Field>
+                                                <Field label="Quartier ciblé (ex. Abobo)">
+                                                    <input
+                                                        value={
+                                                            targetNeighborhood
+                                                        }
+                                                        onChange={(event) =>
+                                                            setTargetNeighborhood(
+                                                                event.target
+                                                                    .value,
+                                                            )
+                                                        }
+                                                        list="campaign-create-neighborhood-suggestions"
+                                                        placeholder="Abobo"
+                                                        className={inputClass}
+                                                    />
+                                                </Field>
+                                            </div>
+
+                                            <datalist id="campaign-create-city-suggestions">
+                                                {CITY_SUGGESTIONS.map(
+                                                    (city) => (
+                                                        <option
+                                                            key={city}
+                                                            value={city}
+                                                        />
+                                                    ),
                                                 )}
-                                                {sector.minimum_age && (
-                                                    <p>
-                                                        Âge minimal requis :{' '}
-                                                        {sector.minimum_age} ans
-                                                    </p>
+                                            </datalist>
+                                            <datalist id="campaign-create-neighborhood-suggestions">
+                                                {NEIGHBORHOOD_SUGGESTIONS.map(
+                                                    (neighborhood) => (
+                                                        <option
+                                                            key={neighborhood}
+                                                            value={neighborhood}
+                                                        />
+                                                    ),
                                                 )}
-                                                {sector.warnings.length > 0 && (
-                                                    <p>
-                                                        Avertissements :{' '}
-                                                        {sector.warnings.join(
-                                                            ', ',
+                                            </datalist>
+
+                                            <div className="space-y-1.5">
+                                                <span className="text-xs font-medium text-[var(--text-primary)]">
+                                                    Tranche d'âge
+                                                </span>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {AGE_BRACKETS.map(
+                                                        (bracket) => (
+                                                            <button
+                                                                key={bracket}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    toggleFromList(
+                                                                        ageBrackets,
+                                                                        setAgeBrackets,
+                                                                        bracket,
+                                                                    )
+                                                                }
+                                                                className={
+                                                                    ageBrackets.includes(
+                                                                        bracket,
+                                                                    )
+                                                                        ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                                                                        : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                                }
+                                                            >
+                                                                {bracket}
+                                                            </button>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1.5">
+                                                <span className="text-xs font-medium text-[var(--text-primary)]">
+                                                    Genre
+                                                </span>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {Object.entries(
+                                                        GENDERS,
+                                                    ).map(([value, label]) => (
+                                                        <button
+                                                            key={value}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                toggleFromList(
+                                                                    genders,
+                                                                    setGenders,
+                                                                    value,
+                                                                )
+                                                            }
+                                                            className={
+                                                                genders.includes(
+                                                                    value,
+                                                                )
+                                                                    ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                                                                    : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                            }
+                                                        >
+                                                            {label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {interestTaxonomy.length > 0 && (
+                                                <div className="space-y-1.5">
+                                                    <span className="text-xs font-medium text-[var(--text-primary)]">
+                                                        Centres d'intérêt
+                                                    </span>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {interestTaxonomy.map(
+                                                            (option) => (
+                                                                <button
+                                                                    key={
+                                                                        option.code
+                                                                    }
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        toggleFromList(
+                                                                            interests,
+                                                                            setInterests,
+                                                                            option.code,
+                                                                        )
+                                                                    }
+                                                                    className={
+                                                                        interests.includes(
+                                                                            option.code,
+                                                                        )
+                                                                            ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                                                                            : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        option.label
+                                                                    }
+                                                                </button>
+                                                            ),
                                                         )}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div className="rounded-lg bg-[var(--bg-raised)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
+                                                {!hasCriteria ? (
+                                                    <p>
+                                                        Aucun critère de ciblage
+                                                        choisi : l'audience
+                                                        calculée portera sur
+                                                        l'ensemble des profils
+                                                        publicitaires consentis.
                                                     </p>
+                                                ) : estimating ? (
+                                                    <p>Calcul de l'audience…</p>
+                                                ) : estimate?.below_threshold ? (
+                                                    <p>
+                                                        Sous le seuil minimal
+                                                        actif
+                                                        {audienceSizeThreshold !==
+                                                        null
+                                                            ? ` (${audienceSizeThreshold})`
+                                                            : ''}
+                                                        : la taille ne vous sera
+                                                        pas communiquée
+                                                        (AMD-0009 §13).
+                                                    </p>
+                                                ) : estimate?.estimated_size !==
+                                                      null &&
+                                                  estimate?.estimated_size !==
+                                                      undefined ? (
+                                                    <p>
+                                                        Audience estimée :{' '}
+                                                        <span className="font-semibold text-[var(--text-primary)]">
+                                                            {
+                                                                estimate.estimated_size
+                                                            }
+                                                        </span>{' '}
+                                                        profil(s)
+                                                        correspondant(s)
+                                                        (calculée depuis les
+                                                        profils publicitaires
+                                                        consentis, jamais
+                                                        devinée).
+                                                    </p>
+                                                ) : (
+                                                    <p>—</p>
                                                 )}
                                             </div>
-                                        </div>
-                                    )}
-
-                                <Field label="Format de la publicité">
-                                    <input
-                                        value={format}
-                                        onChange={(event) =>
-                                            setFormat(event.target.value)
-                                        }
-                                        placeholder={
-                                            sector?.allowed_formats[0] ??
-                                            'banner'
-                                        }
-                                        className={inputClass}
-                                    />
-                                </Field>
-
-                                <p className="text-xs text-[var(--text-secondary)]">
-                                    Condition de crédit : vue complète requise —
-                                    la seule condition prise en charge
-                                    aujourd'hui.
-                                </p>
-                            </section>
-
-                            <section className="space-y-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-                                <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-                                    Audience
-                                </h2>
-
-                                <Field label="Territoires (codes pays séparés par des virgules)">
-                                    <input
-                                        required
-                                        value={territory}
-                                        onChange={(event) =>
-                                            setTerritory(event.target.value)
-                                        }
-                                        className={inputClass}
-                                    />
-                                </Field>
-
-                                <h3 className="text-xs font-semibold tracking-wide text-[var(--text-secondary)] uppercase">
-                                    Ciblage (facultatif)
-                                </h3>
-
-                                <div className="grid gap-4 sm:grid-cols-3">
-                                    <Field label="Pays ciblé (codes séparés par virgules)">
-                                        <input
-                                            value={targetCountry}
-                                            onChange={(event) =>
-                                                setTargetCountry(
-                                                    event.target.value,
-                                                )
-                                            }
-                                            placeholder="CI"
-                                            className={inputClass}
-                                        />
-                                    </Field>
-                                    <Field label="Ville ciblée">
-                                        <input
-                                            value={targetCity}
-                                            onChange={(event) =>
-                                                setTargetCity(
-                                                    event.target.value,
-                                                )
-                                            }
-                                            placeholder="Abidjan"
-                                            className={inputClass}
-                                        />
-                                    </Field>
-                                    <Field label="Quartier ciblé">
-                                        <input
-                                            value={targetNeighborhood}
-                                            onChange={(event) =>
-                                                setTargetNeighborhood(
-                                                    event.target.value,
-                                                )
-                                            }
-                                            placeholder="Abobo"
-                                            className={inputClass}
-                                        />
-                                    </Field>
+                                        </CardContent>
+                                    </Card>
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <span className="text-xs font-medium text-[var(--text-primary)]">
-                                        Tranche d'âge
-                                    </span>
-                                    <div className="flex flex-wrap gap-2">
-                                        {AGE_BRACKETS.map((bracket) => (
-                                            <button
-                                                key={bracket}
+                                <div
+                                    className={
+                                        step === 2 ? 'space-y-5' : 'hidden'
+                                    }
+                                >
+                                    <div className="lg:hidden">
+                                        {previewCard}
+                                    </div>
+
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Récapitulatif</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <dl className="space-y-2 text-sm">
+                                                <SummaryRow
+                                                    label="Code"
+                                                    value={code || '—'}
+                                                />
+                                                <SummaryRow
+                                                    label="Titre"
+                                                    value={headline || '—'}
+                                                />
+                                                <SummaryRow
+                                                    label="Secteur"
+                                                    value={sector?.label ?? '—'}
+                                                />
+                                                <SummaryRow
+                                                    label="Format"
+                                                    value={previewFormatLabel}
+                                                />
+                                                <SummaryRow
+                                                    label="Média"
+                                                    value={
+                                                        video
+                                                            ? 'Vidéo ajoutée'
+                                                            : image
+                                                              ? 'Image ajoutée'
+                                                              : 'Aucun'
+                                                    }
+                                                />
+                                                <SummaryRow
+                                                    label="Territoire de diffusion"
+                                                    value={
+                                                        territories
+                                                            .filter(Boolean)
+                                                            .map(
+                                                                (code) =>
+                                                                    COUNTRIES.find(
+                                                                        (c) =>
+                                                                            c.code ===
+                                                                            code,
+                                                                    )?.name ??
+                                                                    code,
+                                                            )
+                                                            .join(', ') || '—'
+                                                    }
+                                                />
+                                            </dl>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>
+                                                Avant de publier
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-2 text-sm text-[var(--text-secondary)]">
+                                            <p>
+                                                La campagne est créée à l'état
+                                                brouillon.
+                                            </p>
+                                            <p>
+                                                Elle doit ensuite être soumise
+                                                pour revue, puis approuvée.
+                                            </p>
+                                            <p>
+                                                Elle ne peut être activée qu'une
+                                                fois financée intégralement.
+                                            </p>
+                                            <p>
+                                                Aucun gain ni disponibilité de
+                                                campagne n'est garanti.
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        {step > 0 && (
+                                            <Button
                                                 type="button"
+                                                variant="outline"
                                                 onClick={() =>
-                                                    toggleFromList(
-                                                        ageBrackets,
-                                                        setAgeBrackets,
-                                                        bracket,
-                                                    )
-                                                }
-                                                className={
-                                                    ageBrackets.includes(
-                                                        bracket,
-                                                    )
-                                                        ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
-                                                        : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                    setStep(step - 1)
                                                 }
                                             >
-                                                {bracket}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <span className="text-xs font-medium text-[var(--text-primary)]">
-                                        Genre
-                                    </span>
-                                    <div className="flex flex-wrap gap-2">
-                                        {Object.entries(GENDERS).map(
-                                            ([value, label]) => (
-                                                <button
-                                                    key={value}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        toggleFromList(
-                                                            genders,
-                                                            setGenders,
-                                                            value,
-                                                        )
-                                                    }
-                                                    className={
-                                                        genders.includes(value)
-                                                            ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
-                                                            : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
-                                                    }
-                                                >
-                                                    {label}
-                                                </button>
-                                            ),
+                                                Précédent
+                                            </Button>
                                         )}
                                     </div>
-                                </div>
 
-                                {interestTaxonomy.length > 0 && (
-                                    <div className="space-y-1.5">
-                                        <span className="text-xs font-medium text-[var(--text-primary)]">
-                                            Centres d'intérêt
-                                        </span>
-                                        <div className="flex flex-wrap gap-2">
-                                            {interestTaxonomy.map((option) => (
-                                                <button
-                                                    key={option.code}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        toggleFromList(
-                                                            interests,
-                                                            setInterests,
-                                                            option.code,
-                                                        )
-                                                    }
-                                                    className={
-                                                        interests.includes(
-                                                            option.code,
-                                                        )
-                                                            ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
-                                                            : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
-                                                    }
-                                                >
-                                                    {option.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="rounded-lg bg-[var(--bg-raised)] px-3 py-2.5 text-xs text-[var(--text-secondary)]">
-                                    {!hasCriteria ? (
-                                        <p>
-                                            Aucun critère de ciblage choisi :
-                                            l'audience calculée portera sur
-                                            l'ensemble des profils publicitaires
-                                            consentis.
-                                        </p>
-                                    ) : estimating ? (
-                                        <p>Calcul de l'audience…</p>
-                                    ) : estimate?.below_threshold ? (
-                                        <p>
-                                            Sous le seuil minimal actif
-                                            {audienceSizeThreshold !== null
-                                                ? ` (${audienceSizeThreshold})`
-                                                : ''}
-                                            : la taille ne vous sera pas
-                                            communiquée (AMD-0009 §13).
-                                        </p>
-                                    ) : estimate?.estimated_size !== null &&
-                                      estimate?.estimated_size !== undefined ? (
-                                        <p>
-                                            Audience estimée :{' '}
-                                            <span className="font-semibold text-[var(--text-primary)]">
-                                                {estimate.estimated_size}
-                                            </span>{' '}
-                                            profil(s) correspondant(s) (calculée
-                                            depuis les profils publicitaires
-                                            consentis, jamais devinée).
-                                        </p>
+                                    {step < 2 ? (
+                                        <Button
+                                            type="button"
+                                            disabled={
+                                                (step === 0 && !step1Valid) ||
+                                                (step === 1 && !step2Valid)
+                                            }
+                                            onClick={() => setStep(step + 1)}
+                                        >
+                                            Suivant
+                                        </Button>
                                     ) : (
-                                        <p>—</p>
+                                        <Button
+                                            type="submit"
+                                            disabled={submitting}
+                                        >
+                                            {submitting
+                                                ? 'Création...'
+                                                : 'Créer la campagne (brouillon)'}
+                                        </Button>
                                     )}
                                 </div>
-                            </section>
+                            </form>
+                        </div>
 
-                            <button
-                                type="submit"
-                                disabled={submitting}
-                                className="w-full rounded-xl bg-[var(--brand-blue)] py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 sm:w-auto sm:px-6"
-                            >
-                                {submitting
-                                    ? 'Création...'
-                                    : 'Créer la campagne (brouillon)'}
-                            </button>
-                        </form>
-
-                        <aside className="space-y-5">
-                            <AdPreviewCard
-                                advertiserName={
-                                    advertiserProfile?.legal_name ?? null
-                                }
-                                headline={headline}
-                                formatLabel={previewFormatLabel}
-                                video={video}
-                                image={image}
-                                destinationHost={previewDestinationHost}
-                            />
-
-                            <div className="space-y-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 text-sm text-[var(--text-secondary)]">
-                                <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-                                    Avant de publier
-                                </h2>
-                                <p>La campagne est créée à l'état brouillon.</p>
-                                <p>
-                                    Elle doit ensuite être soumise pour revue,
-                                    puis approuvée.
-                                </p>
-                                <p>
-                                    Elle ne peut être activée qu'une fois
-                                    financée intégralement.
-                                </p>
-                                <p>
-                                    Aucun gain ni disponibilité de campagne
-                                    n'est garanti.
-                                </p>
-                            </div>
+                        <aside className="hidden space-y-5 lg:block">
+                            {previewCard}
                         </aside>
                     </div>
                 )}
             </AdvertiserAccessGate>
+
+            {sectorClassifications.length > 0 && step !== 2 && (
+                <div className="lg:hidden">
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button
+                                type="button"
+                                className="fixed right-4 bottom-4 z-20 shadow-lg"
+                            >
+                                <Eye size={16} />
+                                Voir l'aperçu
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent
+                            side="bottom"
+                            className="max-h-[85vh] overflow-y-auto"
+                        >
+                            <SheetHeader>
+                                <SheetTitle>Aperçu de la publicité</SheetTitle>
+                            </SheetHeader>
+                            <div className="px-4 pb-4">{previewCard}</div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+            )}
         </AdvertiserLayout>
     );
 }
@@ -858,12 +1164,126 @@ function Field({
     children: React.ReactNode;
 }) {
     return (
-        <label className="block space-y-1.5">
-            <span className="text-xs font-medium text-[var(--text-primary)]">
+        <div className="block space-y-1.5">
+            <Label className="text-xs font-medium text-[var(--text-primary)]">
                 {label}
-            </span>
+            </Label>
             {children}
-        </label>
+        </div>
+    );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="flex justify-between gap-3 border-b border-[var(--border-default)] pb-2 last:border-0 last:pb-0">
+            <dt className="text-[var(--text-secondary)]">{label}</dt>
+            <dd className="text-right font-medium text-[var(--text-primary)]">
+                {value}
+            </dd>
+        </div>
+    );
+}
+
+// Lot 7 : indicateur d'étape, mirroir visuel des puces déjà utilisées
+// dans ce fichier pour âge/genre/intérêts.
+function StepIndicator({ step }: { step: number }) {
+    return (
+        <div className="flex flex-wrap gap-2">
+            {STEP_LABELS.map((label, index) => (
+                <span
+                    key={label}
+                    className={
+                        index === step
+                            ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                            : index < step
+                              ? 'rounded-full border border-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-[var(--brand-blue)]'
+                              : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                    }
+                >
+                    {index + 1}. {label}
+                </span>
+            ))}
+        </div>
+    );
+}
+
+// Lot 7 : sélection d'un-ou-plusieurs pays via menus déroulants (jamais un
+// texte libre à codes ISO) — mirroir du pattern `toggleFromList` déjà
+// présent dans ce fichier, adapté ici à une liste de menus (une liste de
+// puces serait inutilisable avec ~195 pays).
+function CountrySelectList({
+    label,
+    values,
+    onChange,
+    minRows = 0,
+}: {
+    label: string;
+    values: string[];
+    onChange: (values: string[]) => void;
+    minRows?: number;
+}) {
+    function updateAt(index: number, code: string) {
+        const next = [...values];
+        next[index] = code;
+        onChange(next);
+    }
+
+    function removeAt(index: number) {
+        onChange(values.filter((_, i) => i !== index));
+    }
+
+    return (
+        <div className="space-y-2">
+            <Label className="text-xs font-medium text-[var(--text-primary)]">
+                {label}
+            </Label>
+
+            <div className="space-y-2">
+                {values.map((value, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                        <Select
+                            value={value || undefined}
+                            onValueChange={(next) => updateAt(index, next)}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Choisir un pays" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {COUNTRIES.map((country) => (
+                                    <SelectItem
+                                        key={country.code}
+                                        value={country.code}
+                                    >
+                                        {country.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {values.length > minRows && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                aria-label="Retirer ce pays"
+                                onClick={() => removeAt(index)}
+                            >
+                                <X size={16} />
+                            </Button>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onChange([...values, ''])}
+            >
+                <Plus size={14} />
+                Ajouter un pays
+            </Button>
+        </div>
     );
 }
 
@@ -890,68 +1310,69 @@ function AdPreviewCard({
     const displayName = advertiserName ?? 'Votre entreprise';
 
     return (
-        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-            <h2 className="mb-3 text-sm font-semibold text-[var(--text-primary)]">
-                Aperçu de la publicité
-            </h2>
+        <Card>
+            <CardHeader>
+                <CardTitle>Aperçu de la publicité</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="relative aspect-9/16 w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#173251] via-[#0C2340] to-[#0A1E38]">
+                    <span className="absolute top-3 left-3 z-10 rounded-md bg-[#0E2542]/80 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-[#4FA3FF] uppercase backdrop-blur-sm">
+                        {formatLabel}
+                    </span>
 
-            <div className="relative aspect-9/16 w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#173251] via-[#0C2340] to-[#0A1E38]">
-                <span className="absolute top-3 left-3 z-10 rounded-md bg-[#0E2542]/80 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-[#4FA3FF] uppercase backdrop-blur-sm">
-                    {formatLabel}
-                </span>
-
-                {video ? (
-                    <video
-                        src={video.url}
-                        muted
-                        loop
-                        controls
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
-                ) : image ? (
-                    <img
-                        src={image.url}
-                        alt=""
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
-                ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-                        <ImageIcon
-                            size={28}
-                            className="text-[#4FA3FF]/60"
-                            aria-hidden="true"
+                    {video ? (
+                        <video
+                            src={video.url}
+                            muted
+                            loop
+                            controls
+                            className="absolute inset-0 h-full w-full object-cover"
                         />
-                        <p className="text-xs text-[#A9B7C8]">
-                            Aucun média — ajoutez une vidéo ou une image pour
-                            l'aperçu.
-                        </p>
-                    </div>
-                )}
+                    ) : image ? (
+                        <img
+                            src={image.url}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover"
+                        />
+                    ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+                            <ImageIcon
+                                size={28}
+                                className="text-[#4FA3FF]/60"
+                                aria-hidden="true"
+                            />
+                            <p className="text-xs text-[#A9B7C8]">
+                                Aucun média — ajoutez une vidéo ou une image
+                                pour l'aperçu.
+                            </p>
+                        </div>
+                    )}
 
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[#07182D]/95 via-[#07182D]/55 to-transparent px-3 pt-10 pb-3">
-                    <div className="flex items-center gap-2">
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#4FA3FF] to-[#075CCF] text-xs font-bold text-white">
-                            {displayName.charAt(0).toUpperCase()}
-                        </span>
-                        <div className="min-w-0">
-                            <p className="truncate text-xs font-bold text-white">
-                                {displayName}
-                            </p>
-                            <p className="truncate text-xs text-[#A9B7C8]">
-                                {headline.trim() ||
-                                    'Votre titre apparaîtra ici'}
-                            </p>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[#07182D]/95 via-[#07182D]/55 to-transparent px-3 pt-10 pb-3">
+                        <div className="flex items-center gap-2">
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#4FA3FF] to-[#075CCF] text-xs font-bold text-white">
+                                {displayName.charAt(0).toUpperCase()}
+                            </span>
+                            <div className="min-w-0">
+                                <p className="truncate text-xs font-bold text-white">
+                                    {displayName}
+                                </p>
+                                <p className="truncate text-xs text-[#A9B7C8]">
+                                    {headline.trim() ||
+                                        'Votre titre apparaîtra ici'}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <p className="mt-3 truncate text-xs text-[var(--text-secondary)]">
-                Renvoie vers{' '}
-                <span className="text-[var(--text-primary)]">
-                    {destinationHost}
-                </span>
-            </p>
-        </div>
+                <p className="mt-3 truncate text-xs text-[var(--text-secondary)]">
+                    Renvoie vers{' '}
+                    <span className="text-[var(--text-primary)]">
+                        {destinationHost}
+                    </span>
+                </p>
+            </CardContent>
+        </Card>
     );
 }
