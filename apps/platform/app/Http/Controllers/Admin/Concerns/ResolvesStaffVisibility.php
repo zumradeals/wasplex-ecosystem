@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Concerns;
 
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Governance\Authorization\Enums\GrantState;
+use App\Modules\Governance\Authorization\Integration\AuthenticatedSubject;
 use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
 use App\Modules\Governance\Authorization\Integration\Exceptions\SubjectResolutionFailedException;
 use App\Modules\Governance\Authorization\Models\CapabilityDefinition;
@@ -34,7 +35,7 @@ use Inertia\Response;
 trait ResolvesStaffVisibility
 {
     /**
-     * @return array{link: PersonAccountLink}|Response
+     * @return array{link: PersonAccountLink, subject: AuthenticatedSubject}|Response
      */
     private function resolveStaffSubject(Request $request, string $component, mixed $deniedProps): array|Response
     {
@@ -44,7 +45,7 @@ trait ResolvesStaffVisibility
             return Inertia::render($component, $deniedProps('subject_not_resolved'));
         }
 
-        return ['link' => $subject->personAccountLink];
+        return ['link' => $subject->personAccountLink, 'subject' => $subject];
     }
 
     /**

@@ -43,6 +43,7 @@ use App\Modules\Governance\Authorization\Http\Controllers\Admin\AdminAccessContr
 use App\Modules\Governance\Configuration\Http\Controllers\Admin\AdminConfigurationController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
+use App\Modules\Wallet\Deposit\Http\Controllers\Admin\AdminWalletDepositController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositInitiationController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositReturnController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositWebhookController;
@@ -166,6 +167,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/configurations', [AdminConfigurationController::class, 'index'])
         ->name('admin.configurations');
     Route::get('admin/access', [AdminAccessController::class, 'index'])->name('admin.access');
+
+    // TD-0008-D : supervision des dépôts Wallet GeniusPay en litige
+    // (unknown_reconciliation) et des webhooks à signature invalide
+    // (wallet_deposit.review, lecture seule — voir la migration de
+    // déclaration pour ce qui reste volontairement hors périmètre).
+    Route::get('admin/wallet-deposits', [AdminWalletDepositController::class, 'index'])
+        ->name('admin.wallet-deposits');
 
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne

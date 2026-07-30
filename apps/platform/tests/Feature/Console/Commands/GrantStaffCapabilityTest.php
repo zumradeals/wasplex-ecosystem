@@ -117,6 +117,7 @@ class GrantStaffCapabilityTest extends AdvertisingTestCase
         yield 'alert_match.validate' => ['alert_match.validate', 'alerts.case_category'];
         yield 'alert_return.verify' => ['alert_return.verify', 'alerts.case_category'];
         yield 'governance.system_administrator' => ['governance.system_administrator', 'governance.system'];
+        yield 'wallet_deposit.review' => ['wallet_deposit.review', 'wallet.deposit'];
     }
 
     #[DataProvider('newlyBootstrappableCapabilities')]
@@ -151,5 +152,113 @@ class GrantStaffCapabilityTest extends AdvertisingTestCase
 
         $this->assertSame($expectedResourceType, $grant->scope()->resourceType);
         $this->assertNull($grant->scope()->resourceIds);
+    }
+
+    /**
+     * Addendum ADR-0004 2026-07-30 (« Auto-amorçage de l'Administrateur
+     * Système ») : quand aucun compte ne détient encore
+     * `governance.system_administrator`, un seul compte réel peut se
+     * désigner lui-même sujet, auteur et approbateur du même octroi — la
+     * garde CLI de distinction (TD-0001-A) ne s'applique plus à ce seul cas.
+     */
+    public function test_a_single_account_can_self_bootstrap_governance_system_administrator(): void
+    {
+        $founderEmail = $this->email('founder');
+        $this->makeUser($founderEmail, LinkOrigin::Migration);
+
+        $this->artisan(
+            'governance:grant-staff-capability',
+            [
+                'capability' => 'governance.system_administrator',
+                'subject-email' => $founderEmail,
+                'author-email' => $founderEmail,
+                'approver-email' => $founderEmail,
+            ],
+        )->assertExitCode(0);
+
+        $capability = CapabilityDefinition::query()->where('stable_key', 'governance.system_administrator')->firstOrFail();
+        $founderLink = $this->activeLinkFor(User::query()->where('email', $founderEmail)->firstOrFail());
+
+        $this->assertTrue(
+            Grant::query()
+                ->where('capability_definition_id', $capability->id)
+                ->where('person_account_link_id', $founderLink->id)
+                ->where('state', GrantState::Active->value)
+                ->exists(),
+        );
+    }
+
+    /**
+     * Une fois auto-amorcé, le même compte peut s'accorder seul n'importe
+     * quelle autre capacité déclarée (exemption déjà couverte par
+     * `GrantManager` — ce test vérifie que la garde CLI ne la bloque plus).
+     */
+    public function test_an_active_system_administrator_can_self_grant_configuration_access_alone(): void
+    {
+        $adminEmail = $this->email('sysadmin');
+        $this->makeUser($adminEmail, LinkOrigin::Migration);
+
+        $this->artisan(
+            'governance:grant-staff-capability',
+            [
+                'capability' => 'governance.system_administrator',
+                'subject-email' => $adminEmail,
+                'author-email' => $adminEmail,
+                'approver-email' => $adminEmail,
+            ],
+        )->assertExitCode(0);
+
+        // Le Fondateur/Administrateur Système garde la main sur toutes les
+        // configurations exposées : il peut s'octroyer seul la capacité de
+        // consultation sans dépendre d'un second compte.
+        $this->artisan(
+            'governance:grant-staff-capability',
+            [
+                'capability' => 'configuration.view',
+                'subject-email' => $adminEmail,
+                'author-email' => $adminEmail,
+                'approver-email' => $adminEmail,
+            ],
+        )->assertExitCode(0);
+
+        $capability = CapabilityDefinition::query()->where('stable_key', 'configuration.view')->firstOrFail();
+        $adminLink = $this->activeLinkFor(User::query()->where('email', $adminEmail)->firstOrFail());
+
+        $this->assertTrue(
+            Grant::query()
+                ->where('capability_definition_id', $capability->id)
+                ->where('person_account_link_id', $adminLink->id)
+                ->where('state', GrantState::Active->value)
+                ->exists(),
+        );
+    }
+
+    public function test_bootstrapping_a_second_system_administrator_while_one_is_active_is_refused(): void
+    {
+        $firstEmail = $this->email('first-sysadmin');
+        $this->makeUser($firstEmail, LinkOrigin::Migration);
+
+        $this->artisan(
+            'governance:grant-staff-capability',
+            [
+                'capability' => 'governance.system_administrator',
+                'subject-email' => $firstEmail,
+                'author-email' => $firstEmail,
+                'approver-email' => $firstEmail,
+            ],
+        )->assertExitCode(0);
+
+        $secondEmail = $this->email('second-sysadmin');
+        $this->makeUser($secondEmail, LinkOrigin::Migration);
+
+        $this->artisan(
+            'governance:grant-staff-capability',
+            [
+                'capability' => 'governance.system_administrator',
+                'subject-email' => $secondEmail,
+                'author-email' => $secondEmail,
+                'approver-email' => $secondEmail,
+            ],
+        )->assertExitCode(1);
     }
 }

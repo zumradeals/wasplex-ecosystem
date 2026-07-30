@@ -1,5 +1,11 @@
-import { Head } from '@inertiajs/react';
-import { Landmark, PiggyBank, ShieldCheck, Users } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import {
+    AlertTriangle,
+    Landmark,
+    PiggyBank,
+    ShieldCheck,
+    Users,
+} from 'lucide-react';
 import { AdminAccessGate } from '@/components/admin/admin-access-gate';
 import type { AdminAccess } from '@/components/admin/admin-access-gate';
 import { AdvertiserEmptyState } from '@/components/advertiser/empty-state';
@@ -9,6 +15,7 @@ import {
     amountFormatter,
     displayCampaignStatus,
 } from '@/lib/advertising-labels';
+import admin from '@/routes/admin';
 
 type BudgetTotal = {
     currency: string;
@@ -55,6 +62,27 @@ export default function AdminFinance({
             description="Budget de toutes les campagnes et répartition des publicités qualifiées créditées."
         >
             <Head title="Personnel — Finance et rapprochement" />
+
+            <div className="mb-6">
+                <Link
+                    href={admin.walletDeposits().url}
+                    className="flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-4 transition-colors hover:border-[var(--status-warning)]/50"
+                >
+                    <AlertTriangle
+                        size={20}
+                        className="shrink-0 text-[var(--status-warning)]"
+                    />
+                    <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">
+                            Dépôts Wallet — supervision
+                        </p>
+                        <p className="text-xs text-[var(--text-secondary)]">
+                            Dépôts GeniusPay en litige et webhooks à signature
+                            invalide (wallet_deposit.review).
+                        </p>
+                    </div>
+                </Link>
+            </div>
 
             <AdminAccessGate access={access}>
                 {campaigns.length === 0 ? (
