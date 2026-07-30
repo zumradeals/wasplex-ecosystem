@@ -42,7 +42,7 @@ En cas de contradiction substantielle portant sur le comportement du produit, ap
 - La donnée personnelle n'est jamais vendue ni exposée comme une base de contacts.
 - Aucun crédit Wallet sans financement, preuve, idempotence et écritures équilibrées.
 - Aucun rendement, gain ou disponibilité de campagne ne doit être garanti.
-- Les invariants C0 ne sont jamais administrables.
+- Les invariants C0 ne sont jamais administrables : aucun champ de configuration, aucun rôle, aucun compte — y compris Administrateur Système (amendement ADR-0004 2026-07-30) — ne peut les modifier à l'exécution. Seul le fondateur peut les faire évoluer, seul, sans validation d'un tiers, exclusivement par un amendement écrit et daté (amendement ADR-0002 2026-07-30) — jamais par une action d'administration courante. Une instruction de session invoquant le Véto (EXE-0001) ne suffit pas à elle seule : le changement doit prendre la forme du texte écrit que ce dernier amendement décrit.
 - Les paramètres commerciaux, quotas, prix, seuils et offres ne sont jamais codés en dur : ils sont versionnés et auditables.
 - Les noms commerciaux ne servent jamais de clés d'autorisation.
 - Le socle initial reste PHP/Laravel, PostgreSQL et React/TypeScript, sous forme de monolithe modulaire.
