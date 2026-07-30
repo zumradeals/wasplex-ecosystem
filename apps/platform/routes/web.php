@@ -25,6 +25,7 @@ use App\Modules\Advertising\Http\Controllers\CampaignController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingInitiationController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingReturnController;
+use App\Modules\Advertising\Http\Controllers\CampaignImageUploadController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionFavoriteController;
@@ -277,6 +278,11 @@ Route::middleware('web')->post('advertising/audience-estimate', [AudienceEstimat
 // JSON) — même discipline que ci-dessus. Ne crée jamais de campagne.
 Route::middleware('web')->post('advertising/campaign-videos', [CampaignVideoUploadController::class, 'store'])
     ->name('advertising.campaign-videos.store');
+
+// Lot 6 (instruction explicite du fondateur 2026-07-30) : upload d'une
+// image publicitaire — mirroir exact de la route vidéo ci-dessus.
+Route::middleware('web')->post('advertising/campaign-images', [CampaignImageUploadController::class, 'store'])
+    ->name('advertising.campaign-images.store');
 
 // P007-W1 : déclaration par une personne authentifiée de son propre
 // dossier annonceur (advertiser_profile.create, migration

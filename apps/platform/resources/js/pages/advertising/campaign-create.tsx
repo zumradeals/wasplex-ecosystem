@@ -114,6 +114,13 @@ type VideoUploadResult = {
     duration_seconds: number;
 };
 
+type ImageUploadResult = {
+    path: string;
+    url: string;
+    width: number;
+    height: number;
+};
+
 export default function AdvertisingCampaignCreate({
     access,
     advertiserProfile,
@@ -155,13 +162,16 @@ export default function AdvertisingCampaignCreate({
     const [estimate, setEstimate] = useState<AudienceEstimate | null>(null);
     const [estimating, setEstimating] = useState(false);
 
-    // Lot 4 (instruction explicite du fondateur 2026-07-30) : upload
+    // Lot 4/6 (instruction explicite du fondateur 2026-07-30) : upload
     // immédiat dès sélection du fichier (mirroir du flux GeniusPay :
     // upload d'abord, référence ensuite) — jamais rattaché à une
-    // campagne tant que la création elle-même n'est pas soumise.
+    // campagne tant que la création elle-même n'est pas soumise. Un seul
+    // média à la fois (vidéo OU image, jamais les deux) : accepter l'un
+    // remet l'autre à `null`.
     const [video, setVideo] = useState<VideoUploadResult | null>(null);
-    const [videoUploading, setVideoUploading] = useState(false);
-    const [videoError, setVideoError] = useState<string | null>(null);
+    const [image, setImage] = useState<ImageUploadResult | null>(null);
+    const [mediaUploading, setMediaUploading] = useState(false);
+    const [mediaError, setMediaError] = useState<string | null>(null);
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -237,33 +247,18 @@ export default function AdvertisingCampaignCreate({
         );
     }
 
-    async function handleVideoSelected(
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) {
-        const file = event.target.files?.[0];
-        event.target.value = '';
-
-        if (!file || !advertiserProfile) {
-            return;
-        }
-
-        setVideo(null);
-        setVideoError(null);
-        setVideoUploading(true);
-
+    async function uploadVideo(file: File) {
         const formData = new FormData();
-        formData.append('advertiser_profile_id', advertiserProfile.id);
+        formData.append('advertiser_profile_id', advertiserProfile!.id);
         formData.append('video', file);
 
         const result = await postFormData<
             VideoUploadResult & { reason?: string }
         >('/advertising/campaign-videos', formData);
 
-        setVideoUploading(false);
-
         if (!result.ok) {
             const data = result.data as { reason?: string } | null;
-            setVideoError(
+            setMediaError(
                 data?.reason === 'video_duration_out_of_bounds'
                     ? `Durée hors bornes${videoDurationBounds ? ` (${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s attendues)` : ''}.`
                     : data?.reason === 'video_duration_unreadable'
@@ -275,6 +270,69 @@ export default function AdvertisingCampaignCreate({
         }
 
         setVideo(result.data);
+    }
+
+    async function uploadImage(file: File) {
+        const formData = new FormData();
+        formData.append('advertiser_profile_id', advertiserProfile!.id);
+        formData.append('image', file);
+
+        const result = await postFormData<
+            ImageUploadResult & { reason?: string }
+        >('/advertising/campaign-images', formData);
+
+        if (!result.ok) {
+            const data = result.data as { reason?: string } | null;
+            setMediaError(
+                data?.reason === 'image_orientation_refused'
+                    ? 'Format paysage refusé : une image verticale (portrait ou carrée) est requise.'
+                    : data?.reason === 'image_unreadable'
+                      ? "Le fichier n'a pas pu être lu comme une image valide."
+                      : "L'envoi de l'image n'a pas abouti.",
+            );
+
+            return;
+        }
+
+        setImage(result.data);
+    }
+
+    // Lot 6 (instruction explicite du fondateur 2026-07-30) : un seul
+    // champ « Média » — le type du fichier choisi détermine la route
+    // d'upload et la vérification appliquée. Le rejet d'un type non
+    // reconnu ici n'est qu'un confort d'UX : le serveur reste la seule
+    // autorité (mimetypes validés à nouveau côté requête).
+    async function handleMediaSelected(
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+
+        if (!file || !advertiserProfile) {
+            return;
+        }
+
+        setVideo(null);
+        setImage(null);
+        setMediaError(null);
+
+        if (file.type.startsWith('video/')) {
+            setMediaUploading(true);
+            await uploadVideo(file);
+            setMediaUploading(false);
+
+            return;
+        }
+
+        if (file.type.startsWith('image/')) {
+            setMediaUploading(true);
+            await uploadImage(file);
+            setMediaUploading(false);
+
+            return;
+        }
+
+        setMediaError('Type de fichier non reconnu : vidéo ou image attendue.');
     }
 
     async function handleSubmit(event: React.FormEvent) {
@@ -300,6 +358,7 @@ export default function AdvertisingCampaignCreate({
                           video_duration_seconds: video.duration_seconds,
                       }
                     : {}),
+                ...(image ? { image_path: image.path } : {}),
             },
             expected_event: {
                 format: format || 'banner',
@@ -422,29 +481,28 @@ export default function AdvertisingCampaignCreate({
                                 </Field>
 
                                 <Field
-                                    label={`Vidéo (facultative${videoDurationBounds ? ` — ${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s` : ''})`}
+                                    label={`Média (facultatif — vidéo${videoDurationBounds ? ` ${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s` : ''} ou image verticale)`}
                                 >
                                     <input
                                         type="file"
-                                        accept="video/mp4"
-                                        onChange={handleVideoSelected}
+                                        accept="video/mp4,image/jpeg,image/png,image/webp"
+                                        onChange={handleMediaSelected}
                                         disabled={
-                                            videoUploading || !advertiserProfile
+                                            mediaUploading || !advertiserProfile
                                         }
                                         className={inputClass}
                                     />
                                 </Field>
 
-                                {videoUploading && (
+                                {mediaUploading && (
                                     <p className="text-xs text-[var(--text-secondary)]">
-                                        Envoi et vérification de la durée en
-                                        cours…
+                                        Envoi et vérification en cours…
                                     </p>
                                 )}
 
-                                {videoError && (
+                                {mediaError && (
                                     <p className="text-xs text-[var(--status-danger)]">
-                                        {videoError}
+                                        {mediaError}
                                     </p>
                                 )}
 
@@ -453,6 +511,14 @@ export default function AdvertisingCampaignCreate({
                                         Vidéo acceptée —{' '}
                                         {video.duration_seconds} secondes.
                                         Visible dans l'aperçu ci-contre.
+                                    </p>
+                                )}
+
+                                {image && (
+                                    <p className="text-xs text-[var(--status-success)]">
+                                        Image acceptée — {image.width}×
+                                        {image.height}. Visible dans l'aperçu
+                                        ci-contre.
                                     </p>
                                 )}
                             </section>
@@ -751,6 +817,7 @@ export default function AdvertisingCampaignCreate({
                                 headline={headline}
                                 formatLabel={previewFormatLabel}
                                 video={video}
+                                image={image}
                                 destinationHost={previewDestinationHost}
                             />
 
@@ -810,12 +877,14 @@ function AdPreviewCard({
     headline,
     formatLabel,
     video,
+    image,
     destinationHost,
 }: {
     advertiserName: string | null;
     headline: string;
     formatLabel: string;
     video: VideoUploadResult | null;
+    image: ImageUploadResult | null;
     destinationHost: string;
 }) {
     const displayName = advertiserName ?? 'Votre entreprise';
@@ -839,6 +908,12 @@ function AdPreviewCard({
                         controls
                         className="absolute inset-0 h-full w-full object-cover"
                     />
+                ) : image ? (
+                    <img
+                        src={image.url}
+                        alt=""
+                        className="absolute inset-0 h-full w-full object-cover"
+                    />
                 ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
                         <ImageIcon
@@ -847,7 +922,8 @@ function AdPreviewCard({
                             aria-hidden="true"
                         />
                         <p className="text-xs text-[#A9B7C8]">
-                            Aucun média — ajoutez une vidéo pour l'aperçu.
+                            Aucun média — ajoutez une vidéo ou une image pour
+                            l'aperçu.
                         </p>
                     </div>
                 )}
