@@ -90,7 +90,9 @@ function SectionCard({
                                 <div className="flex gap-2">
                                     {section.pagination.previous_url && (
                                         <Link
-                                            href={section.pagination.previous_url}
+                                            href={
+                                                section.pagination.previous_url
+                                            }
                                             preserveScroll
                                             className="rounded-md border border-[var(--border-default)] px-3 py-1.5 text-xs text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
                                         >
