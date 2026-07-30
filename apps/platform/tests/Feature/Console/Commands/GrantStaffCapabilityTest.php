@@ -193,7 +193,7 @@ class GrantStaffCapabilityTest extends AdvertisingTestCase
      * quelle autre capacité déclarée (exemption déjà couverte par
      * `GrantManager` — ce test vérifie que la garde CLI ne la bloque plus).
      */
-    public function test_an_active_system_administrator_can_self_grant_another_capability_alone(): void
+    public function test_an_active_system_administrator_can_self_grant_configuration_access_alone(): void
     {
         $adminEmail = $this->email('sysadmin');
         $this->makeUser($adminEmail, LinkOrigin::Migration);
@@ -208,17 +208,20 @@ class GrantStaffCapabilityTest extends AdvertisingTestCase
             ],
         )->assertExitCode(0);
 
+        // Le Fondateur/Administrateur Système garde la main sur toutes les
+        // configurations exposées : il peut s'octroyer seul la capacité de
+        // consultation sans dépendre d'un second compte.
         $this->artisan(
             'governance:grant-staff-capability',
             [
-                'capability' => 'campaign.fund',
+                'capability' => 'configuration.view',
                 'subject-email' => $adminEmail,
                 'author-email' => $adminEmail,
                 'approver-email' => $adminEmail,
             ],
         )->assertExitCode(0);
 
-        $capability = CapabilityDefinition::query()->where('stable_key', 'campaign.fund')->firstOrFail();
+        $capability = CapabilityDefinition::query()->where('stable_key', 'configuration.view')->firstOrFail();
         $adminLink = $this->activeLinkFor(User::query()->where('email', $adminEmail)->firstOrFail());
 
         $this->assertTrue(
