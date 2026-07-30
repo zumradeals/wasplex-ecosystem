@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Info } from 'lucide-react';
+import { Image as ImageIcon, Info } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AdvertiserAccessGate } from '@/components/advertiser/advertiser-access-gate';
 import type {
@@ -73,6 +73,21 @@ function buildAudienceCriteria(params: {
     }
 
     return criteria;
+}
+
+// Lot 5 : jamais l'URL brute complète dans l'aperçu — seul le domaine,
+// plus proche de ce qu'affiche réellement un réseau publicitaire.
+// `—` si vide ou invalide, jamais une valeur devinée.
+function destinationHost(url: string): string {
+    if (!url.trim()) {
+        return '—';
+    }
+
+    try {
+        return new URL(url).hostname || '—';
+    } catch {
+        return '—';
+    }
 }
 
 const AGE_BRACKETS = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
@@ -165,6 +180,13 @@ export default function AdvertisingCampaignCreate({
     });
     const hasCriteria = Object.keys(criteria).length > 0;
 
+    // Lot 5 (véto du dirigeant) : aperçu en direct, mirroir du rendu réel du
+    // Feed (dashboard.tsx) — dérivé de l'état déjà présent, jamais un
+    // nouveau champ ni un appel serveur supplémentaire.
+    const previewFormat = format || sector?.allowed_formats[0] || 'banner';
+    const previewFormatLabel = FORMAT_LABELS[previewFormat] ?? previewFormat;
+    const previewDestinationHost = destinationHost(destinationUrl);
+
     useEffect(() => {
         // `hasCriteria` gouverne déjà l'affichage ci-dessous (le message
         // "aucun critère" prime sur `estimate` obsolète) : pas besoin de
@@ -215,7 +237,9 @@ export default function AdvertisingCampaignCreate({
         );
     }
 
-    async function handleVideoSelected(event: React.ChangeEvent<HTMLInputElement>) {
+    async function handleVideoSelected(
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) {
         const file = event.target.files?.[0];
         event.target.value = '';
 
@@ -425,17 +449,11 @@ export default function AdvertisingCampaignCreate({
                                 )}
 
                                 {video && (
-                                    <div className="space-y-2">
-                                        <p className="text-xs text-[var(--status-success)]">
-                                            Vidéo acceptée —{' '}
-                                            {video.duration_seconds} secondes.
-                                        </p>
-                                        <video
-                                            controls
-                                            src={video.url}
-                                            className="w-full max-w-xs rounded-lg border border-[var(--border-default)]"
-                                        />
-                                    </div>
+                                    <p className="text-xs text-[var(--status-success)]">
+                                        Vidéo acceptée —{' '}
+                                        {video.duration_seconds} secondes.
+                                        Visible dans l'aperçu ci-contre.
+                                    </p>
                                 )}
                             </section>
 
@@ -634,9 +652,7 @@ export default function AdvertisingCampaignCreate({
                                                         )
                                                     }
                                                     className={
-                                                        genders.includes(
-                                                            value,
-                                                        )
+                                                        genders.includes(value)
                                                             ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
                                                             : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
                                                     }
@@ -654,30 +670,28 @@ export default function AdvertisingCampaignCreate({
                                             Centres d'intérêt
                                         </span>
                                         <div className="flex flex-wrap gap-2">
-                                            {interestTaxonomy.map(
-                                                (option) => (
-                                                    <button
-                                                        key={option.code}
-                                                        type="button"
-                                                        onClick={() =>
-                                                            toggleFromList(
-                                                                interests,
-                                                                setInterests,
-                                                                option.code,
-                                                            )
-                                                        }
-                                                        className={
-                                                            interests.includes(
-                                                                option.code,
-                                                            )
-                                                                ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
-                                                                : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
-                                                        }
-                                                    >
-                                                        {option.label}
-                                                    </button>
-                                                ),
-                                            )}
+                                            {interestTaxonomy.map((option) => (
+                                                <button
+                                                    key={option.code}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        toggleFromList(
+                                                            interests,
+                                                            setInterests,
+                                                            option.code,
+                                                        )
+                                                    }
+                                                    className={
+                                                        interests.includes(
+                                                            option.code,
+                                                        )
+                                                            ? 'rounded-full bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-medium text-white'
+                                                            : 'rounded-full border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)]'
+                                                    }
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
                                 )}
@@ -687,8 +701,8 @@ export default function AdvertisingCampaignCreate({
                                         <p>
                                             Aucun critère de ciblage choisi :
                                             l'audience calculée portera sur
-                                            l'ensemble des profils
-                                            publicitaires consentis.
+                                            l'ensemble des profils publicitaires
+                                            consentis.
                                         </p>
                                     ) : estimating ? (
                                         <p>Calcul de l'audience…</p>
@@ -702,17 +716,15 @@ export default function AdvertisingCampaignCreate({
                                             communiquée (AMD-0009 §13).
                                         </p>
                                     ) : estimate?.estimated_size !== null &&
-                                      estimate?.estimated_size !==
-                                          undefined ? (
+                                      estimate?.estimated_size !== undefined ? (
                                         <p>
                                             Audience estimée :{' '}
                                             <span className="font-semibold text-[var(--text-primary)]">
                                                 {estimate.estimated_size}
                                             </span>{' '}
-                                            profil(s) correspondant(s)
-                                            (calculée depuis les profils
-                                            publicitaires consentis, jamais
-                                            devinée).
+                                            profil(s) correspondant(s) (calculée
+                                            depuis les profils publicitaires
+                                            consentis, jamais devinée).
                                         </p>
                                     ) : (
                                         <p>—</p>
@@ -731,23 +743,35 @@ export default function AdvertisingCampaignCreate({
                             </button>
                         </form>
 
-                        <aside className="space-y-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 text-sm text-[var(--text-secondary)]">
-                            <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-                                Avant de publier
-                            </h2>
-                            <p>La campagne est créée à l'état brouillon.</p>
-                            <p>
-                                Elle doit ensuite être soumise pour revue, puis
-                                approuvée.
-                            </p>
-                            <p>
-                                Elle ne peut être activée qu'une fois financée
-                                intégralement.
-                            </p>
-                            <p>
-                                Aucun gain ni disponibilité de campagne n'est
-                                garanti.
-                            </p>
+                        <aside className="space-y-5">
+                            <AdPreviewCard
+                                advertiserName={
+                                    advertiserProfile?.legal_name ?? null
+                                }
+                                headline={headline}
+                                formatLabel={previewFormatLabel}
+                                video={video}
+                                destinationHost={previewDestinationHost}
+                            />
+
+                            <div className="space-y-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5 text-sm text-[var(--text-secondary)]">
+                                <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+                                    Avant de publier
+                                </h2>
+                                <p>La campagne est créée à l'état brouillon.</p>
+                                <p>
+                                    Elle doit ensuite être soumise pour revue,
+                                    puis approuvée.
+                                </p>
+                                <p>
+                                    Elle ne peut être activée qu'une fois
+                                    financée intégralement.
+                                </p>
+                                <p>
+                                    Aucun gain ni disponibilité de campagne
+                                    n'est garanti.
+                                </p>
+                            </div>
                         </aside>
                     </div>
                 )}
@@ -773,5 +797,85 @@ function Field({
             </span>
             {children}
         </label>
+    );
+}
+
+// Lot 5 (véto du dirigeant) : aperçu en direct, mirroir visuel du vrai
+// rendu Feed (dashboard.tsx, dégradé + bandeau bas) — jamais une maquette
+// inventée. Aucun élément propre au Feed (gain WP, condition de
+// visionnage, boutons sociaux) : rien de tout cela n'existe encore à ce
+// stade (pas de campagne créée, pas de tarification résolue).
+function AdPreviewCard({
+    advertiserName,
+    headline,
+    formatLabel,
+    video,
+    destinationHost,
+}: {
+    advertiserName: string | null;
+    headline: string;
+    formatLabel: string;
+    video: VideoUploadResult | null;
+    destinationHost: string;
+}) {
+    const displayName = advertiserName ?? 'Votre entreprise';
+
+    return (
+        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
+            <h2 className="mb-3 text-sm font-semibold text-[var(--text-primary)]">
+                Aperçu de la publicité
+            </h2>
+
+            <div className="relative aspect-9/16 w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#173251] via-[#0C2340] to-[#0A1E38]">
+                <span className="absolute top-3 left-3 z-10 rounded-md bg-[#0E2542]/80 px-2 py-0.5 text-[10px] font-semibold tracking-widest text-[#4FA3FF] uppercase backdrop-blur-sm">
+                    {formatLabel}
+                </span>
+
+                {video ? (
+                    <video
+                        src={video.url}
+                        muted
+                        loop
+                        controls
+                        className="absolute inset-0 h-full w-full object-cover"
+                    />
+                ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
+                        <ImageIcon
+                            size={28}
+                            className="text-[#4FA3FF]/60"
+                            aria-hidden="true"
+                        />
+                        <p className="text-xs text-[#A9B7C8]">
+                            Aucun média — ajoutez une vidéo pour l'aperçu.
+                        </p>
+                    </div>
+                )}
+
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-[#07182D]/95 via-[#07182D]/55 to-transparent px-3 pt-10 pb-3">
+                    <div className="flex items-center gap-2">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#4FA3FF] to-[#075CCF] text-xs font-bold text-white">
+                            {displayName.charAt(0).toUpperCase()}
+                        </span>
+                        <div className="min-w-0">
+                            <p className="truncate text-xs font-bold text-white">
+                                {displayName}
+                            </p>
+                            <p className="truncate text-xs text-[#A9B7C8]">
+                                {headline.trim() ||
+                                    'Votre titre apparaîtra ici'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p className="mt-3 truncate text-xs text-[var(--text-secondary)]">
+                Renvoie vers{' '}
+                <span className="text-[var(--text-primary)]">
+                    {destinationHost}
+                </span>
+            </p>
+        </div>
     );
 }
