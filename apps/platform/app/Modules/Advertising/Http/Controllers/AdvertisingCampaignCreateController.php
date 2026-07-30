@@ -7,6 +7,7 @@ use App\Modules\Advertising\Http\Controllers\Concerns\ResolvesAdvertiserWorkspac
 use App\Modules\Advertising\Models\AudienceSegmentSizeThreshold;
 use App\Modules\Advertising\Models\InterestTaxonomyEntry;
 use App\Modules\Advertising\Models\SectorClassification;
+use App\Modules\Advertising\Models\VideoAdDurationBounds;
 use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
 use App\Modules\Governance\Authorization\Integration\AuthorizationRequestFactory;
 use App\Modules\Governance\Authorization\Integration\Http\AuthenticatedSubjectHttpResolver;
@@ -40,6 +41,7 @@ class AdvertisingCampaignCreateController extends Controller
             'sectorClassifications' => [],
             'audienceSizeThreshold' => null,
             'interestTaxonomy' => [],
+            'videoDurationBounds' => null,
         ]);
 
         if ($workspace instanceof Response) {
@@ -54,6 +56,7 @@ class AdvertisingCampaignCreateController extends Controller
             ->get(['id', 'country_code', 'sector', 'allowed_formats', 'minimum_age', 'warnings']);
 
         $threshold = AudienceSegmentSizeThreshold::query()->where('state', 'active')->first();
+        $videoDurationBounds = VideoAdDurationBounds::query()->where('state', 'active')->first();
 
         return Inertia::render('advertising/campaign-create', [
             'access' => ['allowed' => true, 'reason' => null],
@@ -72,6 +75,10 @@ class AdvertisingCampaignCreateController extends Controller
                 ->orderBy('label')
                 ->get(['code', 'label'])
                 ->toArray(),
+            'videoDurationBounds' => $videoDurationBounds === null ? null : [
+                'min_seconds' => $videoDurationBounds->min_seconds,
+                'max_seconds' => $videoDurationBounds->max_seconds,
+            ],
         ]);
     }
 }

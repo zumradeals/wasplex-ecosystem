@@ -45,3 +45,31 @@ export async function postJson<T = unknown>(
         ? { ok: true, status: response.status, data }
         : { ok: false, status: response.status, data };
 }
+
+/**
+ * Mirroir de `postJson` pour un envoi `multipart/form-data` (upload de
+ * fichier, Lot 4) : jamais de `Content-Type` posé à la main — le
+ * navigateur fixe lui-même la frontière multipart exacte.
+ */
+export async function postFormData<T = unknown>(
+    url: string,
+    formData: FormData,
+): Promise<ApiResult<T>> {
+    const xsrfToken = xsrfTokenFromCookie();
+
+    const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            Accept: 'application/json',
+            ...(xsrfToken ? { 'X-XSRF-TOKEN': xsrfToken } : {}),
+        },
+        body: formData,
+    });
+
+    const data = (await response.json().catch(() => null)) as T;
+
+    return response.ok
+        ? { ok: true, status: response.status, data }
+        : { ok: false, status: response.status, data };
+}

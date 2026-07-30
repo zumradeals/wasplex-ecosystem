@@ -8,6 +8,7 @@ use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationCon
 use App\Modules\Advertising\Http\Controllers\Admin\AdminCampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminFinanceController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminInterestTaxonomyController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminVideoDurationController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingAudiencesController;
@@ -30,6 +31,7 @@ use App\Modules\Advertising\Http\Controllers\CampaignVersionFavoriteController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionLikeController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionShareController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionSubmissionController;
+use App\Modules\Advertising\Http\Controllers\CampaignVideoUploadController;
 use App\Modules\Advertising\Http\Controllers\FeedController;
 use App\Modules\Advertising\Http\Controllers\ModerationCaseDecisionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
@@ -214,6 +216,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('admin/interest-taxonomy/{interestTaxonomyEntry}/toggle', [AdminInterestTaxonomyController::class, 'toggle'])
         ->name('admin.interest-taxonomy.toggle');
 
+    // Lot 4 (instruction explicite du fondateur 2026-07-30) : bornes de
+    // durée vidéo autorisée pour une création publicitaire
+    // (advertising.manage_video_duration_bounds) — mirroir exact de
+    // 'admin/interest-taxonomy' ci-dessus.
+    Route::get('admin/video-duration-bounds', [AdminVideoDurationController::class, 'index'])
+        ->name('admin.video-duration-bounds');
+    Route::post('admin/video-duration-bounds', [AdminVideoDurationController::class, 'store'])
+        ->name('admin.video-duration-bounds.store');
+
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne
     // sans appartenance institutionnelle active voit un état refusé
@@ -260,6 +271,12 @@ Route::middleware('web')->post('advertising/campaigns', [CampaignController::cla
 // 'web' hors du groupe 'auth', 401 JSON structuré). Ne crée jamais rien.
 Route::middleware('web')->post('advertising/audience-estimate', [AudienceEstimateController::class, 'store'])
     ->name('advertising.audience-estimate.store');
+
+// Lot 4 (instruction explicite du fondateur 2026-07-30) : upload d'une
+// vidéo publicitaire avant création de campagne (multipart, jamais du
+// JSON) — même discipline que ci-dessus. Ne crée jamais de campagne.
+Route::middleware('web')->post('advertising/campaign-videos', [CampaignVideoUploadController::class, 'store'])
+    ->name('advertising.campaign-videos.store');
 
 // P007-W1 : déclaration par une personne authentifiée de son propre
 // dossier annonceur (advertiser_profile.create, migration
