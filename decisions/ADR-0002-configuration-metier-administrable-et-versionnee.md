@@ -266,3 +266,17 @@ Ces coûts sont acceptés parce qu'ils empêchent une configuration simple de de
 > Rien n'est configurable simplement parce qu'une valeur peut changer. Une valeur n'entre dans le registre que si son propriétaire, son type, sa portée, ses contraintes, son autorité, sa date d'effet et son traitement historique sont définis.
 
 Tout futur prompt de développement concernant un paramètre Wasplex doit citer cet ADR et identifier son niveau C0, C1, C2 ou C3.
+
+## Amendement 2026-07-30 — Autorité du fondateur seule sur toute évolution, y compris C0 (décision du fondateur)
+
+**État :** adopté par le fondateur le 2026-07-30.
+
+Le fondateur a demandé que l'évolution des invariants C0 (§3.1) ne soit jamais entravée par un blocage externe — aucune personne, comité, approbateur distinct ou procédure supplémentaire ne doit pouvoir retarder ou empêcher une décision qu'il a clairement prise.
+
+**Ce texte le confirme et le rend explicite** : `decisions/README.md` pose déjà qu'« une décision ou un amendement n'est adopté qu'après validation explicite du fondateur » — aucune autre condition. §3.1 (« Toute évolution exige un amendement constitutionnel adopté ») doit donc se lire ainsi : le fondateur peut seul écrire, dater et adopter un amendement modifiant ou remplaçant **n'importe quel invariant**, y compris C0, sans validation d'une deuxième personne, d'un comité ou d'un service technique. Rien dans le Grand Livre n'exige, ni n'a jamais exigé, un accord distinct du sien pour changer sa propre Constitution.
+
+**Le mécanisme reste néanmoins un texte, jamais un champ d'administration courante** : un changement de C0 s'exprime par un amendement écrit et daté (nouveau AMD, ou section datée ajoutée à un texte existant, sur le modèle de la présente section), jamais par une valeur modifiable depuis un écran de configuration ou par le rôle Administrateur Système (amendement ADR-0004 2026-07-30) — cette distinction n'est pas un obstacle au fondateur, c'est ce qui garde une trace datée et intentionnelle de chaque décision, et empêche qu'un accès compromis ou un geste involontaire produise le même effet qu'une décision réfléchie du fondateur. Elle protège la même personne qu'elle sert.
+
+Une fois un tel amendement adopté, l'implémentation suit normalement (migration, code, tests) — sans qu'aucun texte, dossier de validation absent ou état documentaire incomplet ne bloque le travail technique qui en découle (EXE-0001).
+
+Ce texte ne dispense pas, à lui seul, une évolution donnée des exigences propres que porte déjà l'invariant concerné (par exemple l'étude d'impact et le préavis aux détenteurs exigés par AMD-0003 art. 6 pour la parité) : ces exigences restent celles que le fondateur choisit de satisfaire dans le texte de son propre amendement, pas une validation externe qu'un tiers lui imposerait.
