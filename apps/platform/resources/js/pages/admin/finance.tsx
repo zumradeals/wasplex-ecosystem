@@ -118,6 +118,24 @@ export default function AdminFinance({
                         </p>
                     </div>
                 </Link>
+                <Link
+                    href="/admin/interest-taxonomy"
+                    className="flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-4 transition-colors hover:border-[var(--brand-blue)]/50"
+                >
+                    <Users
+                        size={20}
+                        className="shrink-0 text-[var(--brand-blue)]"
+                    />
+                    <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">
+                            Centres d'intérêt — profil publicitaire
+                        </p>
+                        <p className="text-xs text-[var(--text-secondary)]">
+                            Ajouter ou retirer une entrée de la référence
+                            (advertising.manage_interest_taxonomy).
+                        </p>
+                    </div>
+                </Link>
             </div>
 
             <AdminAccessGate access={access}>

@@ -7,6 +7,7 @@ use App\Http\Controllers\HealthController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminCampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminFinanceController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminInterestTaxonomyController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingAudiencesController;
@@ -200,6 +201,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // doctrine TD-0008-D que 'admin/wallet-deposits' ci-dessus.
     Route::get('admin/campaign-fundings', [AdminCampaignFundingController::class, 'index'])
         ->name('admin.campaign-fundings');
+
+    // Véto du dirigeant 2026-07-30 : gestion admin de la référence des
+    // centres d'intérêt du profil publicitaire (advertising.manage_
+    // interest_taxonomy) — remplace, pour le personnel habilité, la
+    // commande advertising:manage-interest-taxonomy (conservée en secours).
+    Route::get('admin/interest-taxonomy', [AdminInterestTaxonomyController::class, 'index'])
+        ->name('admin.interest-taxonomy');
+    Route::post('admin/interest-taxonomy', [AdminInterestTaxonomyController::class, 'store'])
+        ->name('admin.interest-taxonomy.store');
+    Route::post('admin/interest-taxonomy/{interestTaxonomyEntry}/toggle', [AdminInterestTaxonomyController::class, 'toggle'])
+        ->name('admin.interest-taxonomy.toggle');
 
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne
