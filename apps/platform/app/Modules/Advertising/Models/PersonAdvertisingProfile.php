@@ -14,6 +14,9 @@ use Illuminate\Support\Str;
  *
  * @property string $id
  * @property string $person_id
+ * @property string|null $country_code
+ * @property string|null $city
+ * @property string|null $neighborhood
  * @property string|null $age_bracket
  * @property string|null $gender
  * @property array<int, string> $interests
@@ -32,7 +35,7 @@ class PersonAdvertisingProfile extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'person_id', 'age_bracket', 'gender', 'interests',
+        'person_id', 'country_code', 'city', 'neighborhood', 'age_bracket', 'gender', 'interests',
         'consent_version', 'consent_given_at', 'consent_withdrawn_at',
     ];
 

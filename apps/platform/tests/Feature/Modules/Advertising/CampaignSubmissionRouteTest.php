@@ -94,8 +94,10 @@ class CampaignSubmissionRouteTest extends AdvertisingTestCase
             'pricing_configuration_key' => 'standard_cpm',
             'pricing_configuration_version' => 1,
             'audience' => [
+                // Lot 3 (véto du dirigeant) : la taille n'est plus fournie
+                // par l'appelant — calculée côté serveur depuis le profil
+                // publicitaire consenti (`AudienceSegmentGuard::computeSize()`).
                 'criteria' => ['country' => 'CI'],
-                'estimated_size' => 10000,
             ],
         ];
     }

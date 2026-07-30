@@ -64,6 +64,9 @@ class AdvertisingProfileRouteTest extends TestCase
         InterestTaxonomyEntry::create(['code' => 'sport', 'label' => 'Sport', 'state' => 'active']);
 
         $response = $this->actingAs($user)->postJson('/me/advertising-profile', [
+            'country_code' => 'CI',
+            'city' => 'Abidjan',
+            'neighborhood' => 'Abobo',
             'age_bracket' => '25-34',
             'gender' => 'woman',
             'interests' => ['sport'],
@@ -72,6 +75,9 @@ class AdvertisingProfileRouteTest extends TestCase
         $response->assertOk();
         $response->assertJson([
             'consented' => true,
+            'country_code' => 'CI',
+            'city' => 'Abidjan',
+            'neighborhood' => 'Abobo',
             'age_bracket' => '25-34',
             'gender' => 'woman',
             'interests' => ['sport'],
@@ -79,7 +85,7 @@ class AdvertisingProfileRouteTest extends TestCase
         $response->assertJsonStructure(['consent_given_at']);
 
         $profile = PersonAdvertisingProfile::query()->sole();
-        $this->assertSame(1, $profile->consent_version);
+        $this->assertSame(2, $profile->consent_version);
         $this->assertNotNull($profile->consent_given_at);
         $this->assertNull($profile->consent_withdrawn_at);
     }
@@ -119,6 +125,9 @@ class AdvertisingProfileRouteTest extends TestCase
         InterestTaxonomyEntry::create(['code' => 'sport', 'label' => 'Sport', 'state' => 'active']);
 
         $this->actingAs($user)->postJson('/me/advertising-profile', [
+            'country_code' => 'CI',
+            'city' => 'Abidjan',
+            'neighborhood' => 'Abobo',
             'age_bracket' => '25-34',
             'gender' => 'woman',
             'interests' => ['sport'],
@@ -130,6 +139,9 @@ class AdvertisingProfileRouteTest extends TestCase
         $response->assertJson(['profile' => null]);
 
         $profile = PersonAdvertisingProfile::query()->sole();
+        $this->assertNull($profile->country_code);
+        $this->assertNull($profile->city);
+        $this->assertNull($profile->neighborhood);
         $this->assertNull($profile->age_bracket);
         $this->assertNull($profile->gender);
         $this->assertSame([], $profile->interests);

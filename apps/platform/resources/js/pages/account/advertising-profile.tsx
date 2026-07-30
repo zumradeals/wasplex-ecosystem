@@ -24,6 +24,9 @@ type InterestOption = { code: string; label: string };
 
 type Profile = {
     consented: boolean;
+    country_code: string | null;
+    city: string | null;
+    neighborhood: string | null;
     age_bracket: string | null;
     gender: string | null;
     interests: string[];
@@ -39,6 +42,13 @@ function ProfileForm({
     initial: Profile | null;
     onSaved: (profile: Profile) => void;
 }) {
+    const [countryCode, setCountryCode] = useState(
+        initial?.country_code ?? '',
+    );
+    const [city, setCity] = useState(initial?.city ?? '');
+    const [neighborhood, setNeighborhood] = useState(
+        initial?.neighborhood ?? '',
+    );
     const [ageBracket, setAgeBracket] = useState(initial?.age_bracket ?? '');
     const [gender, setGender] = useState(initial?.gender ?? '');
     const [interests, setInterests] = useState<string[]>(
@@ -61,6 +71,9 @@ function ProfileForm({
         setError(null);
 
         const result = await postJson<Profile>('/me/advertising-profile', {
+            country_code: countryCode || null,
+            city: city || null,
+            neighborhood: neighborhood || null,
             age_bracket: ageBracket || null,
             gender: gender || null,
             interests,
@@ -84,6 +97,48 @@ function ProfileForm({
             {error && (
                 <p className="text-sm text-[#FF6B6B]">{error}</p>
             )}
+
+            <div className="space-y-1.5">
+                <span className="text-sm font-medium text-[#A9B7C8]">
+                    Pays (facultatif, code à 2 lettres — ex. CI)
+                </span>
+                <input
+                    type="text"
+                    maxLength={2}
+                    value={countryCode}
+                    onChange={(event) =>
+                        setCountryCode(event.target.value.toUpperCase())
+                    }
+                    placeholder="CI"
+                    className="h-12 w-full rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
+                />
+            </div>
+
+            <div className="space-y-1.5">
+                <span className="text-sm font-medium text-[#A9B7C8]">
+                    Ville (facultatif)
+                </span>
+                <input
+                    type="text"
+                    value={city}
+                    onChange={(event) => setCity(event.target.value)}
+                    placeholder="Abidjan"
+                    className="h-12 w-full rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
+                />
+            </div>
+
+            <div className="space-y-1.5">
+                <span className="text-sm font-medium text-[#A9B7C8]">
+                    Quartier (facultatif)
+                </span>
+                <input
+                    type="text"
+                    value={neighborhood}
+                    onChange={(event) => setNeighborhood(event.target.value)}
+                    placeholder="Abobo"
+                    className="h-12 w-full rounded-xl border border-[#35506D] bg-[#173251] px-4 text-white focus:border-[#4FA3FF] focus:ring-2 focus:ring-[#4FA3FF]/30 focus:outline-none"
+                />
+            </div>
 
             <div className="space-y-1.5">
                 <span className="text-sm font-medium text-[#A9B7C8]">
@@ -270,6 +325,25 @@ export default function AdvertisingProfile({
                     ) : (
                         <div className="space-y-4">
                             <div className="space-y-1 text-sm text-[#A9B7C8]">
+                                <p>
+                                    Pays :{' '}
+                                    <span className="text-[#F5F8FC]">
+                                        {current?.country_code ?? 'non précisé'}
+                                    </span>
+                                </p>
+                                <p>
+                                    Ville :{' '}
+                                    <span className="text-[#F5F8FC]">
+                                        {current?.city ?? 'non précisée'}
+                                    </span>
+                                </p>
+                                <p>
+                                    Quartier :{' '}
+                                    <span className="text-[#F5F8FC]">
+                                        {current?.neighborhood ??
+                                            'non précisé'}
+                                    </span>
+                                </p>
                                 <p>
                                     Tranche d'âge :{' '}
                                     <span className="text-[#F5F8FC]">

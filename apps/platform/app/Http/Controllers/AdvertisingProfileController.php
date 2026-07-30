@@ -50,6 +50,9 @@ class AdvertisingProfileController extends Controller
         try {
             $profile = $this->profileService->grantConsentAndUpdate(
                 personId: $personId,
+                countryCode: $request->validated('country_code'),
+                city: $request->validated('city'),
+                neighborhood: $request->validated('neighborhood'),
                 ageBracket: $request->validated('age_bracket'),
                 gender: $request->validated('gender'),
                 interests: $request->validated('interests'),
@@ -81,7 +84,7 @@ class AdvertisingProfileController extends Controller
     }
 
     /**
-     * @return array{consented: bool, age_bracket: string|null, gender: string|null, interests: array<int, string>, consent_given_at: string|null}|null
+     * @return array{consented: bool, country_code: string|null, city: string|null, neighborhood: string|null, age_bracket: string|null, gender: string|null, interests: array<int, string>, consent_given_at: string|null}|null
      */
     private function presentProfile(?PersonAdvertisingProfile $profile): ?array
     {
@@ -91,6 +94,9 @@ class AdvertisingProfileController extends Controller
 
         return [
             'consented' => true,
+            'country_code' => $profile->country_code,
+            'city' => $profile->city,
+            'neighborhood' => $profile->neighborhood,
             'age_bracket' => $profile->age_bracket,
             'gender' => $profile->gender,
             'interests' => $profile->interests,
