@@ -232,6 +232,14 @@ export default function AccountOverview({
                 </section>
 
                 <Link
+                    href="/me/advertising-profile"
+                    className="flex items-center justify-between rounded-xl border border-[#35506D] bg-[#0E2542] px-4 py-3.5 text-sm font-medium text-[#F5F8FC] transition-colors active:bg-[#173251]"
+                >
+                    Intérêts publicitaires
+                    <span className="text-xs text-[#A9B7C8]">Facultatif</span>
+                </Link>
+
+                <Link
                     href={logout()}
                     as="button"
                     data-test="logout-button"
