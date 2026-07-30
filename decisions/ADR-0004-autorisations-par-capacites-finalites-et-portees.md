@@ -372,3 +372,20 @@ Ces coûts sont acceptés : Wasplex ne peut protéger les populations avec des a
 > Aucun rôle ne suffit à autoriser une action sensible. Toute décision doit être liée à une capacité, une finalité, une portée, une durée, des conditions et une identité responsable.
 
 Tout futur prompt concernant administration, institution, annonceur, support, finance, audit, export, recherche ou compte technique doit citer cet ADR.
+
+## Amendement 2026-07-30 — Rôle Administrateur Système (décision du fondateur)
+
+**État :** adopté par le fondateur le 2026-07-30.
+
+Le fondateur a demandé un compte administrateur unique et permanent, disposant de toutes les capacités opérationnelles de Wasplex sans exiger un deuxième approbateur distinct pour chaque octroi ou action — afin de gouverner effectivement la plateforme (gestion des rôles et des comptes, approbation ou refus de campagnes, financement, modération, publication d'alertes, configuration commerciale et opérationnelle) sans être bloqué par l'absence d'une deuxième personne disponible.
+
+**Mécanisme :** une capacité `governance.system_administrator` (risk_class `critical`) marque le compte qui porte ce rôle. Pour le sujet, l'auteur ou l'approbateur d'un octroi dont l'**auteur** détient un grant actif `governance.system_administrator`, `GrantManager::activate()` n'applique plus les vérifications de §12 et de la matrice de `activate()` (auto-habilitation, approbateur requis pour sensitive/critical, approbateur = auteur, approbateur = sujet) : ce compte peut s'accorder et accorder à d'autres n'importe quelle capacité déclarée, seul. §6 et §12 restent la règle par défaut pour tout autre compte : cette exception est nominative, pas une réintroduction générale du « super administrateur » que §6 interdit pour tous les autres cas.
+
+**Ce que ce rôle NE change PAS :**
+
+- Les invariants **C0** (ADR-0002 §3.1 : parité 1 WP = 1 FCFA, partage publicitaire 50/50, donnée personnelle jamais vendue, absence de rendement garanti, couverture minimale du Wallet, séparation des fonds, droits acquis) restent non administrables par quiconque, y compris ce compte. Une évolution de ces règles exige toujours un amendement constitutionnel adopté (ADR-0002 §3.1), jamais un octroi de capacité.
+- Aucune écriture directe dans `ledger.*` : toute opération financière continue de passer exclusivement par `LedgerPoster`, avec preuve, idempotence et écritures équilibrées (CLAUDE.md §2, ADR-0003).
+- Toute action de ce compte reste journalisée intégralement (`AuditRecorder`, `AuthorizationDecisionRecord`) — « plein pouvoir » ne signifie jamais « sans trace ».
+- Ce compte ne peut pas non plus contourner ce que le bris de glace lui-même ne peut pas faire (§16) : modifier une écriture Ledger ou un invariant constitutionnel.
+
+**Un seul compte à la fois :** `governance.system_administrator` ne peut avoir qu'un seul grant actif dans tout le système — `GrantManager::activate()` refuse l'activation d'un second pendant qu'un premier reste actif (révocation d'abord). Son attribution initiale et tout transfert futur restent eux-mêmes soumis à la séparation des tâches classique de ce document (proposé par un compte, activé par un autre, ni l'un ni l'autre n'étant le bénéficiaire ; `risk_class = critical` exige de toute façon un approbateur distinct) — l'exception ci-dessus ne s'applique qu'aux octrois *émis par* ce compte une fois qu'il le détient, jamais à l'octroi *de* ce rôle lui-même.

@@ -6,6 +6,7 @@ use App\Modules\Governance\Authorization\Enums\GrantEffect;
 use App\Modules\Governance\Authorization\Enums\GrantSource;
 use App\Modules\Governance\Authorization\Models\CapabilityDefinition;
 use App\Modules\Governance\Authorization\Models\PolicyVersion;
+use App\Modules\Governance\Authorization\Services\Exceptions\MultipleSystemAdministratorsRefusedException;
 use App\Modules\Governance\Authorization\Services\Exceptions\SelfAuthorizationRefusedException;
 use App\Modules\Governance\Authorization\Services\Exceptions\SeparationOfDutiesViolationException;
 use App\Modules\Governance\Authorization\Services\GrantManager;
@@ -65,10 +66,14 @@ class GrantStaffCapability extends Command
         'alert_case.publish' => 'alerts.case_category',
         'alert_match.validate' => 'alerts.case_category',
         'alert_return.verify' => 'alerts.case_category',
+        // Amendement ADR-0004 2026-07-30 (« Rôle Administrateur Système ») :
+        // resource_type nominal, jamais évalué par ScopeMatcher — voir la
+        // migration de déclaration pour le raisonnement complet.
+        'governance.system_administrator' => 'governance.system',
     ];
 
     protected $signature = 'governance:grant-staff-capability
-        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify)}
+        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify, governance.system_administrator)}
         {subject-email : E-mail du compte qui recevra le droit}
         {author-email : E-mail du compte qui propose ce grant}
         {approver-email : E-mail du compte qui approuve ce grant (distinct du sujet et de l\'auteur)}';
@@ -150,7 +155,7 @@ class GrantStaffCapability extends Command
 
         try {
             $grantManager->activate($grant, $author, $approver, $correlationId);
-        } catch (SelfAuthorizationRefusedException|SeparationOfDutiesViolationException $exception) {
+        } catch (SelfAuthorizationRefusedException|SeparationOfDutiesViolationException|MultipleSystemAdministratorsRefusedException $exception) {
             $this->components->error("Activation refusée : {$exception->getMessage()}");
 
             return self::FAILURE;
