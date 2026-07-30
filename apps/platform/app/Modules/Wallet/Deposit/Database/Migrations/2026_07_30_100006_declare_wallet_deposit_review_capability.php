@@ -37,17 +37,13 @@ use Illuminate\Support\Str;
  *   d'accès à la donnée d'autrui de sensible (même raisonnement que
  *   `alert_case.review`, qui expose des descriptions de dossiers
  *   personnels).
- * - `purpose_required = false` : ADR-0004 §8 réserverait en principe une
- *   finalité obligatoire (« rapprochement financier » y figure explicitement
- *   comme exemple) à un accès sensible à la donnée d'autrui, mais
- *   `ResolvesStaffVisibility::hasActiveStaffGrant()` — le seul mécanisme
- *   d'application utilisé par tout ce portail de supervision (`access.view`,
- *   `configuration.view`, `alert_case.review`) — ne vérifie aucune finalité
- *   à ce jour ; y déclarer `true` sans application réelle serait un état
- *   affiché mais non vérifié, jamais construit sciemment ici (même
- *   raisonnement déjà tenu, explicitement, pour `alert_case.review`).
- *   Reste une porte de reprise commune à tout ce portail, pas propre à
- *   cette capacité.
+ * - `purpose_required = false` : le moteur d'autorisation complet est
+ *   désormais appliqué par `AdminWalletDepositController` (portée, période,
+ *   politique, assurance et audit). Le catalogue de finalités ne déclare
+ *   toutefois pas encore une finalité versionnée de rapprochement financier ;
+ *   la rendre obligatoire sans définition ni liaison rendrait l'écran
+ *   inutilisable. Cet écart reste explicitement suivi dans TD-0008-D et
+ *   devra être fermé avant l'ouverture à une équipe finance élargie.
  * - `approval_required = false` : simple lecture, aucune décision.
  * - `minimum_session_assurance = weak` : même plancher que toutes les
  *   capacités déjà déclarées pour ce portail (TD-0002-A, `standard`
