@@ -14,6 +14,8 @@ Pour toute mission :
 
 Ne pas reconstruire d’anciens concepts à partir de l’historique Git lorsque les fichiers actifs de `docs/` disent autre chose.
 
+Les mentions `CONSTITUTION`, `AMD`, `ADR`, `UX`, `DS` ou « Grand Livre » encore présentes dans des commentaires, noms de tests, commits ou historiques sont des références héritées. Elles n’établissent plus la direction du produit et doivent être remplacées progressivement par des références aux documents métier de `docs/` lorsqu’un fichier concerné est modifié.
+
 ## 2. Ne jamais inventer
 
 Ne jamais inventer silencieusement :
