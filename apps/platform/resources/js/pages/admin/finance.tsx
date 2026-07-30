@@ -100,6 +100,24 @@ export default function AdminFinance({
                         </p>
                     </div>
                 </Link>
+                <Link
+                    href="/admin/campaign-fundings"
+                    className="flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-4 transition-colors hover:border-[var(--status-warning)]/50"
+                >
+                    <AlertTriangle
+                        size={20}
+                        className="shrink-0 text-[var(--status-warning)]"
+                    />
+                    <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">
+                            Financements de campagne — supervision
+                        </p>
+                        <p className="text-xs text-[var(--text-secondary)]">
+                            Financements GeniusPay en litige et webhooks à
+                            signature invalide (campaign_funding.review).
+                        </p>
+                    </div>
+                </Link>
             </div>
 
             <AdminAccessGate access={access}>

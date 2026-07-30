@@ -60,6 +60,10 @@ class GrantAutoIssuer
         // AMD-0017 : initier son propre dépôt Wallet — même raisonnement
         // que `campaign.create`/`wallet.view`.
         'wallet.deposit',
+        // Véto du dirigeant 2026-07-30 : initier le financement de sa
+        // propre campagne via GeniusPay — même raisonnement que
+        // `wallet.deposit` ci-dessus.
+        'campaign.fund_self',
     ];
 
     /**
