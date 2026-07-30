@@ -63,7 +63,7 @@ export default function AdminFinance({
         >
             <Head title="Personnel — Finance et rapprochement" />
 
-            <div className="mb-6">
+            <div className="mb-6 space-y-3">
                 <Link
                     href={admin.walletDeposits().url}
                     className="flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-4 transition-colors hover:border-[var(--status-warning)]/50"
@@ -79,6 +79,24 @@ export default function AdminFinance({
                         <p className="text-xs text-[var(--text-secondary)]">
                             Dépôts GeniusPay en litige et webhooks à signature
                             invalide (wallet_deposit.review).
+                        </p>
+                    </div>
+                </Link>
+                <Link
+                    href="/admin/wallet-deposits/credentials"
+                    className="flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-4 transition-colors hover:border-[var(--brand-blue)]/50"
+                >
+                    <ShieldCheck
+                        size={20}
+                        className="shrink-0 text-[var(--brand-blue)]"
+                    />
+                    <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">
+                            Dépôts Wallet — clés GeniusPay
+                        </p>
+                        <p className="text-xs text-[var(--text-secondary)]">
+                            Configurer les identifiants du prestataire
+                            (wallet_deposit.manage_credentials).
                         </p>
                     </div>
                 </Link>

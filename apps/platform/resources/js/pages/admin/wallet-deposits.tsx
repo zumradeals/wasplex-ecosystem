@@ -194,6 +194,15 @@ export default function AdminWalletDeposits({
         >
             <Head title="Personnel — Dépôts Wallet" />
 
+            <div className="mb-6">
+                <Link
+                    href="/admin/wallet-deposits/credentials"
+                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
+                >
+                    Configurer les clés GeniusPay
+                </Link>
+            </div>
+
             <div className="space-y-6">
                 <SectionCard
                     title="Dépôts en litige"
