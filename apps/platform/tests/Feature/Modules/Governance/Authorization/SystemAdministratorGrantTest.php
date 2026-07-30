@@ -15,6 +15,7 @@ use App\Modules\Governance\Authorization\Services\GrantManager;
 use App\Modules\Governance\Authorization\Support\ConditionsPayload;
 use App\Modules\Governance\Authorization\Support\ScopePayload;
 use App\Modules\Identity\Models\PersonAccountLink;
+use Carbon\CarbonInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 
@@ -91,7 +92,7 @@ class SystemAdministratorGrantTest extends AuthorizationTestCase
         $this->assertSame(GrantState::Active, $grant->state);
     }
 
-    private function makeSystemAdministrator(): PersonAccountLink
+    private function makeSystemAdministrator(?CarbonInterface $validUntil = null): PersonAccountLink
     {
         $subject = $this->activeLinkFor($this->makeUser('sysadmin-'.Str::uuid().'@example.com'));
         $author = $this->makeAuthor();
@@ -105,6 +106,7 @@ class SystemAdministratorGrantTest extends AuthorizationTestCase
             author: $author,
             approver: $approver,
             scope: ScopePayload::fromArray(['resource_type' => 'governance.system']),
+            validUntil: $validUntil,
         );
 
         return $subject;
@@ -203,6 +205,29 @@ class SystemAdministratorGrantTest extends AuthorizationTestCase
             policy: $policy,
             author: $author,
             approver: $approver,
+            scope: ScopePayload::fromArray(['resource_type' => 'governance.system']),
+        );
+
+        $this->assertSame(GrantState::Active, $grant->state);
+    }
+
+    public function test_an_expired_system_administrator_loses_the_exemption_and_no_longer_blocks_a_successor(): void
+    {
+        $former = $this->makeSystemAdministrator(now()->addMinute());
+
+        $this->travel(2)->minutes();
+
+        $this->assertFalse(app(GrantManager::class)->isSystemAdministrator($former));
+
+        $successor = $this->activeLinkFor($this->makeUser('successor-sysadmin-'.Str::uuid().'@example.com'));
+        $policy = $this->makePolicy('successor-after-expiry-policy-'.Str::uuid());
+
+        $grant = $this->proposeAndActivateGrant(
+            subject: $successor,
+            capability: $this->systemAdministratorCapability(),
+            policy: $policy,
+            author: $successor,
+            approver: null,
             scope: ScopePayload::fromArray(['resource_type' => 'governance.system']),
         );
 
