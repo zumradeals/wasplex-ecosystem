@@ -16,18 +16,34 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 /**
- * Bootstrap manuel des toutes premières habilitations personnel Wasplex
- * (P0, demande Koné 2026-07-26) : `campaign.approve`, `campaign.fund`,
- * `event.accept`, `event.reject`, `campaign.moderate` ne figurent dans
- * aucun rôle modèle auto-octroyé (TD-0004-E) — par construction, aucune
- * de ces capacités ne doit jamais être en libre-service.
+ * Bootstrap manuel des habilitations personnel Wasplex (P0, demande Koné
+ * 2026-07-26 ; étendu 2026-07-30 après constat qu'aucun compte réel de
+ * production — y compris celui du fondateur — n'avait jamais reçu la
+ * moindre capacité admin, laissant chaque destination du portail
+ * personnel afficher « Section indisponible ») : aucune des capacités
+ * listées ci-dessous ne figure dans un rôle modèle auto-octroyé
+ * (TD-0004-E) — par construction, aucune ne doit jamais être en
+ * libre-service.
+ *
+ * `access.view`/`configuration.view`/`alert_case.review`/
+ * `alert_case.publish`/`alert_match.validate`/`alert_return.verify` ont
+ * été déclarées par des lots ultérieurs (P008-A, portail Configurations/
+ * Accès) sans jamais être ajoutées à cet outil de bootstrap — écart
+ * comblé ici, sans toucher au mécanisme lui-même. `alert_return.verify`
+ * n'a encore aucun contrôleur d'action réel (seule la liste des
+ * restitutions contestées existe, voir `AdminAlertsController`) : la
+ * capacité peut être octroyée dès maintenant, l'action correspondante
+ * reste à construire.
  *
  * N'invente aucun mécanisme d'autorisation : compose {@see GrantManager}
  * exactement comme le font déjà les tests de route (ex.
  * `CampaignFundingRouteTest::grantFund()`) — propose() puis activate(),
  * avec une portée `resource_type` seule (aucun `resource_ids` : une
  * habilitation personnel n'est jamais limitée à une liste de ressources
- * qui devrait être réélargie à chaque nouvelle campagne). `activate()`
+ * qui devrait être réélargie à chaque nouvelle campagne). Les portées
+ * `alerts.case_category`/`governance.grant`/`governance.configuration_definition`
+ * reprennent exactement celles déjà documentées par les migrations de
+ * déclaration de chaque capacité (aucune valeur devinée ici). `activate()`
  * refuse toujours seul(e) auteur = approbateur, ou l'un des deux = sujet
  * (TD-0001-A) — ce garde-fou n'est jamais contourné ici, seulement
  * redemandé plus tôt avec un message clair.
@@ -43,10 +59,16 @@ class GrantStaffCapability extends Command
         'campaign.moderate' => 'advertising.moderation_case',
         'event.accept' => 'advertising.qualified_event',
         'event.reject' => 'advertising.qualified_event',
+        'access.view' => 'governance.grant',
+        'configuration.view' => 'governance.configuration_definition',
+        'alert_case.review' => 'alerts.case_category',
+        'alert_case.publish' => 'alerts.case_category',
+        'alert_match.validate' => 'alerts.case_category',
+        'alert_return.verify' => 'alerts.case_category',
     ];
 
     protected $signature = 'governance:grant-staff-capability
-        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject)}
+        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify)}
         {subject-email : E-mail du compte qui recevra le droit}
         {author-email : E-mail du compte qui propose ce grant}
         {approver-email : E-mail du compte qui approuve ce grant (distinct du sujet et de l\'auteur)}';
