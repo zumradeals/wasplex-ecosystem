@@ -57,6 +57,9 @@ class GrantAutoIssuer
         'alert_case.submit',
         'alert_case.view_self',
         'alert_match.propose',
+        // AMD-0017 : initier son propre dépôt Wallet — même raisonnement
+        // que `campaign.create`/`wallet.view`.
+        'wallet.deposit',
     ];
 
     /**
