@@ -116,6 +116,7 @@ class GrantStaffCapabilityTest extends AdvertisingTestCase
         yield 'alert_case.publish' => ['alert_case.publish', 'alerts.case_category'];
         yield 'alert_match.validate' => ['alert_match.validate', 'alerts.case_category'];
         yield 'alert_return.verify' => ['alert_return.verify', 'alerts.case_category'];
+        yield 'governance.system_administrator' => ['governance.system_administrator', 'governance.system'];
     }
 
     #[DataProvider('newlyBootstrappableCapabilities')]
