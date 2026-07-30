@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountOverviewController;
+use App\Http\Controllers\AdvertisingProfileController;
 use App\Http\Controllers\GeniusPayWebhookController;
 use App\Http\Controllers\HealthController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationController;
@@ -220,6 +221,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // (même raisonnement que les autres routes d'action mobile de ce
     // fichier, toutes en POST).
     Route::post('me/profile', [AccountOverviewController::class, 'update'])->name('account.profile.update');
+
+    // Véto du dirigeant 2026-07-30 (AMD-0009) : « Intérêts publicitaires »,
+    // section distincte de « Mon espace » (UX-0001 §11) — consentement
+    // facultatif, spécifique, versionné et révocable. Même discipline POST
+    // (jamais PATCH/DELETE) que 'me/profile' ci-dessus : appelé via
+    // `postJson`, pas de soumission de formulaire à spoofer.
+    Route::get('me/advertising-profile', [AdvertisingProfileController::class, 'index'])
+        ->name('account.advertising-profile');
+    Route::post('me/advertising-profile', [AdvertisingProfileController::class, 'update'])
+        ->name('account.advertising-profile.update');
+    Route::post('me/advertising-profile/withdraw', [AdvertisingProfileController::class, 'destroy'])
+        ->name('account.advertising-profile.withdraw');
 });
 
 // Non protégée par le middleware 'auth' : une requête non authentifiée doit
