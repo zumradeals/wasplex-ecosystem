@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Modules\Wallet\Deposit\Http\Controllers;
+namespace App\Modules\Advertising\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\GeniusPayWebhookController;
+use App\Modules\Advertising\Http\Requests\StoreCampaignFundingInitiationRequest;
+use App\Modules\Advertising\Models\Campaign;
+use App\Modules\Advertising\Services\CampaignFundingInitiationService;
 use App\Modules\Governance\Authorization\Contracts\ResourceContext;
 use App\Modules\Governance\Authorization\Enums\Environment;
 use App\Modules\Governance\Authorization\Enums\Operation;
@@ -13,32 +16,35 @@ use App\Modules\Governance\Authorization\Integration\Exceptions\AuthorizationOut
 use App\Modules\Governance\Authorization\Integration\Exceptions\SubjectResolutionFailedException;
 use App\Modules\Governance\Authorization\Integration\Http\AuthenticatedSubjectHttpResolver;
 use App\Modules\Governance\Authorization\Integration\Http\AuthorizationFailureResponder;
-use App\Modules\Wallet\Deposit\Http\Requests\StoreDepositRequest;
-use App\Modules\Wallet\Deposit\Services\DepositInitiationService;
+use App\Modules\Wallet\Deposit\Http\Controllers\DepositInitiationController;
 use App\Modules\Wallet\Deposit\Services\Exceptions\GeniusPayRequestFailedException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 /**
- * Première route sensible réelle du dépôt Wallet (AMD-0017 ;
- * ecosystem/wallet/05). Initie un dépôt (`wallet.deposit`, portée self —
- * une personne ne recharge jamais le wallet d'autrui) et retourne l'URL de
- * checkout GeniusPay : ce contrôleur ne crédite jamais lui-même de valeur,
- * seul le webhook signé le fait
- * ({@see GeniusPayWebhookController}).
+ * Financement de campagne en libre-service par l'annonceur (véto du
+ * dirigeant, 2026-07-30 ; mirroir exact de
+ * {@see DepositInitiationController}).
+ * Initie un financement (`campaign.fund_self`, portée self — un annonceur ne
+ * finance jamais la campagne d'un autre) et retourne l'URL de checkout
+ * GeniusPay : ce contrôleur ne crédite jamais lui-même de valeur, seul le
+ * webhook signé le fait ({@see GeniusPayWebhookController}).
+ *
+ * Distinct de `CampaignFundingController` (`campaign.fund`, staff Wasplex,
+ * paiements hors GeniusPay confirmés manuellement) — les deux coexistent.
  */
-class DepositInitiationController extends Controller
+class CampaignFundingInitiationController extends Controller
 {
     public function __construct(
         private readonly AuthenticatedSubjectHttpResolver $subjectResolver,
         private readonly AuthorizationRequestFactory $authorizationRequestFactory,
         private readonly AuthorizationGate $authorizationGate,
         private readonly AuthorizationFailureResponder $failureResponder,
-        private readonly DepositInitiationService $depositInitiationService,
+        private readonly CampaignFundingInitiationService $initiationService,
     ) {}
 
-    public function store(StoreDepositRequest $request): JsonResponse
+    public function store(StoreCampaignFundingInitiationRequest $request, Campaign $campaign): JsonResponse
     {
         try {
             $subject = $this->subjectResolver->resolve($request);
@@ -46,18 +52,16 @@ class DepositInitiationController extends Controller
             return $this->failureResponder->forUnresolvedSubject($exception);
         }
 
-        $personId = $subject->personAccountLink->person_id;
-
         $authorizationRequest = $this->authorizationRequestFactory->make(
             subject: $subject,
-            capabilityKey: 'wallet.deposit',
+            capabilityKey: 'campaign.fund_self',
             operation: Operation::Write,
             resource: new ResourceContext(
-                resourceType: 'wallet.deposit',
-                resourceId: null,
+                resourceType: 'advertising.campaign',
+                resourceId: $campaign->id,
                 organizationId: null,
-                ownerPersonId: $personId,
-                countryCode: 'CI',
+                ownerPersonId: $campaign->advertiserProfile->representative->person_id,
+                countryCode: null,
                 territoryCodes: [],
                 environment: $this->currentEnvironment(),
             ),
@@ -70,16 +74,16 @@ class DepositInitiationController extends Controller
             return $this->failureResponder->forOutcome($exception);
         }
 
-        $depositId = (string) Str::uuid7();
+        $campaignFundingId = (string) Str::uuid7();
 
         try {
-            $deposit = $this->depositInitiationService->initiate(
-                depositId: $depositId,
-                personId: $personId,
+            $funding = $this->initiationService->initiate(
+                campaignFundingId: $campaignFundingId,
+                campaign: $campaign,
                 initiatedByPersonAccountLinkId: $subject->personAccountLink->id,
                 amount: (int) $request->validated('amount'),
-                successUrl: URL::route('wallet.deposits.return', ['deposit' => $depositId]),
-                errorUrl: URL::route('wallet.deposits.return', ['deposit' => $depositId]),
+                successUrl: URL::route('advertising.campaigns.self-funding.return', ['campaign' => $campaign->id, 'campaignFunding' => $campaignFundingId]),
+                errorUrl: URL::route('advertising.campaigns.self-funding.return', ['campaign' => $campaign->id, 'campaignFunding' => $campaignFundingId]),
                 idempotencyKey: (string) $request->validated('idempotency_key'),
             );
         } catch (GeniusPayRequestFailedException) {
@@ -90,9 +94,9 @@ class DepositInitiationController extends Controller
         }
 
         return new JsonResponse([
-            'deposit_id' => $deposit->id,
-            'state' => $deposit->state->value,
-            'checkout_url' => $deposit->checkout_url,
+            'campaign_funding_id' => $funding->id,
+            'state' => $funding->state->value,
+            'checkout_url' => $funding->checkout_url,
         ], 201);
     }
 

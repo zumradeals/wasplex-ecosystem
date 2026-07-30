@@ -79,10 +79,13 @@ class GrantStaffCapability extends Command
         // jamais évalué par ScopeMatcher — voir la migration de déclaration
         // pour le raisonnement complet.
         'wallet_deposit.manage_credentials' => 'wallet.deposit_provider_credentials',
+        // Véto du dirigeant 2026-07-30 : même doctrine TD-0008-D que
+        // wallet_deposit.review, appliquée au financement de campagne.
+        'campaign_funding.review' => 'advertising.campaign',
     ];
 
     protected $signature = 'governance:grant-staff-capability
-        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify, governance.system_administrator, wallet_deposit.review, wallet_deposit.manage_credentials)}
+        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify, governance.system_administrator, wallet_deposit.review, wallet_deposit.manage_credentials, campaign_funding.review)}
         {subject-email : E-mail du compte qui recevra le droit}
         {author-email : E-mail du compte qui propose ce grant}
         {approver-email : E-mail du compte qui approuve ce grant (distinct du sujet et de l\'auteur)}';

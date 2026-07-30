@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { PiggyBank } from 'lucide-react';
+import { useState } from 'react';
 import { AdvertiserAccessGate } from '@/components/advertiser/advertiser-access-gate';
 import type {
     AdvertiserAccess,
@@ -11,6 +12,7 @@ import {
     amountFormatter,
     displayCampaignStatus,
 } from '@/lib/advertising-labels';
+import { postJson } from '@/lib/api';
 
 type CampaignBudget = {
     campaign_id: string;
@@ -21,6 +23,92 @@ type CampaignBudget = {
     reserved: number;
     consumed: number;
 };
+
+// Véto du dirigeant 2026-07-30 : financement de campagne en libre-service
+// via GeniusPay (campaign.fund_self) — même flux que la recharge Wallet
+// (resources/js/pages/wallet/overview.tsx) : redirection vers le checkout
+// hébergé par GeniusPay, jamais d'affichage d'un budget crédité ici, seul
+// le webhook signé fait foi.
+function FundCampaignButton({ campaignId }: { campaignId: string }) {
+    const [open, setOpen] = useState(false);
+    const [amount, setAmount] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    async function submit(event: React.FormEvent) {
+        event.preventDefault();
+        const parsed = Number(amount);
+
+        if (!Number.isInteger(parsed) || parsed < 200) {
+            setError('Le montant minimum est de 200.');
+
+            return;
+        }
+
+        setSubmitting(true);
+        setError(null);
+
+        const result = await postJson<{ checkout_url: string }>(
+            `/advertising/campaigns/${campaignId}/self-funding`,
+            { amount: parsed, idempotency_key: crypto.randomUUID() },
+        );
+
+        if (result.ok) {
+            window.location.href = result.data.checkout_url;
+
+            return;
+        }
+
+        setSubmitting(false);
+        setError(
+            result.status === 503
+                ? "Le service de paiement n'est pas disponible pour le moment."
+                : "Le financement n'a pas pu être initié.",
+        );
+    }
+
+    if (!open) {
+        return (
+            <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="rounded-md border border-[var(--border-default)] px-3 py-1.5 text-xs font-medium text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
+            >
+                Financer
+            </button>
+        );
+    }
+
+    return (
+        <form
+            onSubmit={submit}
+            className="flex items-center justify-end gap-2"
+        >
+            {error && (
+                <p className="text-xs text-[var(--status-danger)]">
+                    {error}
+                </p>
+            )}
+            <input
+                type="number"
+                min={200}
+                step={1}
+                autoFocus
+                value={amount}
+                onChange={(event) => setAmount(event.target.value)}
+                placeholder="Montant"
+                className="w-28 rounded-md border border-[var(--border-default)] bg-[var(--bg-canvas)] px-2 py-1.5 text-xs text-[var(--text-primary)] focus:border-[var(--brand-blue)] focus:outline-none"
+            />
+            <button
+                type="submit"
+                disabled={submitting}
+                className="rounded-md bg-[var(--brand-blue)] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50"
+            >
+                {submitting ? 'Redirection...' : 'Payer'}
+            </button>
+        </form>
+    );
+}
 
 export default function AdvertisingBudget({
     access,
@@ -68,6 +156,9 @@ export default function AdvertisingBudget({
                                     <th className="px-5 py-2.5 font-medium">
                                         Consommé
                                     </th>
+                                    <th className="px-5 py-2.5 font-medium text-right">
+                                        Financement
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--border-default)]">
@@ -99,6 +190,11 @@ export default function AdvertisingBudget({
                                                 row.consumed,
                                             )}{' '}
                                             {row.currency}
+                                        </td>
+                                        <td className="px-5 py-3 text-right">
+                                            <FundCampaignButton
+                                                campaignId={row.campaign_id}
+                                            />
                                         </td>
                                     </tr>
                                 ))}

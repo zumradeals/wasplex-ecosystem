@@ -2,9 +2,9 @@
 
 namespace App\Modules\Wallet\Deposit\Services;
 
+use App\Http\Controllers\GeniusPayWebhookController;
 use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
 use App\Modules\Wallet\Deposit\Enums\DepositState;
-use App\Modules\Wallet\Deposit\Http\Controllers\DepositWebhookController;
 use App\Modules\Wallet\Deposit\Models\Deposit;
 use App\Modules\Wallet\Deposit\Models\DepositWebhookEvent;
 use App\Modules\Wallet\Ledger\Enums\PostingDirection;
@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 /**
  * Traite une entrée d'inbox déjà enregistrée (ADR-0007 §11 : signature
  * vérifiée et payload durablement stocké avant tout effet — voir
- * {@see DepositWebhookController}).
+ * {@see GeniusPayWebhookController}).
  * Idempotent par construction : un dépôt déjà `completed`/`failed` (état
  * terminal) court-circuite tout retraitement, qu'il s'agisse d'un rejeu du
  * même événement ou d'une nouvelle entrée d'inbox pour le même paiement

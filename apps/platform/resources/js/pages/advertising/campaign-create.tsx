@@ -9,7 +9,6 @@ import type {
 import AdvertiserLayout from '@/layouts/advertiser-layout';
 import { FORMAT_LABELS } from '@/lib/advertising-labels';
 import { postJson } from '@/lib/api';
-import advertising from '@/routes/advertising';
 import campaigns from '@/routes/advertising/campaigns';
 
 type SectorOption = {
@@ -112,7 +111,12 @@ export default function AdvertisingCampaignCreate({
             return;
         }
 
-        router.visit(advertising.campaigns.index().url);
+        // Véto du dirigeant 2026-07-30 : redirige directement vers le
+        // budget plutôt que la liste des campagnes, pour que le geste de
+        // financement (campaign.fund_self) soit immédiatement accessible
+        // après la création — jamais un budget engagé automatiquement,
+        // seulement la page où l'annonceur peut choisir de financer.
+        router.visit('/advertising/budget');
     }
 
     return (

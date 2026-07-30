@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AccountOverviewController;
+use App\Http\Controllers\GeniusPayWebhookController;
 use App\Http\Controllers\HealthController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminCampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminFinanceController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
@@ -17,6 +19,8 @@ use App\Modules\Advertising\Http\Controllers\AdvertisingOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingReportsController;
 use App\Modules\Advertising\Http\Controllers\CampaignController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
+use App\Modules\Advertising\Http\Controllers\CampaignFundingInitiationController;
+use App\Modules\Advertising\Http\Controllers\CampaignFundingReturnController;
 use App\Modules\Advertising\Http\Controllers\CampaignReportController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionApprovalController;
 use App\Modules\Advertising\Http\Controllers\CampaignVersionFavoriteController;
@@ -47,7 +51,6 @@ use App\Modules\Wallet\Deposit\Http\Controllers\Admin\AdminWalletDepositControll
 use App\Modules\Wallet\Deposit\Http\Controllers\Admin\AdminWalletDepositCredentialsController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositInitiationController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositReturnController;
-use App\Modules\Wallet\Deposit\Http\Controllers\DepositWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -108,6 +111,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // connexion pour un visiteur non authentifié plutôt qu'un 401 JSON.
     Route::get('wallet/deposits/{deposit}/return', [DepositReturnController::class, 'show'])
         ->name('wallet.deposits.return');
+
+    // Véto du dirigeant 2026-07-30 : page de retour après redirection
+    // GeniusPay pour un financement de campagne — même raisonnement que
+    // 'wallet/deposits/{deposit}/return' ci-dessus.
+    Route::get('advertising/campaigns/{campaign}/self-funding/{campaignFunding}/return', [CampaignFundingReturnController::class, 'show'])
+        ->name('advertising.campaigns.self-funding.return');
 
     // P007-W1 : tableau de bord annonceur (A-001-01/A-002-01) — reprend
     // l'autorisation campaign.view (portée self) et affiche un état d'écran
@@ -184,6 +193,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('admin/wallet-deposits/credentials', [AdminWalletDepositCredentialsController::class, 'update'])
         ->name('admin.wallet-deposit-credentials.update');
 
+    // Véto du dirigeant 2026-07-30 : supervision des financements de
+    // campagne GeniusPay en litige (unknown_reconciliation) et des webhooks
+    // à signature invalide (campaign_funding.review, lecture seule) — même
+    // doctrine TD-0008-D que 'admin/wallet-deposits' ci-dessus.
+    Route::get('admin/campaign-fundings', [AdminCampaignFundingController::class, 'index'])
+        ->name('admin.campaign-fundings');
+
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne
     // sans appartenance institutionnelle active voit un état refusé
@@ -248,6 +264,15 @@ Route::middleware('web')->post('advertising/moderation-cases/{moderationCase}/de
 Route::middleware('web')->post('advertising/campaigns/{campaign}/funding', [CampaignFundingController::class, 'store'])
     ->name('advertising.campaigns.funding.store');
 
+// Véto du dirigeant 2026-07-30 : financement de campagne en libre-service
+// par l'annonceur via GeniusPay (campaign.fund_self, portée self) —
+// distinct de la route ci-dessus (personnel finance Wasplex, paiements hors
+// GeniusPay). Même discipline : groupe 'web' hors du groupe 'auth', 401
+// JSON structuré pour un appel non authentifié. Ne crédite jamais de valeur
+// elle-même — seul le webhook signé le fait (webhooks.geniuspay.store).
+Route::middleware('web')->post('advertising/campaigns/{campaign}/self-funding', [CampaignFundingInitiationController::class, 'store'])
+    ->name('advertising.campaigns.self-funding.store');
+
 // P005-F : cycle de vie d'un QualifiedEvent (ADR-0010 §4 lignes 3-5).
 // event.submit/event.accept/event.reject sont réservées au personnel
 // Wasplex anti-fraude/mesure d'attention, jamais au bénéficiaire lui-même
@@ -306,7 +331,11 @@ Route::middleware('web')->post('wallet/deposits', [DepositInitiationController::
 // signature HMAC du corps brut, jamais par une capacité ni une session —
 // exempté de CSRF (bootstrap/app.php, `validateCsrfTokens(except: ...)`)
 // puisqu'il s'agit d'un appel serveur à serveur sans jeton de formulaire.
-Route::middleware('web')->post('webhooks/geniuspay', [DepositWebhookController::class, 'store'])
+// Véto du dirigeant 2026-07-30 : une seule URL de webhook est configurée
+// côté GeniusPay en production — `GeniusPayWebhookController` répartit
+// chaque réception entre dépôt Wallet et financement de campagne (voir son
+// docblock), remplace l'ancien `DepositWebhookController`.
+Route::middleware('web')->post('webhooks/geniuspay', [GeniusPayWebhookController::class, 'store'])
     ->name('webhooks.geniuspay.store');
 
 // P008-A : déclaration communautaire (alert_case.submit, portée self).
