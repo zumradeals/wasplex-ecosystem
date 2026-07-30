@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Modules\Wallet\Deposit\Http\Admin;
 
+use App\Modules\Governance\Authorization\Enums\AuthorizationDecision;
+use App\Modules\Governance\Authorization\Models\AuthorizationDecisionRecord;
 use App\Modules\Identity\Enums\LinkOrigin;
 use App\Modules\Wallet\Deposit\Enums\DepositState;
 use App\Modules\Wallet\Deposit\Models\Deposit;
@@ -46,6 +48,15 @@ class AdminWalletDepositRouteTest extends TestCase
             ->where('invalidWebhooks.access.allowed', false)
             ->where('invalidWebhooks.items', []),
         );
+
+        $this->assertTrue(
+            AuthorizationDecisionRecord::query()
+                ->where('capability_key', 'wallet_deposit.review')
+                ->where('operation', 'read')
+                ->where('decision', AuthorizationDecision::Denied->value)
+                ->where('reason_code', 'no_active_grant')
+                ->exists(),
+        );
     }
 
     public function test_a_holder_of_wallet_deposit_review_sees_empty_queues_by_default(): void
@@ -62,6 +73,15 @@ class AdminWalletDepositRouteTest extends TestCase
             ->where('disputedDeposits.items', [])
             ->where('invalidWebhooks.access.allowed', true)
             ->where('invalidWebhooks.items', []),
+        );
+
+        $this->assertTrue(
+            AuthorizationDecisionRecord::query()
+                ->where('capability_key', 'wallet_deposit.review')
+                ->where('operation', 'read')
+                ->where('decision', AuthorizationDecision::Allowed->value)
+                ->where('reason_code', 'allowed')
+                ->exists(),
         );
     }
 
@@ -135,6 +155,34 @@ class AdminWalletDepositRouteTest extends TestCase
             ->component('admin/wallet-deposits')
             ->has('invalidWebhooks.items', 1)
             ->where('invalidWebhooks.items.0.webhook_event_id', $invalid->id),
+        );
+    }
+
+    public function test_invalid_webhook_queue_is_paginated_to_fifty_items(): void
+    {
+        $staff = $this->makeRepresentative();
+        $this->grantStaffCapability($staff, 'wallet_deposit.review', 'wallet.deposit');
+
+        foreach (range(1, 51) as $sequence) {
+            DepositWebhookEvent::create([
+                'provider' => 'geniuspay',
+                'event_type' => 'payment.invalid.'.$sequence,
+                'signature_valid' => false,
+                'raw_payload' => '{}',
+                'received_at' => now()->addSeconds($sequence),
+            ]);
+        }
+
+        $response = $this->actingAs($staff->user)->get('/admin/wallet-deposits');
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('admin/wallet-deposits')
+            ->has('invalidWebhooks.items', 50)
+            ->where('invalidWebhooks.pagination.current_page', 1)
+            ->where('invalidWebhooks.pagination.last_page', 2)
+            ->where('invalidWebhooks.pagination.total', 51)
+            ->where('invalidWebhooks.pagination.per_page', 50),
         );
     }
 
