@@ -31,6 +31,7 @@ use App\Modules\Governance\Authorization\Support\ScopePayload;
 use App\Modules\Identity\Models\Membership;
 use App\Modules\Identity\Models\PersonAccountLink;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -125,9 +126,9 @@ class GrantManager
      * grant actif `governance.system_administrator` (amendement ADR-0004
      * 2026-07-30, « Rôle Administrateur Système ») : ce compte peut alors
      * s'accorder et accorder à d'autres n'importe quelle capacité déclarée,
-     * seul. L'exception ne s'applique jamais à l'octroi de
-     * `governance.system_administrator` lui-même, qui reste soumis à la
-     * matrice ci-dessous et n'admet qu'un seul grant actif à la fois.
+     * seul. L'auto-amorçage de `governance.system_administrator` est
+     * également permis lorsqu'aucun titulaire effectif n'existe ; une
+     * transaction sérialisée garantit qu'un seul grant peut devenir actif.
      *
      * @throws AuthorSubstitutionRefusedException L'auteur transmis diffère de celui enregistré à la proposition.
      * @throws GrantNotProposedException Le grant n'est plus au stade `proposed` (aucune réactivation ni activation répétée).
@@ -137,87 +138,93 @@ class GrantManager
      */
     public function activate(Grant $grant, PersonAccountLink $author, ?PersonAccountLink $approver, string $correlationId): Grant
     {
-        if ($grant->state !== GrantState::Proposed) {
-            throw new GrantNotProposedException(
-                "seul un grant à l'état proposed peut être activé ; état actuel : {$grant->state->value}"
-            );
-        }
-
-        if ($grant->author_person_account_link_id !== $author->id) {
-            throw new AuthorSubstitutionRefusedException(
-                "l'auteur transmis à l'activation ne correspond pas à l'auteur enregistré à la proposition"
-            );
-        }
-
-        $capability = $grant->capabilityDefinition;
-        $policy = $grant->policyVersion;
-
-        $this->assertCapabilityActive($capability);
-        $this->assertPolicyActive($policy);
-
-        if ($capability->stable_key === self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY && $this->hasActiveSystemAdministrator()) {
-            throw new MultipleSystemAdministratorsRefusedException(
-                'un compte détient déjà un grant actif governance.system_administrator ; révoquer le titulaire actuel avant d\'en activer un nouveau'
-            );
-        }
-
-        $subjectPersonId = $this->resolveSubjectPersonId($grant);
-        $authorPersonId = $author->person_id;
-
-        // Amendement ADR-0004 2026-07-30 (addendum « auto-amorçage de
-        // l'Administrateur Système », décision du fondateur postérieure à
-        // l'amendement initial ci-dessus) : l'attribution de
-        // `governance.system_administrator` lui-même est désormais exemptée
-        // de la matrice, pas seulement les octrois qu'il émet ensuite —
-        // atteindre cette ligne pour cette capacité précise prouve déjà
-        // qu'aucun grant actif n'existe (sinon `hasActiveSystemAdministrator()`
-        // aurait levé `MultipleSystemAdministratorsRefusedException`
-        // ci-dessus) : un seul compte peut donc se nommer lui-même, sans
-        // auteur ni approbateur distinct, résolvant le paradoxe de l'amorçage
-        // (aucun autre compte ne pourrait légitimement approuver le tout
-        // premier Administrateur Système). Ce même chemin se rouvre après
-        // toute révocation, symétriquement à `hasActiveSystemAdministrator()`.
-        if (! $this->isSystemAdministratorByPersonId($authorPersonId) && $capability->stable_key !== self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY) {
-            if ($approver === null && $subjectPersonId === $authorPersonId) {
-                throw new SelfAuthorizationRefusedException(
-                    "l'auteur ne peut créer et activer seul sa propre habilitation"
-                );
-            }
-
-            if (in_array($capability->risk_class, [RiskClass::Sensitive, RiskClass::Critical], true) && $approver === null) {
-                throw new SeparationOfDutiesViolationException(
-                    'les capacités sensitive et critical exigent un approbateur distinct'
-                );
-            }
-
-            if ($approver !== null && $approver->person_id === $authorPersonId) {
-                throw new SeparationOfDutiesViolationException(
-                    "l'auteur ne peut être son propre approbateur"
-                );
-            }
-
-            if ($approver !== null && $approver->person_id === $subjectPersonId) {
-                throw new SeparationOfDutiesViolationException(
-                    "l'approbateur ne peut être le sujet de l'habilitation"
-                );
-            }
-        }
-
         return DB::transaction(function () use ($grant, $author, $approver, $correlationId): Grant {
-            $grant->forceFill([
+            // Verrouiller le grant empêche deux activations concurrentes du
+            // même objet. Pour le rôle Administrateur Système, le verrou sur
+            // la définition de capacité sérialise aussi deux grants distincts :
+            // le second ne peut vérifier l'unicité qu'après le commit du premier.
+            $lockedGrant = Grant::query()->lockForUpdate()->findOrFail($grant->id);
+
+            if ($lockedGrant->state !== GrantState::Proposed) {
+                throw new GrantNotProposedException(
+                    "seul un grant à l'état proposed peut être activé ; état actuel : {$lockedGrant->state->value}"
+                );
+            }
+
+            if ($lockedGrant->author_person_account_link_id !== $author->id) {
+                throw new AuthorSubstitutionRefusedException(
+                    "l'auteur transmis à l'activation ne correspond pas à l'auteur enregistré à la proposition"
+                );
+            }
+
+            $capability = $lockedGrant->capabilityDefinition;
+            $policy = $lockedGrant->policyVersion;
+
+            if ($capability->stable_key === self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY) {
+                $capability = CapabilityDefinition::query()
+                    ->whereKey($capability->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+            }
+
+            $this->assertCapabilityActive($capability);
+            $this->assertPolicyActive($policy);
+
+            if ($capability->stable_key === self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY) {
+                if ($this->hasActiveSystemAdministrator()) {
+                    throw new MultipleSystemAdministratorsRefusedException(
+                        'un compte détient déjà un grant actif governance.system_administrator ; révoquer le titulaire actuel avant d\'en activer un nouveau'
+                    );
+                }
+            }
+
+            $subjectPersonId = $this->resolveSubjectPersonId($lockedGrant);
+            $authorPersonId = $author->person_id;
+
+            // Addendum ADR-0004 2026-07-30 : l'Administrateur Système
+            // effectif peut octroyer seul toute capacité déclarée. Le rôle
+            // lui-même peut s'auto-amorcer uniquement quand le verrou
+            // ci-dessus confirme qu'aucun titulaire effectif n'existe.
+            if (! $this->isSystemAdministratorByPersonId($authorPersonId) && $capability->stable_key !== self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY) {
+                if ($approver === null && $subjectPersonId === $authorPersonId) {
+                    throw new SelfAuthorizationRefusedException(
+                        "l'auteur ne peut créer et activer seul sa propre habilitation"
+                    );
+                }
+
+                if (in_array($capability->risk_class, [RiskClass::Sensitive, RiskClass::Critical], true) && $approver === null) {
+                    throw new SeparationOfDutiesViolationException(
+                        'les capacités sensitive et critical exigent un approbateur distinct'
+                    );
+                }
+
+                if ($approver !== null && $approver->person_id === $authorPersonId) {
+                    throw new SeparationOfDutiesViolationException(
+                        "l'auteur ne peut être son propre approbateur"
+                    );
+                }
+
+                if ($approver !== null && $approver->person_id === $subjectPersonId) {
+                    throw new SeparationOfDutiesViolationException(
+                        "l'approbateur ne peut être le sujet de l'habilitation"
+                    );
+                }
+            }
+
+            $lockedGrant->forceFill([
                 'state' => GrantState::Active,
                 'activated_at' => now(),
                 'approver_person_account_link_id' => $approver?->id,
             ])->save();
 
             $this->auditRecorder->recordGrantEvent(
-                $grant->fresh(),
+                $lockedGrant->fresh(),
                 $approver ?? $author,
                 GrantEventType::Activated,
                 $correlationId,
             );
 
-            return $grant->fresh();
+            return $lockedGrant->fresh();
         });
     }
 
@@ -384,19 +391,15 @@ class GrantManager
      */
     private function isSystemAdministratorByPersonId(string $authorPersonId): bool
     {
-        return Grant::query()
-            ->whereHas('capabilityDefinition', fn ($query) => $query->where('stable_key', self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY))
+        return $this->activeSystemAdministratorGrants()
             ->whereHas('personAccountLink', fn ($query) => $query->where('person_id', $authorPersonId))
-            ->where('state', GrantState::Active)
             ->exists();
     }
 
     /**
-     * Enveloppe publique de {@see isSystemAdministrator()} pour les
-     * appelants hors service (ex. `GrantStaffCapability`, qui doit décider
-     * s'il applique sa propre garde de distinction sujet/auteur/approbateur
-     * avant même d'appeler `propose()`/`activate()` — seule source de vérité
-     * réutilisée, aucune requête dupliquée).
+     * Enveloppe publique utilisée par le bootstrap CLI. Un Administrateur
+     * Système ne garde l'exemption que tant que son grant, sa capacité et sa
+     * politique sont tous actifs et dans leur période d'effet.
      */
     public function isSystemAdministrator(PersonAccountLink $link): bool
     {
@@ -405,9 +408,39 @@ class GrantManager
 
     private function hasActiveSystemAdministrator(): bool
     {
-        return Grant::query()
-            ->whereHas('capabilityDefinition', fn ($query) => $query->where('stable_key', self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY))
-            ->where('state', GrantState::Active)
-            ->exists();
+        return $this->activeSystemAdministratorGrants()->exists();
     }
+
+    /**
+     * @return Builder<Grant>
+     */
+    private function activeSystemAdministratorGrants(): Builder
+    {
+        $now = now();
+
+        return Grant::query()
+            ->whereHas('capabilityDefinition', function ($query) use ($now): void {
+                $query
+                    ->where('stable_key', self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY)
+                    ->where('state', CapabilityState::Active->value)
+                    ->where('effective_from', '<=', $now)
+                    ->where(function ($period) use ($now): void {
+                        $period->whereNull('effective_to')->orWhere('effective_to', '>', $now);
+                    });
+            })
+            ->whereHas('policyVersion', function ($query) use ($now): void {
+                $query
+                    ->where('state', PolicyState::Active->value)
+                    ->where('effective_from', '<=', $now)
+                    ->where(function ($period) use ($now): void {
+                        $period->whereNull('effective_to')->orWhere('effective_to', '>', $now);
+                    });
+            })
+            ->where('state', GrantState::Active->value)
+            ->where('valid_from', '<=', $now)
+            ->where(function ($query) use ($now): void {
+                $query->whereNull('valid_until')->orWhere('valid_until', '>', $now);
+            });
+    }
+
 }
