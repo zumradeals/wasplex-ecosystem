@@ -1,37 +1,28 @@
-# Wasplex Ecosystem
+# Wasplex
 
-Dépôt normatif et architectural de l'écosystème Wasplex.
+Ce dépôt contient l’application Wasplex et sa documentation métier opérationnelle.
 
-La Constitution, les amendements, décisions, spécifications métier, ADR, parcours UX et le catalogue UI exécutable constituent le Grand Livre transmis aux équipes humaines et aux IA de développement.
-
-## État de référence
-
-- Constitution v1.5 adoptée ;
-- AMD-0001 à AMD-0015 adoptés ; AMD-0015 attend sa consolidation dans la Constitution v1.6 ;
-- ADR-0001 à ADR-0009 adoptés ;
-- DS-0001 adopté ;
-- UX-0001 à UX-0003 adoptés ;
-- catalogue React/TypeScript initial dans `ui-catalogue/`.
+Wasplex n’est plus piloté par une Constitution, des amendements, des lois internes ou un Grand Livre. La référence de construction se trouve dans `docs/` : un fichier simple par domaine, rédigé pour expliquer directement le produit attendu.
 
 ## Ordre de lecture
 
-1. `CONSTITUTION.md`
-2. `GLOSSARY.md`
-3. `decisions/README.md`
-4. amendements et spécifications du domaine concerné
-5. ADR adoptés dans `decisions/`, puis leurs spécifications dans `architecture/`
-6. DS et documents `design/`
-7. décisions et documents `ux/`
-8. `CLAUDE.md` avant toute exécution avec Claude Code
+1. `docs/00-vision-generale-wasplex.md`
+2. le document métier du module concerné dans `docs/`
+3. `CLAUDE.md` pour la méthode de travail
+4. le code et les tests existants
 
-Une maquette, un prompt ou une implémentation ne peut contredire une règle supérieure adoptée.
+## Règle de construction
 
-Les brouillons d'architecture historiques non normatifs sont isolés dans `history/architecture-drafts/`. Ils ne doivent jamais être utilisés à la place des ADR adoptés.
+Un écran, une table ou une route ne suffisent pas à déclarer une fonctionnalité terminée. Le parcours réel doit fonctionner de bout en bout et produire le résultat métier décrit dans `docs/`.
 
-## Architecture officielle
+Lorsqu’une information commerciale ou une formule n’est pas décidée, elle doit rester indiquée comme décision ouverte. Elle ne doit pas être remplacée par une valeur fictive présentée comme réelle.
 
-Monolithe modulaire Laravel, PostgreSQL, React, TypeScript, Inertia et Vite. Supabase ne fait pas partie de l'architecture officielle.
+## Socle technique actuel
 
-## Branche principale
+- Laravel / PHP
+- PostgreSQL
+- React / TypeScript
+- Inertia / Vite
+- monolithe modulaire
 
-`main` est la branche stable de référence. Les branches historiques restent consultables tant qu'elles ne sont pas explicitement archivées ou supprimées.
+Le code, les tests, les migrations et le déploiement restent dans leurs répertoires techniques existants.
