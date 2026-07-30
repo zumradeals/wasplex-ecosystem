@@ -1,12 +1,22 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { AdminAccessGate } from '@/components/admin/admin-access-gate';
 import type { AdminAccess } from '@/components/admin/admin-access-gate';
 import AdminLayout from '@/layouts/admin-layout';
 import { amountFormatter } from '@/lib/advertising-labels';
 
+type QueuePagination = {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    previous_url: string | null;
+    next_url: string | null;
+};
+
 type Section<T> = {
     access: AdminAccess;
     items: T[];
+    pagination: QueuePagination;
 };
 
 type DisputedDepositItem = {
@@ -58,13 +68,48 @@ function SectionCard({
             </div>
             <div className="p-5">
                 <AdminAccessGate access={section.access}>
-                    {section.items.length === 0 ? (
-                        <p className="text-sm text-[var(--text-secondary)]">
-                            {emptyLabel}
-                        </p>
-                    ) : (
-                        <div className="space-y-3">{children}</div>
-                    )}
+                    <>
+                        {section.items.length === 0 ? (
+                            <p className="text-sm text-[var(--text-secondary)]">
+                                {emptyLabel}
+                            </p>
+                        ) : (
+                            <div className="space-y-3">{children}</div>
+                        )}
+
+                        {section.pagination.last_page > 1 && (
+                            <nav
+                                className="mt-5 flex items-center justify-between gap-3 border-t border-[var(--border-default)] pt-4"
+                                aria-label={`Pagination — ${title}`}
+                            >
+                                <div className="text-xs text-[var(--text-secondary)]">
+                                    Page {section.pagination.current_page} sur{' '}
+                                    {section.pagination.last_page} —{' '}
+                                    {section.pagination.total} éléments
+                                </div>
+                                <div className="flex gap-2">
+                                    {section.pagination.previous_url && (
+                                        <Link
+                                            href={section.pagination.previous_url}
+                                            preserveScroll
+                                            className="rounded-md border border-[var(--border-default)] px-3 py-1.5 text-xs text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
+                                        >
+                                            Précédent
+                                        </Link>
+                                    )}
+                                    {section.pagination.next_url && (
+                                        <Link
+                                            href={section.pagination.next_url}
+                                            preserveScroll
+                                            className="rounded-md border border-[var(--border-default)] px-3 py-1.5 text-xs text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
+                                        >
+                                            Suivant
+                                        </Link>
+                                    )}
+                                </div>
+                            </nav>
+                        )}
+                    </>
                 </AdminAccessGate>
             </div>
         </section>
