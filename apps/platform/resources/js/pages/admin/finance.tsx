@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import {
     AlertTriangle,
     Landmark,
+    ListTree,
     PiggyBank,
     ShieldCheck,
     Users,
@@ -152,6 +153,25 @@ export default function AdminFinance({
                         <p className="text-xs text-[var(--text-secondary)]">
                             Régler les bornes min/max en secondes
                             (advertising.manage_video_duration_bounds).
+                        </p>
+                    </div>
+                </Link>
+                <Link
+                    href="/admin/sector-classifications"
+                    className="flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] px-5 py-4 transition-colors hover:border-[var(--brand-blue)]/50"
+                >
+                    <ListTree
+                        size={20}
+                        className="shrink-0 text-[var(--brand-blue)]"
+                    />
+                    <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">
+                            Secteurs publicitaires
+                        </p>
+                        <p className="text-xs text-[var(--text-secondary)]">
+                            Publier une classification (pays, secteur) — âge
+                            minimal, formats, niveau de revue
+                            (advertising.manage_sector_classifications).
                         </p>
                     </div>
                 </Link>

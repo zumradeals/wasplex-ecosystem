@@ -8,6 +8,7 @@ use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationCon
 use App\Modules\Advertising\Http\Controllers\Admin\AdminCampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminFinanceController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminInterestTaxonomyController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminSectorClassificationController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminVideoDurationController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
@@ -225,6 +226,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('admin.video-duration-bounds');
     Route::post('admin/video-duration-bounds', [AdminVideoDurationController::class, 'store'])
         ->name('admin.video-duration-bounds.store');
+
+    // Lot 9 (véto du dirigeant 2026-07-30) : matrice de classification des
+    // secteurs (advertising.manage_sector_classifications) — mirroir
+    // d'autorisation exact des deux écrans ci-dessus. Contrairement à
+    // 'admin/interest-taxonomy', pas de {resource} sur l'action de
+    // retrait : chaque classification identifie déjà sa paire
+    // (pays, secteur) par son id propre.
+    Route::get('admin/sector-classifications', [AdminSectorClassificationController::class, 'index'])
+        ->name('admin.sector-classifications');
+    Route::post('admin/sector-classifications', [AdminSectorClassificationController::class, 'store'])
+        ->name('admin.sector-classifications.store');
+    Route::post('admin/sector-classifications/{sectorClassification}/retire', [AdminSectorClassificationController::class, 'retire'])
+        ->name('admin.sector-classifications.retire');
 
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne
