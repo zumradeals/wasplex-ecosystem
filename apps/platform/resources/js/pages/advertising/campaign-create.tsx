@@ -27,6 +27,7 @@ import AdvertiserLayout from '@/layouts/advertiser-layout';
 import { FORMAT_LABELS } from '@/lib/advertising-labels';
 import { postFormData, postJson } from '@/lib/api';
 import { COUNTRIES } from '@/lib/countries';
+import { CURRENCIES } from '@/lib/currencies';
 import campaigns from '@/routes/advertising/campaigns';
 
 type SectorOption = {
@@ -187,7 +188,21 @@ export default function AdvertisingCampaignCreate({
 }) {
     const [step, setStep] = useState(0);
 
-    const [code, setCode] = useState('');
+    // Lot 8 (instruction explicite du fondateur 2026-07-30) : le code de
+    // campagne n'a jamais eu de signification métier — un simple
+    // identifiant unique (`unique:campaigns,code`) utilisé dans les
+    // messages du grand livre comptable. Un non-tech n'a plus à en
+    // inventer un : généré une seule fois par instance de formulaire
+    // (mirroir du générateur de clé d'idempotence de `dashboard.tsx`),
+    // jamais recalculé à chaque rendu.
+    const [code] = useState(
+        () =>
+            `campaign-${
+                typeof crypto.randomUUID === 'function'
+                    ? crypto.randomUUID()
+                    : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+            }`,
+    );
     const [currency, setCurrency] = useState('XOF');
     const [sectorId, setSectorId] = useState(
         sectorClassifications[0]?.id ?? '',
@@ -255,7 +270,6 @@ export default function AdvertisingCampaignCreate({
     // (jamais une validation HTML5 sur des champs masqués d'une autre
     // étape, un piège classique des formulaires en plusieurs pages).
     const step1Valid = Boolean(
-        code.trim() &&
         currency.trim().length === 3 &&
         headline.trim() &&
         destinationUrl.trim() &&
@@ -508,33 +522,46 @@ export default function AdvertisingCampaignCreate({
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
-                                            <div className="grid gap-4 sm:grid-cols-2">
-                                                <Field label="Code de la campagne">
-                                                    <input
-                                                        value={code}
-                                                        onChange={(event) =>
-                                                            setCode(
-                                                                event.target
-                                                                    .value,
+                                            <Field label="Devise du budget">
+                                                <Select
+                                                    value={
+                                                        currency || undefined
+                                                    }
+                                                    onValueChange={setCurrency}
+                                                >
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Choisir une devise" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {[...CURRENCIES]
+                                                            .sort((a, b) =>
+                                                                a.name.localeCompare(
+                                                                    b.name,
+                                                                    'fr',
+                                                                ),
                                                             )
-                                                        }
-                                                        placeholder="ex. rentree-2026"
-                                                        className={inputClass}
-                                                    />
-                                                </Field>
-                                                <Field label="Devise (3 lettres)">
-                                                    <input
-                                                        maxLength={3}
-                                                        value={currency}
-                                                        onChange={(event) =>
-                                                            setCurrency(
-                                                                event.target.value.toUpperCase(),
-                                                            )
-                                                        }
-                                                        className={`${inputClass} uppercase`}
-                                                    />
-                                                </Field>
-                                            </div>
+                                                            .map((option) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        option.code
+                                                                    }
+                                                                    value={
+                                                                        option.code
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        option.name
+                                                                    }{' '}
+                                                                    (
+                                                                    {
+                                                                        option.code
+                                                                    }
+                                                                    )
+                                                                </SelectItem>
+                                                            ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </Field>
 
                                             <Field label="Titre de la création">
                                                 <input
@@ -1005,12 +1032,12 @@ export default function AdvertisingCampaignCreate({
                                         <CardContent>
                                             <dl className="space-y-2 text-sm">
                                                 <SummaryRow
-                                                    label="Code"
-                                                    value={code || '—'}
-                                                />
-                                                <SummaryRow
                                                     label="Titre"
                                                     value={headline || '—'}
+                                                />
+                                                <SummaryRow
+                                                    label="Devise"
+                                                    value={currency || '—'}
                                                 />
                                                 <SummaryRow
                                                     label="Secteur"
