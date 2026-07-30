@@ -14,6 +14,8 @@ const ACCESS_DENIED_MESSAGES: Record<string, string> = {
     no_active_grant: 'Vous ne détenez pas ce droit sur ce compte.',
     subject_not_resolved:
         "Votre session n'a pas pu être confirmée. Reconnectez-vous pour réessayer.",
+    session_assurance_insufficient:
+        'Cette section exige une session renforcée. Confirmez votre mot de passe puis réessayez.',
 };
 
 export function AdminAccessGate({

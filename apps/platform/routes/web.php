@@ -44,6 +44,7 @@ use App\Modules\Governance\Configuration\Http\Controllers\Admin\AdminConfigurati
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
 use App\Modules\Wallet\Deposit\Http\Controllers\Admin\AdminWalletDepositController;
+use App\Modules\Wallet\Deposit\Http\Controllers\Admin\AdminWalletDepositCredentialsController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositInitiationController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositReturnController;
 use App\Modules\Wallet\Deposit\Http\Controllers\DepositWebhookController;
@@ -174,6 +175,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // déclaration pour ce qui reste volontairement hors périmètre).
     Route::get('admin/wallet-deposits', [AdminWalletDepositController::class, 'index'])
         ->name('admin.wallet-deposits');
+
+    // Véto du dirigeant 2026-07-30 (TD-0008-A) : configuration admin des
+    // clés GeniusPay (wallet_deposit.manage_credentials, écriture critique —
+    // voir la migration de déclaration pour le raisonnement complet).
+    Route::get('admin/wallet-deposits/credentials', [AdminWalletDepositCredentialsController::class, 'edit'])
+        ->name('admin.wallet-deposit-credentials');
+    Route::post('admin/wallet-deposits/credentials', [AdminWalletDepositCredentialsController::class, 'update'])
+        ->name('admin.wallet-deposit-credentials.update');
 
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne
