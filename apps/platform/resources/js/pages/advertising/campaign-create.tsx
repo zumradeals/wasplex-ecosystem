@@ -8,7 +8,7 @@ import type {
 } from '@/components/advertiser/advertiser-access-gate';
 import AdvertiserLayout from '@/layouts/advertiser-layout';
 import { FORMAT_LABELS } from '@/lib/advertising-labels';
-import { postJson } from '@/lib/api';
+import { postFormData, postJson } from '@/lib/api';
 import campaigns from '@/routes/advertising/campaigns';
 
 type SectorOption = {
@@ -91,18 +91,28 @@ type AudienceEstimate = {
     below_threshold: boolean;
 };
 
+type VideoDurationBounds = { min_seconds: number; max_seconds: number };
+
+type VideoUploadResult = {
+    path: string;
+    url: string;
+    duration_seconds: number;
+};
+
 export default function AdvertisingCampaignCreate({
     access,
     advertiserProfile,
     sectorClassifications,
     audienceSizeThreshold,
     interestTaxonomy,
+    videoDurationBounds,
 }: {
     access: AdvertiserAccess;
     advertiserProfile: AdvertiserProfileSummary | null;
     sectorClassifications: SectorOption[];
     audienceSizeThreshold: number | null;
     interestTaxonomy: InterestOption[];
+    videoDurationBounds: VideoDurationBounds | null;
 }) {
     const [code, setCode] = useState('');
     const [currency, setCurrency] = useState('XOF');
@@ -129,6 +139,14 @@ export default function AdvertisingCampaignCreate({
     const [interests, setInterests] = useState<string[]>([]);
     const [estimate, setEstimate] = useState<AudienceEstimate | null>(null);
     const [estimating, setEstimating] = useState(false);
+
+    // Lot 4 (instruction explicite du fondateur 2026-07-30) : upload
+    // immédiat dès sélection du fichier (mirroir du flux GeniusPay :
+    // upload d'abord, référence ensuite) — jamais rattaché à une
+    // campagne tant que la création elle-même n'est pas soumise.
+    const [video, setVideo] = useState<VideoUploadResult | null>(null);
+    const [videoUploading, setVideoUploading] = useState(false);
+    const [videoError, setVideoError] = useState<string | null>(null);
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -197,6 +215,44 @@ export default function AdvertisingCampaignCreate({
         );
     }
 
+    async function handleVideoSelected(event: React.ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+
+        if (!file || !advertiserProfile) {
+            return;
+        }
+
+        setVideo(null);
+        setVideoError(null);
+        setVideoUploading(true);
+
+        const formData = new FormData();
+        formData.append('advertiser_profile_id', advertiserProfile.id);
+        formData.append('video', file);
+
+        const result = await postFormData<
+            VideoUploadResult & { reason?: string }
+        >('/advertising/campaign-videos', formData);
+
+        setVideoUploading(false);
+
+        if (!result.ok) {
+            const data = result.data as { reason?: string } | null;
+            setVideoError(
+                data?.reason === 'video_duration_out_of_bounds'
+                    ? `Durée hors bornes${videoDurationBounds ? ` (${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s attendues)` : ''}.`
+                    : data?.reason === 'video_duration_unreadable'
+                      ? "Le fichier n'a pas pu être lu comme une vidéo valide."
+                      : "L'envoi de la vidéo n'a pas abouti.",
+            );
+
+            return;
+        }
+
+        setVideo(result.data);
+    }
+
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
 
@@ -212,7 +268,15 @@ export default function AdvertisingCampaignCreate({
             code,
             currency,
             sector_classification_id: sectorId,
-            creations: { headline },
+            creations: {
+                headline,
+                ...(video
+                    ? {
+                          video_path: video.path,
+                          video_duration_seconds: video.duration_seconds,
+                      }
+                    : {}),
+            },
             expected_event: {
                 format: format || 'banner',
                 condition: 'completion',
@@ -332,6 +396,47 @@ export default function AdvertisingCampaignCreate({
                                         className={inputClass}
                                     />
                                 </Field>
+
+                                <Field
+                                    label={`Vidéo (facultative${videoDurationBounds ? ` — ${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s` : ''})`}
+                                >
+                                    <input
+                                        type="file"
+                                        accept="video/mp4"
+                                        onChange={handleVideoSelected}
+                                        disabled={
+                                            videoUploading || !advertiserProfile
+                                        }
+                                        className={inputClass}
+                                    />
+                                </Field>
+
+                                {videoUploading && (
+                                    <p className="text-xs text-[var(--text-secondary)]">
+                                        Envoi et vérification de la durée en
+                                        cours…
+                                    </p>
+                                )}
+
+                                {videoError && (
+                                    <p className="text-xs text-[var(--status-danger)]">
+                                        {videoError}
+                                    </p>
+                                )}
+
+                                {video && (
+                                    <div className="space-y-2">
+                                        <p className="text-xs text-[var(--status-success)]">
+                                            Vidéo acceptée —{' '}
+                                            {video.duration_seconds} secondes.
+                                        </p>
+                                        <video
+                                            controls
+                                            src={video.url}
+                                            className="w-full max-w-xs rounded-lg border border-[var(--border-default)]"
+                                        />
+                                    </div>
+                                )}
                             </section>
 
                             <section className="space-y-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
