@@ -9,6 +9,7 @@ use App\Modules\Governance\Authorization\Models\Grant;
 use App\Modules\Identity\Enums\LinkOrigin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\Modules\Advertising\AdvertisingTestCase;
 
 /**
@@ -94,5 +95,60 @@ class GrantStaffCapabilityTest extends AdvertisingTestCase
                 'approver-email' => $this->email('approver'),
             ],
         )->assertExitCode(1);
+    }
+
+    /**
+     * Écart comblé 2026-07-30 : `access.view`, `configuration.view`,
+     * `alert_case.review`, `alert_case.publish`, `alert_match.validate` et
+     * `alert_return.verify` ont été déclarées par des lots ultérieurs
+     * (P008-A, portail Configurations/Accès) sans jamais être ajoutées à
+     * cet outil de bootstrap — sans quoi aucun compte réel, y compris
+     * celui du fondateur, ne pouvait jamais recevoir ces capacités en
+     * production.
+     *
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function newlyBootstrappableCapabilities(): iterable
+    {
+        yield 'access.view' => ['access.view', 'governance.grant'];
+        yield 'configuration.view' => ['configuration.view', 'governance.configuration_definition'];
+        yield 'alert_case.review' => ['alert_case.review', 'alerts.case_category'];
+        yield 'alert_case.publish' => ['alert_case.publish', 'alerts.case_category'];
+        yield 'alert_match.validate' => ['alert_match.validate', 'alerts.case_category'];
+        yield 'alert_return.verify' => ['alert_return.verify', 'alerts.case_category'];
+    }
+
+    #[DataProvider('newlyBootstrappableCapabilities')]
+    public function test_it_activates_a_grant_for_each_newly_bootstrappable_capability(string $capability, string $expectedResourceType): void
+    {
+        $subjectEmail = $this->email('staff-subject');
+        $authorEmail = $this->email('staff-author');
+        $approverEmail = $this->email('staff-approver');
+
+        $this->makeUser($subjectEmail, LinkOrigin::Migration);
+        $this->makeUser($authorEmail, LinkOrigin::Migration);
+        $this->makeUser($approverEmail, LinkOrigin::Migration);
+
+        $this->artisan(
+            'governance:grant-staff-capability',
+            [
+                'capability' => $capability,
+                'subject-email' => $subjectEmail,
+                'author-email' => $authorEmail,
+                'approver-email' => $approverEmail,
+            ],
+        )->assertExitCode(0);
+
+        $capabilityDefinition = CapabilityDefinition::query()->where('stable_key', $capability)->firstOrFail();
+        $subjectLink = $this->activeLinkFor(User::query()->where('email', $subjectEmail)->firstOrFail());
+
+        $grant = Grant::query()
+            ->where('capability_definition_id', $capabilityDefinition->id)
+            ->where('person_account_link_id', $subjectLink->id)
+            ->where('state', GrantState::Active->value)
+            ->firstOrFail();
+
+        $this->assertSame($expectedResourceType, $grant->scope()->resourceType);
+        $this->assertNull($grant->scope()->resourceIds);
     }
 }
