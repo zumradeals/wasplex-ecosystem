@@ -164,7 +164,20 @@ class GrantManager
         $subjectPersonId = $this->resolveSubjectPersonId($grant);
         $authorPersonId = $author->person_id;
 
-        if (! $this->isSystemAdministrator($authorPersonId)) {
+        // Amendement ADR-0004 2026-07-30 (addendum « auto-amorçage de
+        // l'Administrateur Système », décision du fondateur postérieure à
+        // l'amendement initial ci-dessus) : l'attribution de
+        // `governance.system_administrator` lui-même est désormais exemptée
+        // de la matrice, pas seulement les octrois qu'il émet ensuite —
+        // atteindre cette ligne pour cette capacité précise prouve déjà
+        // qu'aucun grant actif n'existe (sinon `hasActiveSystemAdministrator()`
+        // aurait levé `MultipleSystemAdministratorsRefusedException`
+        // ci-dessus) : un seul compte peut donc se nommer lui-même, sans
+        // auteur ni approbateur distinct, résolvant le paradoxe de l'amorçage
+        // (aucun autre compte ne pourrait légitimement approuver le tout
+        // premier Administrateur Système). Ce même chemin se rouvre après
+        // toute révocation, symétriquement à `hasActiveSystemAdministrator()`.
+        if (! $this->isSystemAdministratorByPersonId($authorPersonId) && $capability->stable_key !== self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY) {
             if ($approver === null && $subjectPersonId === $authorPersonId) {
                 throw new SelfAuthorizationRefusedException(
                     "l'auteur ne peut créer et activer seul sa propre habilitation"
@@ -369,13 +382,25 @@ class GrantManager
      * authentifier l'appel — même granularité que
      * {@see resolveSubjectPersonId()} ci-dessus.
      */
-    private function isSystemAdministrator(string $authorPersonId): bool
+    private function isSystemAdministratorByPersonId(string $authorPersonId): bool
     {
         return Grant::query()
             ->whereHas('capabilityDefinition', fn ($query) => $query->where('stable_key', self::SYSTEM_ADMINISTRATOR_CAPABILITY_KEY))
             ->whereHas('personAccountLink', fn ($query) => $query->where('person_id', $authorPersonId))
             ->where('state', GrantState::Active)
             ->exists();
+    }
+
+    /**
+     * Enveloppe publique de {@see isSystemAdministrator()} pour les
+     * appelants hors service (ex. `GrantStaffCapability`, qui doit décider
+     * s'il applique sa propre garde de distinction sujet/auteur/approbateur
+     * avant même d'appeler `propose()`/`activate()` — seule source de vérité
+     * réutilisée, aucune requête dupliquée).
+     */
+    public function isSystemAdministrator(PersonAccountLink $link): bool
+    {
+        return $this->isSystemAdministratorByPersonId($link->person_id);
     }
 
     private function hasActiveSystemAdministrator(): bool

@@ -47,7 +47,11 @@ use Illuminate\Support\Str;
  * déclaration de chaque capacité (aucune valeur devinée ici). `activate()`
  * refuse toujours seul(e) auteur = approbateur, ou l'un des deux = sujet
  * (TD-0001-A) — ce garde-fou n'est jamais contourné ici, seulement
- * redemandé plus tôt avec un message clair.
+ * redemandé plus tôt avec un message clair, **sauf** pour l'attribution de
+ * `governance.system_administrator` lui-même et pour tout octroi dont
+ * l'auteur détient déjà ce rôle (addendum ADR-0004 2026-07-30, décision du
+ * fondateur : un seul compte peut s'auto-amorcer puis s'accorder seul
+ * n'importe quelle autre capacité — voir `GrantManager::activate()`).
  */
 class GrantStaffCapability extends Command
 {
@@ -70,10 +74,11 @@ class GrantStaffCapability extends Command
         // resource_type nominal, jamais évalué par ScopeMatcher — voir la
         // migration de déclaration pour le raisonnement complet.
         'governance.system_administrator' => 'governance.system',
+        'wallet_deposit.review' => 'wallet.deposit',
     ];
 
     protected $signature = 'governance:grant-staff-capability
-        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify, governance.system_administrator)}
+        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify, governance.system_administrator, wallet_deposit.review)}
         {subject-email : E-mail du compte qui recevra le droit}
         {author-email : E-mail du compte qui propose ce grant}
         {approver-email : E-mail du compte qui approuve ce grant (distinct du sujet et de l\'auteur)}';
@@ -99,14 +104,6 @@ class GrantStaffCapability extends Command
         $authorEmail = $this->argument('author-email');
         $approverEmail = $this->argument('approver-email');
 
-        if ($authorEmail === $approverEmail || $authorEmail === $subjectEmail || $approverEmail === $subjectEmail) {
-            $this->components->error(
-                'Sujet, auteur et approbateur doivent être trois comptes distincts (séparation des tâches, TD-0001-A) — activate() les refuserait de toute façon.',
-            );
-
-            return self::FAILURE;
-        }
-
         $capability = CapabilityDefinition::query()
             ->where('stable_key', $capabilityKey)
             ->where('state', 'active')
@@ -123,6 +120,27 @@ class GrantStaffCapability extends Command
         $approver = $this->resolveLink($approverEmail);
 
         if ($subject === null || $author === null || $approver === null) {
+            return self::FAILURE;
+        }
+
+        // Addendum ADR-0004 2026-07-30 (auto-amorçage de l'Administrateur
+        // Système, décision du fondateur) : la garde de distinction
+        // sujet/auteur/approbateur ne s'applique plus (1) à l'attribution de
+        // `governance.system_administrator` lui-même — `GrantManager`
+        // refuse de toute façon un second grant actif via
+        // `MultipleSystemAdministratorsRefusedException` — ni (2) lorsque
+        // l'auteur détient déjà ce rôle (il peut alors s'accorder n'importe
+        // quelle autre capacité seul, cf. `GrantManager::activate()`).
+        // Aucune règle dupliquée ici : seule source de vérité,
+        // `GrantManager::isSystemAdministrator()`.
+        $bootstrapExempt = $capabilityKey === 'governance.system_administrator'
+            || $grantManager->isSystemAdministrator($author);
+
+        if (! $bootstrapExempt && ($authorEmail === $approverEmail || $authorEmail === $subjectEmail || $approverEmail === $subjectEmail)) {
+            $this->components->error(
+                'Sujet, auteur et approbateur doivent être trois comptes distincts (séparation des tâches, TD-0001-A) — activate() les refuserait de toute façon.',
+            );
+
             return self::FAILURE;
         }
 
@@ -153,8 +171,17 @@ class GrantStaffCapability extends Command
             correlationId: $correlationId,
         );
 
+        // `governance.grants_author_not_approver_check` (contrainte SQL,
+        // 2026_07_23_100008) refuse tout approbateur identique à l'auteur,
+        // sans exception — même dans le chemin d'auto-amorçage. Un
+        // approbateur qui ne fait qu'y dupliquer l'auteur n'apporte de
+        // toute façon aucune garantie réelle : on n'enregistre alors aucun
+        // approbateur, exactement comme le fait déjà l'auto-octroi
+        // (`GrantManager::activate()`, approbateur `null`).
+        $approverForActivation = $bootstrapExempt && $approverEmail === $authorEmail ? null : $approver;
+
         try {
-            $grantManager->activate($grant, $author, $approver, $correlationId);
+            $grantManager->activate($grant, $author, $approverForActivation, $correlationId);
         } catch (SelfAuthorizationRefusedException|SeparationOfDutiesViolationException|MultipleSystemAdministratorsRefusedException $exception) {
             $this->components->error("Activation refusée : {$exception->getMessage()}");
 
