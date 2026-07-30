@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        // AMD-0017 : webhook GeniusPay, appel serveur à serveur sans jeton
+        // de formulaire — authentifié par signature HMAC du corps brut
+        // (DepositWebhookController), jamais par CSRF (ADR-0007 §11).
+        $middleware->validateCsrfTokens(except: ['webhooks/geniuspay']);
+
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,

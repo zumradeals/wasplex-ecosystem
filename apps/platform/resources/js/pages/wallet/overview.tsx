@@ -1,5 +1,9 @@
 import { Head } from '@inertiajs/react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import DepositInitiationController from '@/actions/App/Modules/Wallet/Deposit/Http/Controllers/DepositInitiationController';
 import MobileLayout from '@/layouts/mobile-layout';
+import { postJson } from '@/lib/api';
 
 type Balance = {
     currency: string;
@@ -91,20 +95,34 @@ export default function WalletOverview({
     access: Access;
     balances: Balance[];
 }) {
+    const [rechargeOpen, setRechargeOpen] = useState(false);
+
     return (
         <MobileLayout>
             <Head title="Wallet" />
 
             <div className="space-y-6 p-4">
                 {/* Header */}
-                <div>
-                    <h1 className="text-xl font-bold text-[#F5F8FC]">
-                        Votre Wallet
-                    </h1>
-                    <p className="mt-1 text-xs text-[#A9B7C8]">
-                        1 WP = 1 FCFA · solde reconstruit depuis le registre
-                        comptable
-                    </p>
+                <div className="flex items-start justify-between gap-3">
+                    <div>
+                        <h1 className="text-xl font-bold text-[#F5F8FC]">
+                            Votre Wallet
+                        </h1>
+                        <p className="mt-1 text-xs text-[#A9B7C8]">
+                            1 WP = 1 FCFA · solde reconstruit depuis le registre
+                            comptable
+                        </p>
+                    </div>
+
+                    {access.allowed && (
+                        <button
+                            type="button"
+                            onClick={() => setRechargeOpen(true)}
+                            className="shrink-0 rounded-full bg-[#4FA3FF] px-4 py-2 text-sm font-semibold text-[#07182D]"
+                        >
+                            Recharger
+                        </button>
+                    )}
                 </div>
 
                 {/* Access denied */}
@@ -167,6 +185,118 @@ export default function WalletOverview({
                         </section>
                     ))}
             </div>
+
+            {rechargeOpen && (
+                <RechargeSheet onClose={() => setRechargeOpen(false)} />
+            )}
         </MobileLayout>
+    );
+}
+
+/**
+ * AMD-0017 : recharge du Wallet via GeniusPay (pilote Côte d'Ivoire).
+ * Redirige vers la page de checkout hébergée par GeniusPay — jamais
+ * d'affichage d'un solde crédité ici : seul le retour confirmé par webhook
+ * ({@see \App\Modules\Wallet\Deposit\Http\Controllers\DepositWebhookController})
+ * fait foi (`wallet/deposit-return`).
+ */
+function RechargeSheet({ onClose }: { onClose: () => void }) {
+    const [amount, setAmount] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+
+    async function submit() {
+        const parsed = Number(amount);
+
+        if (!Number.isInteger(parsed) || parsed < 200) {
+            toast.error('Le montant minimum est de 200 FCFA.');
+
+            return;
+        }
+
+        setSubmitting(true);
+
+        const result = await postJson<{ checkout_url: string }>(
+            DepositInitiationController.store().url,
+            {
+                amount: parsed,
+                idempotency_key: crypto.randomUUID(),
+            },
+        );
+
+        if (result.ok) {
+            window.location.href = result.data.checkout_url;
+
+            return;
+        }
+
+        setSubmitting(false);
+
+        toast.error(
+            result.status === 503
+                ? "Le service de paiement n'est pas disponible pour le moment. Réessayez dans quelques instants."
+                : "La recharge n'a pas pu être initiée.",
+        );
+    }
+
+    return (
+        <Sheet onClose={onClose} title="Recharger">
+            <label className="block text-sm font-medium text-[#A9B7C8]">
+                Montant (FCFA)
+                <input
+                    type="number"
+                    inputMode="numeric"
+                    min={200}
+                    step={1}
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    placeholder="15000"
+                    className="mt-1 w-full rounded-lg border border-[#35506D] bg-[#0E2542] px-3 py-2 text-white"
+                />
+            </label>
+
+            <p className="mt-3 text-xs text-[#A9B7C8]">
+                Vous serez redirigé vers la page de paiement sécurisée GeniusPay
+                (Wave, Orange Money, MTN Money ou carte). Le WP n'est crédité
+                qu'après confirmation du paiement.
+            </p>
+
+            <button
+                type="button"
+                onClick={submit}
+                disabled={submitting || amount.trim() === ''}
+                className="mt-4 w-full rounded-lg bg-[#4FA3FF] py-3 text-sm font-semibold text-[#07182D] disabled:opacity-50"
+            >
+                {submitting ? 'Redirection...' : 'Continuer vers le paiement'}
+            </button>
+        </Sheet>
+    );
+}
+
+function Sheet({
+    title,
+    onClose,
+    children,
+}: {
+    title: string;
+    onClose: () => void;
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="fixed inset-0 z-[60] flex items-end bg-black/60">
+            <div className="max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-[#07182D] p-4 pb-24">
+                <div className="mb-3 flex items-center justify-between">
+                    <h2 className="text-base font-bold text-white">{title}</h2>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Fermer"
+                        className="text-[#A9B7C8]"
+                    >
+                        ✕
+                    </button>
+                </div>
+                {children}
+            </div>
+        </div>
     );
 }

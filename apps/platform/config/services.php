@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    // AMD-0017 : pilote de dépôt Wallet en Côte d'Ivoire. Aucun secret
+    // codé en dur (EXE-0001 §5) — `api_key`/`api_secret`/`webhook_secret`
+    // doivent être fournis par l'environnement de production ; en leur
+    // absence, `HttpGeniusPayClient` échoue proprement (403 côté
+    // prestataire) plutôt que d'inventer une valeur.
+    'geniuspay' => [
+        'base_url' => env('GENIUSPAY_BASE_URL', 'http://pay.genius.ci/api/v1/merchant'),
+        'api_key' => env('GENIUSPAY_API_KEY'),
+        'api_secret' => env('GENIUSPAY_API_SECRET'),
+        'webhook_secret' => env('GENIUSPAY_WEBHOOK_SECRET'),
+    ],
+
 ];

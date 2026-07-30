@@ -43,6 +43,9 @@ use App\Modules\Governance\Authorization\Http\Controllers\Admin\AdminAccessContr
 use App\Modules\Governance\Configuration\Http\Controllers\Admin\AdminConfigurationController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
+use App\Modules\Wallet\Deposit\Http\Controllers\DepositInitiationController;
+use App\Modules\Wallet\Deposit\Http\Controllers\DepositReturnController;
+use App\Modules\Wallet\Deposit\Http\Controllers\DepositWebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -96,6 +99,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // (redirection vers la connexion, jamais un 401 JSON) : c'est un écran,
     // pas un point de terminaison API.
     Route::get('wallet', [WalletOverviewController::class, 'show'])->name('wallet.show');
+
+    // AMD-0017 : page de retour après redirection GeniusPay
+    // (success_url/error_url) — même raisonnement que 'wallet' ci-dessus :
+    // un écran, jamais un point de terminaison API, redirection vers la
+    // connexion pour un visiteur non authentifié plutôt qu'un 401 JSON.
+    Route::get('wallet/deposits/{deposit}/return', [DepositReturnController::class, 'show'])
+        ->name('wallet.deposits.return');
 
     // P007-W1 : tableau de bord annonceur (A-001-01/A-002-01) — reprend
     // l'autorisation campaign.view (portée self) et affiche un état d'écran
@@ -266,6 +276,21 @@ Route::middleware('web')->post('advertising/campaign-versions/{campaignVersion}/
 // structuré pour un appel non authentifié.
 Route::middleware('web')->get('wallet/balance', [WalletBalanceController::class, 'show'])
     ->name('wallet.balance.show');
+
+// AMD-0017 : initiation d'un dépôt (wallet.deposit, portée self) — pilote
+// Côte d'Ivoire via GeniusPay (ecosystem/wallet/05). Même discipline que
+// ci-dessus : groupe 'web' hors du groupe 'auth', 401 JSON structuré pour
+// un appel non authentifié. Ne crédite jamais de valeur elle-même — voir
+// la route webhook ci-dessous, seule habilitée à le faire.
+Route::middleware('web')->post('wallet/deposits', [DepositInitiationController::class, 'store'])
+    ->name('wallet.deposits.store');
+
+// AMD-0017 : webhook entrant GeniusPay (ADR-0007 §11). Authentifié par
+// signature HMAC du corps brut, jamais par une capacité ni une session —
+// exempté de CSRF (bootstrap/app.php, `validateCsrfTokens(except: ...)`)
+// puisqu'il s'agit d'un appel serveur à serveur sans jeton de formulaire.
+Route::middleware('web')->post('webhooks/geniuspay', [DepositWebhookController::class, 'store'])
+    ->name('webhooks.geniuspay.store');
 
 // P008-A : déclaration communautaire (alert_case.submit, portée self).
 // Même discipline que ci-dessus : groupe 'web' hors du groupe 'auth', 401

@@ -22,6 +22,7 @@ Les décisions adoptées et propositions constitutionnelles sont indexées ici.
 | AMD-0014 | Live volontaire, qualifié et prioritairement sûr | Adopté et intégré à la v1.5 |
 | AMD-0015 | Fonds Social : prélèvement composite et pérennité partagée | Adopté — intégration proposée à la v1.6 |
 | AMD-0016 | Protection, Santé et intégration cloisonnée des urgences | Adopté et intégré à la v1.7 (article 23) |
+| AMD-0017 | Pilote de dépôt Wallet en Côte d'Ivoire via GeniusPay | Adopté — exception pilote réversible à l'article 17 (AMD-0011) |
 | ADR-0001 | Architecture initiale : monolithe modulaire Laravel/PostgreSQL/React/Inertia | Adopté |
 | ADR-0002 | Moteur de configuration métier typé, administrable et versionné | Adopté |
 | ADR-0003 | Ledger Wallet en partie double, immuable et rapprochable | Adopté |
