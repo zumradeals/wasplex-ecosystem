@@ -75,7 +75,7 @@ final class SystemAdministratorAuthorizationEngine extends AuthorizationEngine
             return AuthorizationResult::make(
                 AuthorizationDecision::Denied,
                 'audit_unavailable',
-                "La décision n'a pas pu être enregistrée ; l'accès est refusé par prudence.",
+                'La décision n\'a pas pu être enregistrée ; l\'accès est refusé par prudence.',
                 $request->correlationId,
             );
         }
@@ -175,8 +175,8 @@ final class SystemAdministratorAuthorizationEngine extends AuthorizationEngine
             $systemAdministratorGrant->capabilityDefinition->minimum_session_assurance,
         );
 
-        if (! $conditionsResult->satisfied) {
-            if (! $conditionsResult->onlySessionAssuranceInsufficient) {
+        if (!$conditionsResult->satisfied) {
+            if (!$conditionsResult->onlySessionAssuranceInsufficient) {
                 return null;
             }
 
@@ -188,7 +188,7 @@ final class SystemAdministratorAuthorizationEngine extends AuthorizationEngine
                 'result' => AuthorizationResult::make(
                     AuthorizationDecision::StepUpRequired,
                     'system_administrator_session_assurance_insufficient',
-                    "Une authentification forte est requise pour utiliser les pouvoirs de l'Administrateur Système.",
+                    'Une authentification forte est requise pour utiliser les pouvoirs de l\'Administrateur Système.',
                     $request->correlationId,
                     $systemAdministratorGrant->policyVersion->stable_key,
                     $systemAdministratorGrant->policyVersion->version,
@@ -213,7 +213,7 @@ final class SystemAdministratorAuthorizationEngine extends AuthorizationEngine
             'result' => AuthorizationResult::make(
                 AuthorizationDecision::Allowed,
                 'system_administrator_override',
-                "Action autorisée par le rôle Administrateur Système, sans grant individuel supplémentaire.",
+                'Action autorisée par le rôle Administrateur Système, sans grant individuel supplémentaire.',
                 $request->correlationId,
                 $systemAdministratorGrant->policyVersion->stable_key,
                 $systemAdministratorGrant->policyVersion->version,
