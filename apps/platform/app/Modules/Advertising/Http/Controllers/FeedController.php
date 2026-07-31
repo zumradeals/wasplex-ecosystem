@@ -13,6 +13,7 @@ use App\Modules\Advertising\Projections\SocialEngagementProjection;
 use App\Modules\Advertising\Services\AudienceSegmentGuard;
 use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Advertising\Services\Exceptions\PricingConfigurationNotResolvableException;
+use App\Modules\Advertising\Services\FrequencyCapGuard;
 use App\Modules\Advertising\Services\QualifiedEventPricingResolver;
 use App\Modules\Alerts\Projections\PublicAlertFeedProjection;
 use App\Modules\Governance\Authorization\Contracts\ResourceContext;
@@ -50,8 +51,11 @@ use Inertia\Response;
  * réutilisé côté lecture). `reward_amount` reflète aussi le type
  * économique et le quota mensuel déjà consommé de la personne précise
  * (`CampaignBudgetService::previewUserShareForPerson()`), jamais un
- * montant générique identique pour tout le monde. La fréquence maximale
- * par utilisateur (ADR-0002 §3.3) reste hors périmètre de ce lot.
+ * montant générique identique pour tout le monde. Une publicité déjà
+ * récompensée une fois pour cette personne reste revoyable gratuitement
+ * jusqu'au plafond de fréquence configuré ({@see FrequencyCapGuard}),
+ * puis disparaît entièrement de son Feed — fermant l'écart précédemment
+ * documenté ici (ADR-0002 §3.3).
  *
  * P008-A (mission §15) : reçoit aussi une petite surface d'alertes
  * communautaires publiées (`alerts.publications`, lecture seule via
@@ -77,6 +81,7 @@ class FeedController extends Controller
         private readonly SocialEngagementProjection $socialEngagementProjection,
         private readonly PublicAlertFeedProjection $publicAlertFeed,
         private readonly AudienceSegmentGuard $audienceSegmentGuard,
+        private readonly FrequencyCapGuard $frequencyCapGuard,
     ) {}
 
     public function index(Request $request): Response
@@ -249,6 +254,19 @@ class FeedController extends Controller
             return null;
         }
 
+        // Plafond de revisionnage gratuit (instruction explicite du
+        // fondateur, 2026-07-31) : une fois le nombre maximal de
+        // revisionnages atteint (quotidien ou total) pour cette personne
+        // et cette CampaignVersion précise, la publicité disparaît
+        // entièrement du Feed — même barrière que
+        // {@see \App\Modules\Advertising\Services\CampaignBudgetService::submitQualifiedEvent()},
+        // appliquée ici en amont pour qu'un client honnête ne tente même
+        // pas la soumission. Sans sujet résolvable, aucun plafond
+        // personnel n'a de sens à appliquer.
+        if ($subject !== null && $this->frequencyCapGuard->hasReachedCap($subject->personAccountLink->id, $version->id)) {
+            return null;
+        }
+
         try {
             // Coût réellement réservé sur le budget campagne à la
             // soumission de l'événement (`CampaignBudgetService::
@@ -283,7 +301,7 @@ class FeedController extends Controller
             // résolvable retombe sur le plafond générique — la seule
             // information disponible sans identité confirmée.
             'reward_amount' => $subject !== null
-                ? $this->campaignBudgetService->previewUserShareForPerson($basePrice, $subject->personAccountLink->person_id, $subject->personAccountLink->id, $campaign)
+                ? $this->campaignBudgetService->previewUserShareForPerson($basePrice, $subject->personAccountLink->person_id, $subject->personAccountLink->id, $campaign, $version)
                 : $this->campaignBudgetService->userShareOfAmount($basePrice),
             'currency' => $campaign->currency,
         ];

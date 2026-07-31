@@ -13,6 +13,7 @@ use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Projections\PersonMonthlyQuotaProjection;
 use App\Modules\Advertising\Services\Exceptions\CampaignNotAcceptingReservationsException;
+use App\Modules\Advertising\Services\Exceptions\FrequencyCapExceededException;
 use App\Modules\Advertising\Services\Exceptions\InsufficientBudgetException;
 use App\Modules\Identity\Models\PersonAccountLink;
 use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
@@ -43,6 +44,7 @@ class CampaignBudgetService
         private readonly CampaignBudgetProjection $budgetProjection,
         private readonly EconomicTypeResolver $economicTypeResolver,
         private readonly PersonMonthlyQuotaProjection $quotaProjection,
+        private readonly FrequencyCapGuard $frequencyCapGuard,
     ) {}
 
     /**
@@ -123,6 +125,19 @@ class CampaignBudgetService
         if ($campaign->state !== CampaignState::Active) {
             throw new CampaignNotAcceptingReservationsException(
                 "la campagne {$campaign->code} n'accepte plus de nouvelle réservation dans son état actuel ({$campaign->state->value}), ADR-0010 §7"
+            );
+        }
+
+        // Plafond de revisionnage gratuit (instruction explicite du
+        // fondateur, 2026-07-31) : une nouvelle soumission n'est acceptée
+        // que si cette personne n'a pas déjà atteint le nombre maximal de
+        // revisionnages, quotidien ou total, pour cette CampaignVersion
+        // précise — barrière serveur en profondeur, le Feed cesse
+        // normalement d'offrir cette publicité avant même d'y arriver
+        // ({@see \App\Modules\Advertising\Http\Controllers\FeedController}).
+        if ($this->frequencyCapGuard->hasReachedCap($beneficiary->id, $version->id)) {
+            throw new FrequencyCapExceededException(
+                'cette personne a déjà atteint le plafond de revisionnage gratuit pour cette CampaignVersion'
             );
         }
 
@@ -250,6 +265,23 @@ class CampaignBudgetService
         // `$amount - $userShare`, jamais d'un second calcul indépendant,
         // pour que la conservation de valeur soit garantie par
         // construction (aucune fuite d'arrondi possible).
+        // Récompense unique par personne et par CampaignVersion (instruction
+        // explicite du fondateur, 2026-07-31) : un revisionnage au-delà de
+        // ce premier événement accepté reste tracé et facturé normalement
+        // à l'annonceur (exposition réelle), mais ne verse plus rien au
+        // bénéficiaire — Wasplex absorbe l'intégralité du montant, comme
+        // pour `quota_exceeded`/`economic_type_pool_exhausted` ci-dessous,
+        // dans sa propre colonne pour ne jamais confondre les trois
+        // raisons dans un audit. Le plafond de fréquence lui-même
+        // (quotidien/total) est appliqué en amont, à la soumission
+        // ({@see submitQualifiedEvent()}) — cette vérification-ci ne fait
+        // que constater qu'une récompense a déjà eu lieu.
+        $alreadyRewarded = QualifiedEvent::query()
+            ->where('beneficiary_person_account_link_id', $event->beneficiary_person_account_link_id)
+            ->where('campaign_version_id', $event->campaign_version_id)
+            ->where('billing_status', BillingStatus::Accepted)
+            ->exists();
+
         $economicType = $this->economicTypeResolver->forPerson($event->beneficiary->person_id);
         $quotaExceeded = $economicType->monthly_quota !== null
             && $this->quotaProjection->consumedThisMonth($event->beneficiary_person_account_link_id) >= $economicType->monthly_quota;
@@ -258,7 +290,7 @@ class CampaignBudgetService
         $subPoolConsumed = $this->economicTypeSubPoolConsumed($campaign, $economicType);
         $poolExhausted = $subPoolConsumed + $standardUserShare > $subPoolAllocated;
 
-        $userShare = ($quotaExceeded || $poolExhausted) ? 0 : $standardUserShare;
+        $userShare = ($alreadyRewarded || $quotaExceeded || $poolExhausted) ? 0 : $standardUserShare;
         $wasplexShare = $amount - $userShare;
 
         // Dimensions conservées pour retrouver, par requête directe sur les
@@ -316,6 +348,7 @@ class CampaignBudgetService
             'economic_type_percentage_applied' => $economicType->user_share_percentage,
             'quota_exceeded' => $quotaExceeded,
             'economic_type_pool_exhausted' => $poolExhausted,
+            'already_rewarded' => $alreadyRewarded,
         ])->save();
 
         return $event->fresh();
@@ -371,8 +404,18 @@ class CampaignBudgetService
      * précise. Même formule exacte que {@see acceptQualifiedEvent()}, sans
      * écriture Ledger ni effet de bord : une lecture pure.
      */
-    public function previewUserShareForPerson(int $amount, string $personId, string $personAccountLinkId, Campaign $campaign): int
+    public function previewUserShareForPerson(int $amount, string $personId, string $personAccountLinkId, Campaign $campaign, CampaignVersion $version): int
     {
+        $alreadyRewarded = QualifiedEvent::query()
+            ->where('beneficiary_person_account_link_id', $personAccountLinkId)
+            ->where('campaign_version_id', $version->id)
+            ->where('billing_status', BillingStatus::Accepted)
+            ->exists();
+
+        if ($alreadyRewarded) {
+            return 0;
+        }
+
         $economicType = $this->economicTypeResolver->forPerson($personId);
         $quotaExceeded = $economicType->monthly_quota !== null
             && $this->quotaProjection->consumedThisMonth($personAccountLinkId) >= $economicType->monthly_quota;

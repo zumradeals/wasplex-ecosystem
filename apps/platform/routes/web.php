@@ -8,6 +8,7 @@ use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationCon
 use App\Modules\Advertising\Http\Controllers\Admin\AdminCampaignFundingController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminEconomicTypesController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminFinanceController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminFrequencyCapController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminInterestTaxonomyController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminSectorClassificationController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminSubscriptionPlansController;
@@ -255,6 +256,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('admin.video-duration-bounds');
     Route::post('admin/video-duration-bounds', [AdminVideoDurationController::class, 'store'])
         ->name('admin.video-duration-bounds.store');
+
+    // Instruction explicite du fondateur 2026-07-31 : plafond de
+    // revisionnage gratuit (advertising.manage_frequency_cap) — mirroir
+    // exact de 'admin/video-duration-bounds' ci-dessus.
+    Route::get('admin/frequency-cap', [AdminFrequencyCapController::class, 'index'])
+        ->name('admin.frequency-cap');
+    Route::post('admin/frequency-cap', [AdminFrequencyCapController::class, 'store'])
+        ->name('admin.frequency-cap.store');
 
     // Lot 9 (véto du dirigeant 2026-07-30) : matrice de classification des
     // secteurs (advertising.manage_sector_classifications) — mirroir

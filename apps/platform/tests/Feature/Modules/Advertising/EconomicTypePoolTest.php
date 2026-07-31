@@ -94,15 +94,18 @@ class EconomicTypePoolTest extends AdvertisingTestCase
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
 
-        $viewer = $this->makeBeneficiary();
-        $this->assignType($gold, $viewer->person_id);
-
         // Part utilisateur totale de la campagne : 5000f (50% de 10000f).
         // Cagnotte Gold (30%) : 1500f. Chaque événement de 1000f verse
         // 500f — la cagnotte tient exactement 3 événements (1500f) avant
-        // épuisement.
+        // épuisement. Un spectateur distinct par événement (jamais le
+        // même deux fois : le plafond de revisionnage gratuit, instruction
+        // explicite du fondateur 2026-07-31, refuserait sinon la
+        // quatrième soumission avant même d'atteindre la cagnotte).
         $shares = [];
         for ($i = 0; $i < 4; $i++) {
+            $viewer = $this->makeBeneficiary();
+            $this->assignType($gold, $viewer->person_id);
+
             $event = $this->budgetService()->submitQualifiedEvent(
                 campaign: $campaign,
                 version: $version,
@@ -135,10 +138,10 @@ class EconomicTypePoolTest extends AdvertisingTestCase
         $this->fundCampaign($campaign, 10_000);
         $version = $this->proposeAndApproveVersion($campaign);
 
-        $viewer = $this->makeBeneficiary();
-        $this->assignType($gold, $viewer->person_id);
-
         for ($i = 0; $i < 3; $i++) {
+            $viewer = $this->makeBeneficiary();
+            $this->assignType($gold, $viewer->person_id);
+
             $event = $this->budgetService()->submitQualifiedEvent(
                 campaign: $campaign,
                 version: $version,
@@ -152,10 +155,13 @@ class EconomicTypePoolTest extends AdvertisingTestCase
             $this->budgetService()->acceptQualifiedEvent($event);
         }
 
+        $lastViewer = $this->makeBeneficiary();
+        $this->assignType($gold, $lastViewer->person_id);
+
         $exhaustedEvent = $this->budgetService()->submitQualifiedEvent(
             campaign: $campaign,
             version: $version,
-            beneficiary: $viewer,
+            beneficiary: $lastViewer,
             format: 'banner',
             evidence: ['proof' => 'completion'],
             appliedPriceAmount: 1_000,
@@ -243,14 +249,21 @@ class EconomicTypePoolTest extends AdvertisingTestCase
 
         $this->assertSame(
             500,
-            $service->previewUserShareForPerson(1_000, $viewer->person_id, $viewer->id, $campaign),
+            $service->previewUserShareForPerson(1_000, $viewer->person_id, $viewer->id, $campaign, $version),
         );
 
+        // Épuise la cagnotte Gold via trois AUTRES spectateurs (jamais
+        // `$viewer` lui-même : le plafond de revisionnage gratuit,
+        // instruction explicite du fondateur 2026-07-31, refuserait sa
+        // propre resoumission avant d'atteindre la cagnotte).
         for ($i = 0; $i < 3; $i++) {
+            $otherViewer = $this->makeBeneficiary();
+            $this->assignType($gold, $otherViewer->person_id);
+
             $event = $this->budgetService()->submitQualifiedEvent(
                 campaign: $campaign,
                 version: $version,
-                beneficiary: $viewer,
+                beneficiary: $otherViewer,
                 format: 'banner',
                 evidence: ['proof' => 'completion'],
                 appliedPriceAmount: 1_000,
@@ -260,9 +273,12 @@ class EconomicTypePoolTest extends AdvertisingTestCase
             $this->budgetService()->acceptQualifiedEvent($event);
         }
 
+        // La cagnotte Gold est désormais épuisée par les trois autres
+        // spectateurs : l'aperçu de `$viewer`, qui n'a lui-même encore
+        // rien soumis, reflète honnêtement qu'il ne toucherait plus rien.
         $this->assertSame(
             0,
-            $service->previewUserShareForPerson(1_000, $viewer->person_id, $viewer->id, $campaign),
+            $service->previewUserShareForPerson(1_000, $viewer->person_id, $viewer->id, $campaign, $version),
         );
     }
 }

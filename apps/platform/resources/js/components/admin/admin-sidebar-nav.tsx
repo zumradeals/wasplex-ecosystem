@@ -7,6 +7,7 @@ import {
     KeyRound,
     Landmark,
     Megaphone,
+    Repeat,
     ScrollText,
     Settings,
     ShieldAlert,
@@ -85,6 +86,12 @@ const AVAILABLE_ITEMS = [
         label: "Plans d'abonnement",
         href: admin.subscriptionPlans().url,
         icon: CreditCard,
+    },
+    {
+        key: 'frequency-cap',
+        label: 'Revisionnage gratuit',
+        href: admin.frequencyCap().url,
+        icon: Repeat,
     },
 ] as const;
 
