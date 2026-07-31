@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Modules\Governance\Authorization\Services\AuthorizationEngine;
+use App\Modules\Governance\Authorization\Services\SystemAdministratorAuthorizationEngine;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +17,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            AuthorizationEngine::class,
+            SystemAdministratorAuthorizationEngine::class,
+        );
     }
 
     /**
