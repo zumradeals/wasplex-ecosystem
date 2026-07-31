@@ -61,6 +61,7 @@ use App\Modules\Alerts\Http\Controllers\Institutional\InstitutionalPortalControl
 use App\Modules\Alerts\Http\Controllers\SosReportController;
 use App\Modules\Governance\Authorization\Http\Controllers\Admin\AdminAccessController;
 use App\Modules\Governance\Configuration\Http\Controllers\Admin\AdminConfigurationController;
+use App\Modules\Identity\Http\Controllers\Admin\AdminUsersController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletBalanceController;
 use App\Modules\Wallet\Balance\Http\Controllers\WalletOverviewController;
 use App\Modules\Wallet\Deposit\Http\Controllers\Admin\AdminWalletDepositController;
@@ -283,6 +284,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('admin.subscription-plans');
     Route::post('admin/subscription-plans', [AdminSubscriptionPlansController::class, 'store'])
         ->name('admin.subscription-plans.store');
+
+    // Instruction explicite du fondateur 2026-07-31 : gestion admin des
+    // comptes utilisateurs (identity.manage_users) — création et
+    // transitions d'état (actif/suspendu/clôturé), jamais de suppression
+    // physique d'une personne réelle.
+    Route::get('admin/users', [AdminUsersController::class, 'index'])
+        ->name('admin.users');
+    Route::post('admin/users', [AdminUsersController::class, 'store'])
+        ->name('admin.users.store');
+    Route::post('admin/users/{user}/state', [AdminUsersController::class, 'updateState'])
+        ->name('admin.users.state');
 
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne

@@ -10,6 +10,7 @@ import {
     ScrollText,
     Settings,
     ShieldAlert,
+    UserCog,
     Users,
     Wallet,
 } from 'lucide-react';
@@ -66,6 +67,12 @@ const AVAILABLE_ITEMS = [
         label: 'Accès',
         href: admin.access().url,
         icon: KeyRound,
+    },
+    {
+        key: 'users',
+        label: 'Utilisateurs',
+        href: admin.users().url,
+        icon: UserCog,
     },
     {
         key: 'economic-types',
