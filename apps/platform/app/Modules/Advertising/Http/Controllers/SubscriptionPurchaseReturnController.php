@@ -13,7 +13,7 @@ use Inertia\Response;
 /**
  * Page de retour après redirection GeniusPay pour un achat d'abonnement
  * (instruction explicite du fondateur, 2026-07-31 ; mirroir exact de
- * {@see \App\Modules\Advertising\Http\Controllers\AdvertiserWalletDepositReturnController}).
+ * {@see AdvertiserWalletDepositReturnController}).
  * L'accès se vérifie sur la propriété de l'achat (son propre `person_id`),
  * pas sur une capacité dédiée : même contenu que ce que l'achat lui-même a
  * déjà autorisé.

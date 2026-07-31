@@ -21,7 +21,7 @@ return new class extends Migration
             'version' => 1,
             'domain' => 'advertising',
             'action' => 'purchase',
-            'description' => "Acheter un abonnement pour son propre compte via GeniusPay, en libre-service.",
+            'description' => 'Acheter un abonnement pour son propre compte via GeniusPay, en libre-service.',
             'operation' => 'write',
             'risk_class' => 'ordinary',
             'purpose_required' => false,

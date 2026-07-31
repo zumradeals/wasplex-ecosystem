@@ -23,7 +23,7 @@ use Illuminate\Support\Str;
 /**
  * Achat d'abonnement en libre-service (instruction explicite du fondateur,
  * 2026-07-31 ; mirroir exact de
- * {@see \App\Modules\Advertising\Http\Controllers\AdvertiserWalletDepositInitiationController}).
+ * {@see AdvertiserWalletDepositInitiationController}).
  * `subscription.purchase`, portée self — ne crédite jamais l'abonnement
  * lui-même, seul le webhook signé le fait.
  */

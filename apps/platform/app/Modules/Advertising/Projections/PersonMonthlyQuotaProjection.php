@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
  *
  * Jamais un compteur stocké : reconstruit depuis `advertising.qualified_events`
  * à chaque lecture, même discipline que
- * {@see \App\Modules\Advertising\Projections\CampaignBudgetProjection}
+ * {@see CampaignBudgetProjection}
  * (ADR-0003 §19). Mois civil UTC — décision technique par défaut,
  * documentée comme telle (docs/02 §4 laisse ce point ouvert ; « civil » et
  * « UTC » sont les valeurs les plus simples à auditer, changeables sans
