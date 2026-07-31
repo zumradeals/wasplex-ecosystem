@@ -118,6 +118,14 @@ class GrantStaffCapabilityTest extends AdvertisingTestCase
         yield 'alert_return.verify' => ['alert_return.verify', 'alerts.case_category'];
         yield 'governance.system_administrator' => ['governance.system_administrator', 'governance.system'];
         yield 'wallet_deposit.review' => ['wallet_deposit.review', 'wallet.deposit'];
+        // Écart comblé 2026-07-31 : quatre capacités déclarées cette
+        // session (types économiques, plans d'abonnement, gestion des
+        // utilisateurs, plafond de revisionnage gratuit) n'avaient jamais
+        // été ajoutées à cet outil de bootstrap.
+        yield 'advertising.manage_economic_types' => ['advertising.manage_economic_types', 'advertising.economic_type'];
+        yield 'advertising.manage_subscription_plans' => ['advertising.manage_subscription_plans', 'advertising.subscription_plan'];
+        yield 'identity.manage_users' => ['identity.manage_users', 'identity.user'];
+        yield 'advertising.manage_frequency_cap' => ['advertising.manage_frequency_cap', 'advertising.frequency_cap_bounds'];
     }
 
     #[DataProvider('newlyBootstrappableCapabilities')]

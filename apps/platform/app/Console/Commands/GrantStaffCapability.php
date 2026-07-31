@@ -91,10 +91,26 @@ class GrantStaffCapability extends Command
         // Lot 9 (véto du dirigeant 2026-07-30) : resource_type nominal,
         // jamais évalué par ScopeMatcher.
         'advertising.manage_sector_classifications' => 'advertising.sector_classification',
+        // Instruction explicite du fondateur 2026-07-31 : trois types
+        // économiques, résource_type nominal, jamais évalué par
+        // ScopeMatcher — voir la migration de déclaration.
+        'advertising.manage_economic_types' => 'advertising.economic_type',
+        // Instruction explicite du fondateur 2026-07-31 : plans
+        // d'abonnement, resource_type nominal, jamais évalué par
+        // ScopeMatcher.
+        'advertising.manage_subscription_plans' => 'advertising.subscription_plan',
+        // Instruction explicite du fondateur 2026-07-31 : gestion des
+        // comptes utilisateurs (création, suspension, clôture),
+        // resource_type nominal, jamais évalué par ScopeMatcher.
+        'identity.manage_users' => 'identity.user',
+        // Instruction explicite du fondateur 2026-07-31 : plafond de
+        // revisionnage gratuit, resource_type nominal, jamais évalué par
+        // ScopeMatcher.
+        'advertising.manage_frequency_cap' => 'advertising.frequency_cap_bounds',
     ];
 
     protected $signature = 'governance:grant-staff-capability
-        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify, governance.system_administrator, wallet_deposit.review, wallet_deposit.manage_credentials, campaign_funding.review, advertising.manage_interest_taxonomy, advertising.manage_video_duration_bounds, advertising.manage_sector_classifications)}
+        {capability : Une des capacités personnel Wasplex (campaign.approve, campaign.fund, campaign.moderate, event.accept, event.reject, access.view, configuration.view, alert_case.review, alert_case.publish, alert_match.validate, alert_return.verify, governance.system_administrator, wallet_deposit.review, wallet_deposit.manage_credentials, campaign_funding.review, advertising.manage_interest_taxonomy, advertising.manage_video_duration_bounds, advertising.manage_sector_classifications, advertising.manage_economic_types, advertising.manage_subscription_plans, identity.manage_users, advertising.manage_frequency_cap)}
         {subject-email : E-mail du compte qui recevra le droit}
         {author-email : E-mail du compte qui propose ce grant}
         {approver-email : E-mail du compte qui approuve ce grant (distinct du sujet et de l\'auteur)}';
