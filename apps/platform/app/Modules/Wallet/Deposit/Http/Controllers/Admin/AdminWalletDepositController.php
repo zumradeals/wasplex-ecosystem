@@ -180,6 +180,7 @@ class AdminWalletDepositController extends Controller
     }
 
     /**
+     * @param  LengthAwarePaginator<int, mixed>  $paginator
      * @return array{current_page: int, last_page: int, per_page: int, total: int, previous_url: ?string, next_url: ?string}
      */
     private function pagination(LengthAwarePaginator $paginator): array
