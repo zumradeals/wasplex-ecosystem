@@ -99,6 +99,80 @@ class AudienceSegmentGuard
     }
 
     /**
+     * Une personne précise correspond-elle à des critères de ciblage
+     * (instruction explicite du fondateur, 2026-07-31 : c'est le maillon
+     * manquant signalé par `FeedController` — jusqu'ici, aucune méthode ne
+     * permettait de vérifier un seul profil plutôt que de compter une
+     * population entière). Des critères vides correspondent à tout le
+     * monde (campagne non ciblée, portée la plus large par défaut — même
+     * sémantique que {@see matchingProfilesQuery()}). Une personne sans
+     * profil publicitaire du tout, ou dont le consentement est retiré, ne
+     * correspond jamais à des critères non vides — jamais un profil deviné
+     * (AMD-0009 §2, §4).
+     *
+     * Comparaisons en mémoire plutôt qu'une requête SQL par campagne : le
+     * Feed évalue de nombreuses campagnes pour une seule personne par
+     * requête HTTP, l'inverse exact de {@see computeSize()} (une requête,
+     * beaucoup de personnes) — un aller-retour base par campagne serait un
+     * N+1 évitable.
+     *
+     * @param  array<string, mixed>  $criteria
+     */
+    public function matchesPerson(array $criteria, ?PersonAdvertisingProfile $profile): bool
+    {
+        if ($criteria === []) {
+            return true;
+        }
+
+        if ($profile === null || $profile->consent_withdrawn_at !== null) {
+            return false;
+        }
+
+        if (! empty($criteria['country']) && ! in_array($profile->country_code, (array) $criteria['country'], true)) {
+            return false;
+        }
+
+        if (! empty($criteria['city']) && ! $this->matchesCaseInsensitive($profile->city, (array) $criteria['city'])) {
+            return false;
+        }
+
+        if (! empty($criteria['neighborhood']) && ! $this->matchesCaseInsensitive($profile->neighborhood, (array) $criteria['neighborhood'])) {
+            return false;
+        }
+
+        if (! empty($criteria['age_bracket']) && ! in_array($profile->age_bracket, (array) $criteria['age_bracket'], true)) {
+            return false;
+        }
+
+        if (! empty($criteria['gender']) && ! in_array($profile->gender, (array) $criteria['gender'], true)) {
+            return false;
+        }
+
+        if (! empty($criteria['interests'])) {
+            $requested = (array) $criteria['interests'];
+            if (array_intersect($requested, $profile->interests) === []) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  array<int, mixed>  $candidates
+     */
+    private function matchesCaseInsensitive(?string $value, array $candidates): bool
+    {
+        if ($value === null) {
+            return false;
+        }
+
+        $lowered = array_map(static fn (mixed $candidate): string => strtolower((string) $candidate), $candidates);
+
+        return in_array(strtolower($value), $lowered, true);
+    }
+
+    /**
      * Requête entièrement interne au schéma `advertising` —
      * `person_advertising_profiles` est déjà possédée par ce module,
      * aucune jointure vers `identity` (CLAUDE.md §6). `city`/`neighborhood`

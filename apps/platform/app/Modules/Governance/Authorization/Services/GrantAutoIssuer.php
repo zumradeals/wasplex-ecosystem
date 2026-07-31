@@ -70,6 +70,9 @@ class GrantAutoIssuer
         // `campaign.fund_self` ci-dessus.
         'advertiser_wallet.deposit',
         'advertiser_wallet.allocate',
+        // Instruction explicite du fondateur 2026-07-31 : acheter son
+        // propre abonnement via GeniusPay — même raisonnement.
+        'subscription.purchase',
     ];
 
     /**

@@ -10,6 +10,7 @@ use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
 use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
+use App\Modules\Advertising\Projections\PersonMonthlyQuotaProjection;
 use App\Modules\Advertising\Services\Exceptions\CampaignNotAcceptingReservationsException;
 use App\Modules\Advertising\Services\Exceptions\InsufficientBudgetException;
 use App\Modules\Identity\Models\PersonAccountLink;
@@ -39,6 +40,8 @@ class CampaignBudgetService
         private readonly SharedLedgerAccounts $sharedAccounts,
         private readonly PersonLedgerAccounts $personAccounts,
         private readonly CampaignBudgetProjection $budgetProjection,
+        private readonly EconomicTypeResolver $economicTypeResolver,
+        private readonly PersonMonthlyQuotaProjection $quotaProjection,
     ) {}
 
     /**
@@ -221,9 +224,29 @@ class CampaignBudgetService
         // « Amendement 2026-07-26 — Arrondi du partage égal ») : quand
         // l'égalité exacte est impossible en unités entières, l'ambiguïté
         // se résout en faveur de la partie qu'AMD-0002 protège. Ferme
-        // TD-0004-B.
-        $userShare = intdiv($amount + 1, 2);
-        $wasplexShare = intdiv($amount, 2);
+        // TD-0004-B. Ce montant reste le plafond de la part utilisateur
+        // (docs/02 §5 : jamais dépasser la part utilisateur réellement
+        // financée par la campagne) — le type économique ne peut que le
+        // réduire, jamais l'augmenter.
+        $standardUserShare = intdiv($amount + 1, 2);
+
+        // Instruction explicite du fondateur 2026-07-31 : le type
+        // économique du bénéficiaire module la part utilisateur standard —
+        // un type à 100 % reçoit exactement `$standardUserShare`, un type à
+        // 60 % en reçoit 60 %. Le reliquat non versé reste chez Wasplex :
+        // `$wasplexShare` se déduit toujours de `$amount - $userShare`,
+        // jamais d'un second calcul indépendant, pour que la conservation
+        // de valeur soit garantie par construction (aucune fuite d'arrondi
+        // possible). Quota mensuel (docs/02 §4, décision confirmée : ne se
+        // consomme que sur un événement validé qui paie réellement) évalué
+        // sur les événements déjà `accepted` avant celui-ci — jamais sur
+        // lui-même.
+        $economicType = $this->economicTypeResolver->forPerson($event->beneficiary->person_id);
+        $quotaExceeded = $economicType->monthly_quota !== null
+            && $this->quotaProjection->consumedThisMonth($event->beneficiary_person_account_link_id) >= $economicType->monthly_quota;
+
+        $userShare = $quotaExceeded ? 0 : intdiv($standardUserShare * $economicType->user_share_percentage, 100);
+        $wasplexShare = $amount - $userShare;
 
         // Dimensions conservées pour retrouver, par requête directe sur les
         // postings, l'événement qualifié précis à l'origine de ce crédit —
@@ -275,20 +298,31 @@ class CampaignBudgetService
             'acceptance_rules_configuration_version' => $rulesConfigurationVersion,
             'consumption_transaction_id' => $consumption->id,
             'distribution_transaction_id' => $distribution->id,
+            'user_share_amount' => $userShare,
+            'economic_type_id' => $economicType->id,
+            'economic_type_percentage_applied' => $economicType->user_share_percentage,
+            'quota_exceeded' => $quotaExceeded,
         ])->save();
 
         return $event->fresh();
     }
 
     /**
-     * Part utilisateur du net distribuable d'un événement (AMD-0002,
-     * ratio 50/50 exact, unité résiduelle à l'utilisateur — décision du
-     * fondateur 2026-07-26, ADR-0010) — unique définition de ce calcul
-     * côté lecture, alignée sur les écritures de `acceptQualifiedEvent()`.
+     * Part utilisateur réellement créditée pour un événement déjà accepté
+     * (instruction explicite du fondateur, 2026-07-31) : lit directement
+     * `user_share_amount`, la valeur épinglée par
+     * `acceptQualifiedEvent()` au moment de l'acceptation — jamais
+     * recalculée après coup, puisqu'elle dépend du type économique et du
+     * quota du bénéficiaire à cet instant précis, deux facteurs qui
+     * peuvent changer depuis (docs/02 §6). Un événement non encore
+     * `accepted` n'a pas de part utilisateur définitive : retombe sur le
+     * plafond générique {@see userShareOfAmount()} (AMD-0002, 50 % exact,
+     * sans aucune modulation par type), qui reste la seule information
+     * disponible avant acceptation.
      */
     public function userShareOf(QualifiedEvent $event): int
     {
-        return $this->userShareOfAmount($event->applied_price_amount);
+        return $event->user_share_amount ?? $this->userShareOfAmount($event->applied_price_amount);
     }
 
     /**
@@ -310,6 +344,30 @@ class CampaignBudgetService
     public function wasplexShareOfAmount(int $amount): int
     {
         return intdiv($amount, 2);
+    }
+
+    /**
+     * Aperçu honnête du gain qu'une personne précise recevrait réellement
+     * si elle validait cet événement maintenant (instruction explicite du
+     * fondateur, 2026-07-31 ; docs/03 §10 : « le montant affiché avant la
+     * participation doit être le montant effectivement crédité ») — utilisé
+     * par le Feed, jamais un montant générique {@see userShareOfAmount()}
+     * qui ignorerait le type économique et le quota déjà consommé de cette
+     * personne précise. Même formule exacte que
+     * {@see acceptQualifiedEvent()}, sans écriture Ledger ni effet de bord :
+     * une lecture pure.
+     */
+    public function previewUserShareForPerson(int $amount, string $personId, string $personAccountLinkId): int
+    {
+        $economicType = $this->economicTypeResolver->forPerson($personId);
+        $quotaExceeded = $economicType->monthly_quota !== null
+            && $this->quotaProjection->consumedThisMonth($personAccountLinkId) >= $economicType->monthly_quota;
+
+        if ($quotaExceeded) {
+            return 0;
+        }
+
+        return intdiv(intdiv($amount + 1, 2) * $economicType->user_share_percentage, 100);
     }
 
     /**

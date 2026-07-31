@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Modules\Advertising\Models\AdvertiserWalletDepositWebhookEvent;
 use App\Modules\Advertising\Models\CampaignFundingWebhookEvent;
+use App\Modules\Advertising\Models\SubscriptionPurchaseWebhookEvent;
 use App\Modules\Advertising\Services\AdvertiserWalletDepositWebhookService;
 use App\Modules\Advertising\Services\CampaignFundingWebhookService;
+use App\Modules\Advertising\Services\SubscriptionPurchaseWebhookService;
 use App\Modules\Wallet\Deposit\Models\DepositWebhookEvent;
 use App\Modules\Wallet\Deposit\Services\DepositWebhookService;
 use App\Modules\Wallet\Deposit\Services\GeniusPay\GeniusPayWebhookSignatureVerifier;
@@ -27,9 +29,12 @@ use Throwable;
  * 2. Si `processing_result === 'deposit_not_found'` (la référence ne
  *    correspond à aucun dépôt Wallet), tente ensuite le financement de
  *    campagne ({@see CampaignFundingWebhookService}) ;
- * 3. Si `processing_result === 'campaign_funding_not_found'`, tente enfin
- *    le dépôt Wallet annonceur (instruction explicite du fondateur,
- *    2026-07-31 ; {@see AdvertiserWalletDepositWebhookService}).
+ * 3. Si `processing_result === 'campaign_funding_not_found'`, tente
+ *    ensuite le dépôt Wallet annonceur (instruction explicite du
+ *    fondateur, 2026-07-31 ; {@see AdvertiserWalletDepositWebhookService}) ;
+ * 4. Si `processing_result === 'advertiser_wallet_deposit_not_found'`,
+ *    tente enfin l'achat d'abonnement (instruction explicite du fondateur,
+ *    2026-07-31 ; {@see SubscriptionPurchaseWebhookService}).
  *
  * Remplace l'ancien `DepositWebhookController` (supprimé, sa logique de
  * réception/journalisation est reprise ici à l'identique pour le dépôt
@@ -43,6 +48,7 @@ class GeniusPayWebhookController extends Controller
         private readonly DepositWebhookService $depositWebhookService,
         private readonly CampaignFundingWebhookService $campaignFundingWebhookService,
         private readonly AdvertiserWalletDepositWebhookService $advertiserWalletDepositWebhookService,
+        private readonly SubscriptionPurchaseWebhookService $subscriptionPurchaseWebhookService,
     ) {}
 
     public function store(Request $request): Response
@@ -108,6 +114,23 @@ class GeniusPayWebhookController extends Controller
                         'webhook_event_id' => $advertiserWalletDepositEvent->id,
                         'exception' => $exception->getMessage(),
                     ]);
+                }
+
+                if ($advertiserWalletDepositEvent->processing_result === 'advertiser_wallet_deposit_not_found') {
+                    $subscriptionPurchaseEvent = SubscriptionPurchaseWebhookEvent::create([
+                        'provider' => 'geniuspay',
+                        'signature_valid' => true,
+                        'raw_payload' => $rawPayload,
+                    ]);
+
+                    try {
+                        $this->subscriptionPurchaseWebhookService->process($subscriptionPurchaseEvent);
+                    } catch (Throwable $exception) {
+                        Log::error('subscription_purchase_webhook_processing_failed', [
+                            'webhook_event_id' => $subscriptionPurchaseEvent->id,
+                            'exception' => $exception->getMessage(),
+                        ]);
+                    }
                 }
             }
         }

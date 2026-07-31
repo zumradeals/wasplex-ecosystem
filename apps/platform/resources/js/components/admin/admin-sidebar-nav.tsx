@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     Building2,
+    CreditCard,
     FileWarning,
     Inbox,
     KeyRound,
@@ -9,6 +10,7 @@ import {
     ScrollText,
     Settings,
     ShieldAlert,
+    Users,
     Wallet,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -64,6 +66,18 @@ const AVAILABLE_ITEMS = [
         label: 'Accès',
         href: admin.access().url,
         icon: KeyRound,
+    },
+    {
+        key: 'economic-types',
+        label: 'Types économiques',
+        href: admin.economicTypes().url,
+        icon: Users,
+    },
+    {
+        key: 'subscription-plans',
+        label: "Plans d'abonnement",
+        href: admin.subscriptionPlans().url,
+        icon: CreditCard,
     },
 ] as const;
 

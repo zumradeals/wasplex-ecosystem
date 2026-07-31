@@ -6,9 +6,11 @@ use App\Http\Controllers\GeniusPayWebhookController;
 use App\Http\Controllers\HealthController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminAdvertisingModerationController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminCampaignFundingController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminEconomicTypesController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminFinanceController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminInterestTaxonomyController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminSectorClassificationController;
+use App\Modules\Advertising\Http\Controllers\Admin\AdminSubscriptionPlansController;
 use App\Modules\Advertising\Http\Controllers\Admin\AdminVideoDurationController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
@@ -44,6 +46,9 @@ use App\Modules\Advertising\Http\Controllers\QualifiedEventAcceptanceController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventRejectionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSelfSubmissionController;
 use App\Modules\Advertising\Http\Controllers\QualifiedEventSubmissionController;
+use App\Modules\Advertising\Http\Controllers\SubscriptionPurchaseInitiationController;
+use App\Modules\Advertising\Http\Controllers\SubscriptionPurchaseReturnController;
+use App\Modules\Advertising\Http\Controllers\SubscriptionsController;
 use App\Modules\Alerts\Http\Controllers\Admin\AdminAlertsController;
 use App\Modules\Alerts\Http\Controllers\Admin\AdminCaseDecisionController;
 use App\Modules\Alerts\Http\Controllers\Admin\AdminCorrespondenceDecisionController;
@@ -134,6 +139,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // raisonnement que les deux routes de retour ci-dessus.
     Route::get('advertising/wallet/deposits/{deposit}/return', [AdvertiserWalletDepositReturnController::class, 'show'])
         ->name('advertising.wallet.deposits.return');
+
+    // Instruction explicite du fondateur 2026-07-31 : écran « Abonnements »
+    // (docs/02) — contenu de diffusion public, même raisonnement que le
+    // Feed. Page de retour GeniusPay associée, même raisonnement que les
+    // routes de retour ci-dessus.
+    Route::get('subscriptions', [SubscriptionsController::class, 'index'])->name('subscriptions.index');
+    Route::get('subscriptions/purchases/{purchase}/return', [SubscriptionPurchaseReturnController::class, 'show'])
+        ->name('subscriptions.purchases.return');
 
     // P007-W1 : tableau de bord annonceur (A-001-01/A-002-01) — reprend
     // l'autorisation campaign.view (portée self) et affiche un état d'écran
@@ -254,6 +267,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('admin.sector-classifications.store');
     Route::post('admin/sector-classifications/{sectorClassification}/retire', [AdminSectorClassificationController::class, 'retire'])
         ->name('admin.sector-classifications.retire');
+
+    // Instruction explicite du fondateur 2026-07-31 : gestion des trois
+    // types économiques (advertising.manage_economic_types) — mirroir
+    // exact des deux écrans ci-dessus.
+    Route::get('admin/economic-types', [AdminEconomicTypesController::class, 'index'])
+        ->name('admin.economic-types');
+    Route::post('admin/economic-types', [AdminEconomicTypesController::class, 'store'])
+        ->name('admin.economic-types.store');
+
+    // Instruction explicite du fondateur 2026-07-31 : gestion des plans
+    // d'abonnement (advertising.manage_subscription_plans) — mirroir exact
+    // de l'écran ci-dessus.
+    Route::get('admin/subscription-plans', [AdminSubscriptionPlansController::class, 'index'])
+        ->name('admin.subscription-plans');
+    Route::post('admin/subscription-plans', [AdminSubscriptionPlansController::class, 'store'])
+        ->name('admin.subscription-plans.store');
 
     // P008-A : Portail des institutions Wasplex (ecosystem/institutions/01
     // §10) — distinct du portail personnel Wasplex ci-dessus. Une personne
@@ -378,6 +407,14 @@ Route::middleware('web')->post('advertising/wallet/deposits', [AdvertiserWalletD
 // un appel non authentifié.
 Route::middleware('web')->post('advertising/wallet/allocations', [AdvertiserWalletAllocationController::class, 'store'])
     ->name('advertising.wallet.allocations.store');
+
+// Instruction explicite du fondateur 2026-07-31 : achat d'abonnement en
+// libre-service via GeniusPay (subscription.purchase, portée self). Même
+// discipline que les routes de dépôt ci-dessus : groupe 'web' hors du
+// groupe 'auth', 401 JSON structuré pour un appel non authentifié. Ne
+// crédite jamais l'abonnement elle-même — seul le webhook signé le fait.
+Route::middleware('web')->post('subscriptions/purchases', [SubscriptionPurchaseInitiationController::class, 'store'])
+    ->name('subscriptions.purchases.store');
 
 // P005-F : cycle de vie d'un QualifiedEvent (ADR-0010 §4 lignes 3-5).
 // event.submit/event.accept/event.reject sont réservées au personnel

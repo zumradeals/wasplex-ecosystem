@@ -7,8 +7,10 @@ use App\Modules\Advertising\Enums\CampaignState;
 use App\Modules\Advertising\Enums\CampaignVersionState;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
+use App\Modules\Advertising\Models\PersonAdvertisingProfile;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Projections\SocialEngagementProjection;
+use App\Modules\Advertising\Services\AudienceSegmentGuard;
 use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Advertising\Services\Exceptions\PricingConfigurationNotResolvableException;
 use App\Modules\Advertising\Services\QualifiedEventPricingResolver;
@@ -39,13 +41,17 @@ use Inertia\Response;
  * annonceur). Seule la soumission de preuve (`event.self_submit`, déjà
  * gouvernée) exige une autorisation réelle.
  *
- * Volontairement minimal (noyau, TD-0006 lignée) : une seule campagne
- * approuvée à la fois par définition existante (ADR-0010 §5), aucune
- * correspondance d'audience réelle par personne (`AudienceSegment` reste
- * un agrégat, jamais un ciblage individuel — AMD-0009 §13) : ce noyau
- * montre toute campagne active, approuvée, financée et dont le prix est
- * résolvable, sans encore filtrer par pertinence d'audience ni limiter la
- * fréquence par utilisateur (ADR-0002 §3.3, quotas différés).
+ * Instruction explicite du fondateur, 2026-07-31 : filtre désormais
+ * réellement par correspondance d'audience individuelle
+ * ({@see AudienceSegmentGuard::matchesPerson()}) — une campagne dont le
+ * segment ne correspond pas au profil publicitaire consenti du sujet
+ * n'apparaît plus dans son Feed, fermant l'écart documenté jusqu'ici (le
+ * calcul de correspondance existait déjà côté écriture/estimation, jamais
+ * réutilisé côté lecture). `reward_amount` reflète aussi le type
+ * économique et le quota mensuel déjà consommé de la personne précise
+ * (`CampaignBudgetService::previewUserShareForPerson()`), jamais un
+ * montant générique identique pour tout le monde. La fréquence maximale
+ * par utilisateur (ADR-0002 §3.3) reste hors périmètre de ce lot.
  *
  * P008-A (mission §15) : reçoit aussi une petite surface d'alertes
  * communautaires publiées (`alerts.publications`, lecture seule via
@@ -70,35 +76,46 @@ class FeedController extends Controller
         private readonly PersonBalanceProjection $balanceProjection,
         private readonly SocialEngagementProjection $socialEngagementProjection,
         private readonly PublicAlertFeedProjection $publicAlertFeed,
+        private readonly AudienceSegmentGuard $audienceSegmentGuard,
     ) {}
 
     public function index(Request $request): Response
     {
-        $campaigns = Campaign::query()
-            ->where('state', CampaignState::Active)
-            ->with(['advertiserProfile', 'versions' => function ($query): void {
-                $query->where('state', CampaignVersionState::Approved);
-            }])
-            ->get()
-            ->filter(fn (Campaign $campaign): bool => $campaign->versions->isNotEmpty());
-
-        $ads = $campaigns
-            ->map(function (Campaign $campaign): ?array {
-                $version = $campaign->versions->first();
-
-                return $this->eligibleAd($campaign, $version);
-            })
-            ->filter()
-            ->values()
-            ->all();
-
-        // Résolu une seule fois, réutilisé pour le solde Wallet et les
-        // signaux sociaux — jamais deux résolutions du même sujet.
+        // Résolu une seule fois, réutilisé pour le solde Wallet, les
+        // signaux sociaux et — depuis ce lot — la correspondance
+        // d'audience et le gain réel : jamais deux résolutions du même
+        // sujet.
         try {
             $subject = $this->subjectResolver->resolve($request);
         } catch (SubjectResolutionFailedException) {
             $subject = null;
         }
+
+        // Profil publicitaire consenti du sujet, chargé une seule fois
+        // (pas par campagne) : une personne sans sujet résolvable ou sans
+        // profil ne correspond alors qu'aux campagnes non ciblées
+        // (critères vides), jamais à un profil deviné.
+        $profile = $subject !== null
+            ? PersonAdvertisingProfile::query()->where('person_id', $subject->personAccountLink->person_id)->first()
+            : null;
+
+        $campaigns = Campaign::query()
+            ->where('state', CampaignState::Active)
+            ->with(['advertiserProfile', 'versions' => function ($query): void {
+                $query->where('state', CampaignVersionState::Approved)->with('audienceSegment');
+            }])
+            ->get()
+            ->filter(fn (Campaign $campaign): bool => $campaign->versions->isNotEmpty());
+
+        $ads = $campaigns
+            ->map(function (Campaign $campaign) use ($subject, $profile): ?array {
+                $version = $campaign->versions->first();
+
+                return $this->eligibleAd($campaign, $version, $subject, $profile);
+            })
+            ->filter()
+            ->values()
+            ->all();
 
         $ads = $this->withSocialEngagement($ads, $subject);
 
@@ -210,11 +227,25 @@ class FeedController extends Controller
     /**
      * @return array<string, mixed>|null
      */
-    private function eligibleAd(Campaign $campaign, CampaignVersion $version): ?array
+    private function eligibleAd(Campaign $campaign, CampaignVersion $version, ?AuthenticatedSubject $subject, ?PersonAdvertisingProfile $profile): ?array
     {
         $available = $this->budgetProjection->available($campaign);
 
         if ($available <= 0) {
+            return null;
+        }
+
+        // Instruction explicite du fondateur, 2026-07-31 : correspondance
+        // d'audience individuelle réelle, plus une simple estimation
+        // agrégée — une campagne ciblée (critères non vides) que le profil
+        // de cette personne ne satisfait pas n'apparaît jamais dans son
+        // Feed. Une campagne sans segment persisté (jamais censé arriver,
+        // `CampaignController::store()` en crée toujours un — voir
+        // `AudienceSegmentGuard::createSegment()`) est traitée comme non
+        // ciblée plutôt que de faire échouer tout le Feed.
+        $segment = $version->audienceSegment;
+        $criteria = $segment !== null ? $segment->criteria : [];
+        if (! $this->audienceSegmentGuard->matchesPerson($criteria, $profile)) {
             return null;
         }
 
@@ -242,13 +273,18 @@ class FeedController extends Controller
             'headline' => $version->creations['headline'] ?? $campaign->code,
             'format' => $version->expected_event['format'] ?? 'display',
             'condition' => $version->expected_event['condition'] ?? 'completion',
-            // Part utilisateur réelle du partage 50/50 (AMD-0002,
-            // `CampaignBudgetService::userShareOfAmount()`) — jamais le
-            // prix de base entier : celui-ci finance aussi la part
-            // Wasplex, jamais versée au bénéficiaire (docs/03 §8 « le
-            // montant affiché avant la participation doit être le montant
-            // effectivement crédité lorsque l'événement est validé »).
-            'reward_amount' => $this->campaignBudgetService->userShareOfAmount($basePrice),
+            // Gain réel de cette personne précise (instruction explicite du
+            // fondateur, 2026-07-31) : tient compte de son type économique
+            // et de son quota mensuel déjà consommé
+            // (`CampaignBudgetService::previewUserShareForPerson()`),
+            // jamais le plafond générique 50/50 qui ignorerait les deux
+            // (docs/03 §10 « le montant affiché avant la participation doit
+            // être le montant effectivement crédité »). Un sujet non
+            // résolvable retombe sur le plafond générique — la seule
+            // information disponible sans identité confirmée.
+            'reward_amount' => $subject !== null
+                ? $this->campaignBudgetService->previewUserShareForPerson($basePrice, $subject->personAccountLink->person_id, $subject->personAccountLink->id)
+                : $this->campaignBudgetService->userShareOfAmount($basePrice),
             'currency' => $campaign->currency,
         ];
     }
