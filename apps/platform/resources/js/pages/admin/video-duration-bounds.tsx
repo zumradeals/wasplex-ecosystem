@@ -65,8 +65,8 @@ export default function AdminVideoDurationBounds({
                             <p className="mb-4 text-sm text-[var(--text-secondary)]">
                                 Borne active (version {current.version}) :{' '}
                                 <span className="font-semibold text-[var(--text-primary)]">
-                                    {current.min_seconds}–
-                                    {current.max_seconds} secondes
+                                    {current.min_seconds}–{current.max_seconds}{' '}
+                                    secondes
                                 </span>
                             </p>
                         )}

@@ -43,6 +43,12 @@ use Illuminate\Support\Str;
  * @property string|null $release_transaction_id
  * @property string $correlation_id
  * @property string $idempotency_key
+ * @property int|null $user_share_amount
+ * @property string|null $economic_type_id
+ * @property int|null $economic_type_percentage_applied
+ * @property bool|null $quota_exceeded
+ * @property bool|null $economic_type_pool_exhausted
+ * @property bool|null $already_rewarded
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -61,6 +67,8 @@ class QualifiedEvent extends Model
         'billing_status', 'reservation_transaction_id', 'consumption_transaction_id',
         'distribution_transaction_id', 'release_transaction_id',
         'correlation_id', 'idempotency_key',
+        'user_share_amount', 'economic_type_id', 'economic_type_percentage_applied', 'quota_exceeded',
+        'economic_type_pool_exhausted', 'already_rewarded',
     ];
 
     protected function casts(): array
@@ -73,6 +81,11 @@ class QualifiedEvent extends Model
             'billing_status' => BillingStatus::class,
             'acceptance_mode' => AcceptanceMode::class,
             'acceptance_rules_configuration_version' => 'integer',
+            'user_share_amount' => 'integer',
+            'economic_type_percentage_applied' => 'integer',
+            'quota_exceeded' => 'boolean',
+            'economic_type_pool_exhausted' => 'boolean',
+            'already_rewarded' => 'boolean',
         ];
     }
 

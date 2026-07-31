@@ -64,6 +64,15 @@ class GrantAutoIssuer
         // propre campagne via GeniusPay — même raisonnement que
         // `wallet.deposit` ci-dessus.
         'campaign.fund_self',
+        // Instruction explicite du fondateur 2026-07-31 : initier un dépôt
+        // dans son propre solde Wallet annonceur mutualisé, et allouer ce
+        // solde à ses propres campagnes — même raisonnement que
+        // `campaign.fund_self` ci-dessus.
+        'advertiser_wallet.deposit',
+        'advertiser_wallet.allocate',
+        // Instruction explicite du fondateur 2026-07-31 : acheter son
+        // propre abonnement via GeniusPay — même raisonnement.
+        'subscription.purchase',
     ];
 
     /**

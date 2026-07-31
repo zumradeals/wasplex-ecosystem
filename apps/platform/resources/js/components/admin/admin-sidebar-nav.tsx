@@ -1,14 +1,18 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     Building2,
+    CreditCard,
     FileWarning,
     Inbox,
     KeyRound,
     Landmark,
     Megaphone,
+    Repeat,
     ScrollText,
     Settings,
     ShieldAlert,
+    UserCog,
+    Users,
     Wallet,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -64,6 +68,30 @@ const AVAILABLE_ITEMS = [
         label: 'Accès',
         href: admin.access().url,
         icon: KeyRound,
+    },
+    {
+        key: 'users',
+        label: 'Utilisateurs',
+        href: admin.users().url,
+        icon: UserCog,
+    },
+    {
+        key: 'economic-types',
+        label: 'Types économiques',
+        href: admin.economicTypes().url,
+        icon: Users,
+    },
+    {
+        key: 'subscription-plans',
+        label: "Plans d'abonnement",
+        href: admin.subscriptionPlans().url,
+        icon: CreditCard,
+    },
+    {
+        key: 'frequency-cap',
+        label: 'Revisionnage gratuit',
+        href: admin.frequencyCap().url,
+        icon: Repeat,
     },
 ] as const;
 

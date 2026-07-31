@@ -23,19 +23,20 @@ function AddEntryForm({ onAdded }: { onAdded: (entry: Entry) => void }) {
         setSubmitting(true);
         setError(null);
 
-        const result = await postJson<Entry & { errors?: Record<string, string[]> }>(
-            '/admin/interest-taxonomy',
-            { code, label },
-        );
+        const result = await postJson<
+            Entry & { errors?: Record<string, string[]> }
+        >('/admin/interest-taxonomy', { code, label });
 
         setSubmitting(false);
 
         if (!result.ok) {
-            const data = result.data as { errors?: Record<string, string[]> } | null;
+            const data = result.data as {
+                errors?: Record<string, string[]>;
+            } | null;
             setError(
                 data?.errors?.code?.[0] ??
                     data?.errors?.label?.[0] ??
-                    "L'ajout n'a pas abouti. Le code doit être unique, en minuscules (ex. \"sport\").",
+                    'L\'ajout n\'a pas abouti. Le code doit être unique, en minuscules (ex. "sport").',
             );
 
             return;
@@ -184,8 +185,7 @@ export default function AdminInterestTaxonomy({
                             </h2>
                             {list.length === 0 ? (
                                 <p className="text-sm text-[var(--text-secondary)]">
-                                    Aucun centre d'intérêt n'est encore
-                                    proposé.
+                                    Aucun centre d'intérêt n'est encore proposé.
                                 </p>
                             ) : (
                                 <div className="space-y-2">

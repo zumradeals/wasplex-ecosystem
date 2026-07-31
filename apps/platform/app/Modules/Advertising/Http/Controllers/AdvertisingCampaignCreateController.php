@@ -8,9 +8,12 @@ use App\Modules\Advertising\Models\AudienceSegmentSizeThreshold;
 use App\Modules\Advertising\Models\InterestTaxonomyEntry;
 use App\Modules\Advertising\Models\SectorClassification;
 use App\Modules\Advertising\Models\VideoAdDurationBounds;
+use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
 use App\Modules\Governance\Authorization\Integration\AuthorizationRequestFactory;
 use App\Modules\Governance\Authorization\Integration\Http\AuthenticatedSubjectHttpResolver;
+use App\Modules\Governance\Configuration\Services\ConfigurationResolver;
+use App\Modules\Governance\Configuration\Services\Exceptions\NoActiveConfigurationException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,20 +22,30 @@ use Inertia\Response;
  * Nouvelle campagne (UX-0001 §8, sous-écran de « Campagnes ») : formulaire
  * de création qui n'affiche que des contraintes réellement configurées
  * (secteurs actifs, formats autorisés par secteur, seuil minimal
- * d'audience actif) — jamais un tarif par durée ni une estimation de
- * portée/clics/WasPoints distribués : aucun de ces mécanismes n'existe
- * dans le registre de configuration aujourd'hui (`02-cycle-financier-campagne.md`
- * §6 « la formule exacte n'est pas codée en dur »). La soumission
+ * d'audience actif) — jamais une estimation de portée/clics inventée.
+ *
+ * Expose désormais (chantier « espace annonceur cohérent avec le modèle
+ * économique », véto du dirigeant) le prix unitaire actuellement résolvable
+ * et sa répartition 50/50 réelle (AMD-0002), pour que l'annonceur voie un
+ * devis fondé sur le moteur qui existe déjà plutôt qu'aucun chiffre du
+ * tout — jamais présenté comme un catalogue tarifaire commercial : une
+ * seule valeur, encore démonstrative (`AdvertisingDemoConfigurationSeeder`),
+ * tant qu'aucun catalogue versionné par format/durée n'est décidé
+ * (`docs/01-modele-economique-publicitaire.md` §5). La soumission
  * elle-même reste {@see CampaignController::store()}, inchangée.
  */
 class AdvertisingCampaignCreateController extends Controller
 {
     use ResolvesAdvertiserWorkspace;
 
+    private const PRICING_CONFIGURATION_KEY = 'advertising.qualified_event_base_price';
+
     public function __construct(
         private readonly AuthenticatedSubjectHttpResolver $subjectResolver,
         private readonly AuthorizationRequestFactory $authorizationRequestFactory,
         private readonly AuthorizationGate $authorizationGate,
+        private readonly ConfigurationResolver $configurationResolver,
+        private readonly CampaignBudgetService $campaignBudgetService,
     ) {}
 
     public function create(Request $request): Response
@@ -42,6 +55,7 @@ class AdvertisingCampaignCreateController extends Controller
             'audienceSizeThreshold' => null,
             'interestTaxonomy' => [],
             'videoDurationBounds' => null,
+            'indicativePricing' => null,
         ]);
 
         if ($workspace instanceof Response) {
@@ -79,6 +93,28 @@ class AdvertisingCampaignCreateController extends Controller
                 'min_seconds' => $videoDurationBounds->min_seconds,
                 'max_seconds' => $videoDurationBounds->max_seconds,
             ],
+            'indicativePricing' => $this->indicativePricing(),
         ]);
+    }
+
+    /**
+     * Part Wasplex volontairement absente de ce payload (instruction
+     * explicite du fondateur) : la marge de la plateforme n'est jamais
+     * communiquée à l'annonceur, y compris dans la réponse réseau brute.
+     *
+     * @return array{unit_price: int, user_share: int}|null
+     */
+    private function indicativePricing(): ?array
+    {
+        try {
+            $unitPrice = (int) $this->configurationResolver->value(self::PRICING_CONFIGURATION_KEY);
+        } catch (NoActiveConfigurationException) {
+            return null;
+        }
+
+        return [
+            'unit_price' => $unitPrice,
+            'user_share' => $this->campaignBudgetService->userShareOfAmount($unitPrice),
+        ];
     }
 }

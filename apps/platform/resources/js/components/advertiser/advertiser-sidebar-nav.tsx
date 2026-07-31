@@ -9,6 +9,7 @@ import {
     PiggyBank,
     Radar,
     TrendingUp,
+    Wallet,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import WasplexMascot from '@/components/wasplex-mascot';
@@ -46,6 +47,12 @@ const NAV_ITEMS = [
         label: 'Créations',
         href: advertising.creations().url,
         icon: Image,
+    },
+    {
+        key: 'wallet',
+        label: 'Wallet',
+        href: advertising.wallet().url,
+        icon: Wallet,
     },
     {
         key: 'budget',

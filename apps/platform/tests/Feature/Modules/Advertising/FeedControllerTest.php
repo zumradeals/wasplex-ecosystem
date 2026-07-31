@@ -3,6 +3,7 @@
 namespace Tests\Feature\Modules\Advertising;
 
 use App\Modules\Advertising\Models\Campaign;
+use App\Modules\Advertising\Models\FrequencyCapBounds;
 use App\Modules\Advertising\Services\CampaignVersionService;
 use App\Modules\Governance\Configuration\Enums\ConfigurationLevel;
 use App\Modules\Governance\Configuration\Enums\DefinitionState;
@@ -190,7 +191,10 @@ class FeedControllerTest extends AdvertisingTestCase
             ->has('ads', 1)
             ->where('ads.0.advertiser', $campaign->advertiserProfile->legal_name)
             ->where('ads.0.headline', 'Découvrez notre offre')
-            ->where('ads.0.reward_amount', 777)
+            // Part utilisateur du ratio 50/50 exact (AMD-0002), pas le
+            // prix de base entier réservé sur le budget campagne :
+            // intdiv(777 + 1, 2).
+            ->where('ads.0.reward_amount', 389)
             ->where('ads.0.currency', $campaign->currency)
             ->where('ads.0.format', 'banner')
             ->where('ads.0.condition', 'completion'),
@@ -239,6 +243,47 @@ class FeedControllerTest extends AdvertisingTestCase
         $response->assertInertia(fn (Assert $page) => $page
             ->where('wallet_balance.available', 500)
             ->where('wallet_balance.currency', $campaign->currency),
+        );
+    }
+
+    public function test_excludes_a_campaign_once_the_person_has_reached_their_frequency_cap(): void
+    {
+        // Borne resserrée à 1/jour, 1 au total (instruction explicite du
+        // fondateur, 2026-07-31) pour que la seule vue déjà acceptée
+        // suffise à épuiser le plafond.
+        FrequencyCapBounds::query()->update(['state' => 'retired']);
+        FrequencyCapBounds::create([
+            'daily_free_view_limit' => 1,
+            'lifetime_free_view_limit' => 1,
+            'version' => 99,
+            'state' => 'active',
+        ]);
+
+        $campaign = $this->eligibleCampaign(funding: 10_000, reward: 1_000);
+        $version = $campaign->versions()->firstOrFail();
+
+        $user = $this->makeUser('feed-frequency-cap-'.Str::uuid().'@example.com');
+        $user->forceFill(['email_verified_at' => now()])->save();
+        $link = $this->activeLinkFor($user);
+
+        $event = $this->budgetService()->submitQualifiedEvent(
+            campaign: $campaign,
+            version: $version,
+            beneficiary: $link,
+            format: 'banner',
+            evidence: ['completed' => true],
+            appliedPriceAmount: 1_000,
+            idempotencyKey: 'feed-frequency-cap-'.Str::uuid(),
+            correlationId: (string) Str::uuid(),
+        );
+        $this->budgetService()->acceptQualifiedEvent($event);
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('dashboard')
+            ->has('ads', 0),
         );
     }
 

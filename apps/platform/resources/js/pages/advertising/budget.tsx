@@ -22,6 +22,9 @@ type CampaignBudget = {
     available: number;
     reserved: number;
     consumed: number;
+    unit_price: number | null;
+    user_share_per_event: number | null;
+    events_affordable: number | null;
 };
 
 // Véto du dirigeant 2026-07-30 : financement de campagne en libre-service
@@ -80,14 +83,9 @@ function FundCampaignButton({ campaignId }: { campaignId: string }) {
     }
 
     return (
-        <form
-            onSubmit={submit}
-            className="flex items-center justify-end gap-2"
-        >
+        <form onSubmit={submit} className="flex items-center justify-end gap-2">
             {error && (
-                <p className="text-xs text-[var(--status-danger)]">
-                    {error}
-                </p>
+                <p className="text-xs text-[var(--status-danger)]">{error}</p>
             )}
             <input
                 type="number"
@@ -156,7 +154,13 @@ export default function AdvertisingBudget({
                                     <th className="px-5 py-2.5 font-medium">
                                         Consommé
                                     </th>
-                                    <th className="px-5 py-2.5 font-medium text-right">
+                                    <th className="px-5 py-2.5 font-medium">
+                                        Prix / vue qualifiée
+                                    </th>
+                                    <th className="px-5 py-2.5 font-medium">
+                                        Vues finançables
+                                    </th>
+                                    <th className="px-5 py-2.5 text-right font-medium">
                                         Financement
                                     </th>
                                 </tr>
@@ -190,6 +194,31 @@ export default function AdvertisingBudget({
                                                 row.consumed,
                                             )}{' '}
                                             {row.currency}
+                                        </td>
+                                        <td className="px-5 py-3 tabular-nums">
+                                            {row.unit_price !== null ? (
+                                                <>
+                                                    <span className="text-[var(--text-primary)]">
+                                                        {amountFormatter.format(
+                                                            row.unit_price,
+                                                        )}{' '}
+                                                        {row.currency}
+                                                    </span>
+                                                    <p className="text-xs text-[var(--text-secondary)]">
+                                                        Récompense utilisateur :{' '}
+                                                        {
+                                                            row.user_share_per_event
+                                                        }
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <span className="text-[var(--text-secondary)]">
+                                                    Non résolvable
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-5 py-3 text-[var(--text-primary)] tabular-nums">
+                                            {row.events_affordable ?? '—'}
                                         </td>
                                         <td className="px-5 py-3 text-right">
                                             <FundCampaignButton

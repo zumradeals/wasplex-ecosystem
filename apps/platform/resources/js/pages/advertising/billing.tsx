@@ -46,9 +46,14 @@ export default function AdvertisingBilling({
                     <Info size={14} className="mt-0.5 shrink-0" />
                     <p>
                         Une campagne ne peut être activée sans financement
-                        intégral de son budget engagé. Le financement est
-                        confirmé par Wasplex après réception ; aucun paiement en
-                        libre-service n'est disponible sur cet écran.
+                        intégral de son budget engagé. Financez une campagne
+                        depuis l'écran Budget (paiement en libre-service via
+                        GeniusPay) ; le budget n'est crédité qu'après
+                        confirmation signée du paiement, jamais avant. Le
+                        traitement du solde non consommé (reliquat) en fin de
+                        campagne n'est pas encore décidé : il reste affiché ici
+                        comme « encore disponible », ni remboursé ni réengagé
+                        automatiquement pour l'instant.
                     </p>
                 </div>
 

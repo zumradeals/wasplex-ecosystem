@@ -8,9 +8,12 @@ use App\Modules\Advertising\Enums\CampaignState;
 use App\Modules\Advertising\Enums\FraudDecision;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
+use App\Modules\Advertising\Models\EconomicType;
 use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
+use App\Modules\Advertising\Projections\PersonMonthlyQuotaProjection;
 use App\Modules\Advertising\Services\Exceptions\CampaignNotAcceptingReservationsException;
+use App\Modules\Advertising\Services\Exceptions\FrequencyCapExceededException;
 use App\Modules\Advertising\Services\Exceptions\InsufficientBudgetException;
 use App\Modules\Identity\Models\PersonAccountLink;
 use App\Modules\Wallet\Balance\Services\PersonLedgerAccounts;
@@ -39,6 +42,9 @@ class CampaignBudgetService
         private readonly SharedLedgerAccounts $sharedAccounts,
         private readonly PersonLedgerAccounts $personAccounts,
         private readonly CampaignBudgetProjection $budgetProjection,
+        private readonly EconomicTypeResolver $economicTypeResolver,
+        private readonly PersonMonthlyQuotaProjection $quotaProjection,
+        private readonly FrequencyCapGuard $frequencyCapGuard,
     ) {}
 
     /**
@@ -119,6 +125,19 @@ class CampaignBudgetService
         if ($campaign->state !== CampaignState::Active) {
             throw new CampaignNotAcceptingReservationsException(
                 "la campagne {$campaign->code} n'accepte plus de nouvelle réservation dans son état actuel ({$campaign->state->value}), ADR-0010 §7"
+            );
+        }
+
+        // Plafond de revisionnage gratuit (instruction explicite du
+        // fondateur, 2026-07-31) : une nouvelle soumission n'est acceptée
+        // que si cette personne n'a pas déjà atteint le nombre maximal de
+        // revisionnages, quotidien ou total, pour cette CampaignVersion
+        // précise — barrière serveur en profondeur, le Feed cesse
+        // normalement d'offrir cette publicité avant même d'y arriver
+        // ({@see \App\Modules\Advertising\Http\Controllers\FeedController}).
+        if ($this->frequencyCapGuard->hasReachedCap($beneficiary->id, $version->id)) {
+            throw new FrequencyCapExceededException(
+                'cette personne a déjà atteint le plafond de revisionnage gratuit pour cette CampaignVersion'
             );
         }
 
@@ -221,9 +240,58 @@ class CampaignBudgetService
         // « Amendement 2026-07-26 — Arrondi du partage égal ») : quand
         // l'égalité exacte est impossible en unités entières, l'ambiguïté
         // se résout en faveur de la partie qu'AMD-0002 protège. Ferme
-        // TD-0004-B.
-        $userShare = intdiv($amount + 1, 2);
-        $wasplexShare = intdiv($amount, 2);
+        // TD-0004-B. Ce montant reste le plafond de la part utilisateur
+        // (docs/02 §5 : jamais dépasser la part utilisateur réellement
+        // financée par la campagne) — le type économique ne peut que le
+        // réduire, jamais l'augmenter.
+        $standardUserShare = intdiv($amount + 1, 2);
+
+        // Instruction explicite du fondateur 2026-07-31 (confirmée par
+        // exemple concret Orange CI, 2026-07-31) : le type économique du
+        // bénéficiaire ne réduit plus la part de CET événement — chaque
+        // spectateur touche la part utilisateur standard pleine
+        // (`$standardUserShare`) tant que la cagnotte de son type n'est pas
+        // épuisée. Cette cagnotte est propre à la campagne, dimensionnée en
+        // pourcentage de la part utilisateur totale déjà financée
+        // (ex. gratuit 10 %, premium 25 %, gold 30 %, platinum 35 %,
+        // totalisant 100 %) — voir {@see economicTypeSubPoolAllocated()}.
+        // Cagnotte épuisée ou quota mensuel personnel dépassé (docs/02 §4,
+        // décision confirmée : ne se consomme que sur un événement validé
+        // qui paie réellement, évalué sur les événements déjà `accepted`
+        // avant celui-ci, jamais sur lui-même) : deux raisons distinctes
+        // d'un versement nul, chacune tracée dans sa propre colonne pour
+        // ne jamais les confondre dans un audit. Le reliquat non versé
+        // reste chez Wasplex : `$wasplexShare` se déduit toujours de
+        // `$amount - $userShare`, jamais d'un second calcul indépendant,
+        // pour que la conservation de valeur soit garantie par
+        // construction (aucune fuite d'arrondi possible).
+        // Récompense unique par personne et par CampaignVersion (instruction
+        // explicite du fondateur, 2026-07-31) : un revisionnage au-delà de
+        // ce premier événement accepté reste tracé et facturé normalement
+        // à l'annonceur (exposition réelle), mais ne verse plus rien au
+        // bénéficiaire — Wasplex absorbe l'intégralité du montant, comme
+        // pour `quota_exceeded`/`economic_type_pool_exhausted` ci-dessous,
+        // dans sa propre colonne pour ne jamais confondre les trois
+        // raisons dans un audit. Le plafond de fréquence lui-même
+        // (quotidien/total) est appliqué en amont, à la soumission
+        // ({@see submitQualifiedEvent()}) — cette vérification-ci ne fait
+        // que constater qu'une récompense a déjà eu lieu.
+        $alreadyRewarded = QualifiedEvent::query()
+            ->where('beneficiary_person_account_link_id', $event->beneficiary_person_account_link_id)
+            ->where('campaign_version_id', $event->campaign_version_id)
+            ->where('billing_status', BillingStatus::Accepted)
+            ->exists();
+
+        $economicType = $this->economicTypeResolver->forPerson($event->beneficiary->person_id);
+        $quotaExceeded = $economicType->monthly_quota !== null
+            && $this->quotaProjection->consumedThisMonth($event->beneficiary_person_account_link_id) >= $economicType->monthly_quota;
+
+        $subPoolAllocated = $this->economicTypeSubPoolAllocated($campaign, $economicType);
+        $subPoolConsumed = $this->economicTypeSubPoolConsumed($campaign, $economicType);
+        $poolExhausted = $subPoolConsumed + $standardUserShare > $subPoolAllocated;
+
+        $userShare = ($alreadyRewarded || $quotaExceeded || $poolExhausted) ? 0 : $standardUserShare;
+        $wasplexShare = $amount - $userShare;
 
         // Dimensions conservées pour retrouver, par requête directe sur les
         // postings, l'événement qualifié précis à l'origine de ce crédit —
@@ -275,20 +343,131 @@ class CampaignBudgetService
             'acceptance_rules_configuration_version' => $rulesConfigurationVersion,
             'consumption_transaction_id' => $consumption->id,
             'distribution_transaction_id' => $distribution->id,
+            'user_share_amount' => $userShare,
+            'economic_type_id' => $economicType->id,
+            'economic_type_percentage_applied' => $economicType->user_share_percentage,
+            'quota_exceeded' => $quotaExceeded,
+            'economic_type_pool_exhausted' => $poolExhausted,
+            'already_rewarded' => $alreadyRewarded,
         ])->save();
 
         return $event->fresh();
     }
 
     /**
-     * Part utilisateur du net distribuable d'un événement (AMD-0002,
-     * ratio 50/50 exact, unité résiduelle à l'utilisateur — décision du
-     * fondateur 2026-07-26, ADR-0010) — unique définition de ce calcul
-     * côté lecture, alignée sur les écritures de `acceptQualifiedEvent()`.
+     * Part utilisateur réellement créditée pour un événement déjà accepté
+     * (instruction explicite du fondateur, 2026-07-31) : lit directement
+     * `user_share_amount`, la valeur épinglée par
+     * `acceptQualifiedEvent()` au moment de l'acceptation — jamais
+     * recalculée après coup, puisqu'elle dépend du type économique et du
+     * quota du bénéficiaire à cet instant précis, deux facteurs qui
+     * peuvent changer depuis (docs/02 §6). Un événement non encore
+     * `accepted` n'a pas de part utilisateur définitive : retombe sur le
+     * plafond générique {@see userShareOfAmount()} (AMD-0002, 50 % exact,
+     * sans aucune modulation par type), qui reste la seule information
+     * disponible avant acceptation.
      */
     public function userShareOf(QualifiedEvent $event): int
     {
-        return intdiv($event->applied_price_amount + 1, 2);
+        return $event->user_share_amount ?? $this->userShareOfAmount($event->applied_price_amount);
+    }
+
+    /**
+     * Même formule que {@see userShareOf()} mais applicable à un montant
+     * brut avant qu'un `QualifiedEvent` n'existe (aperçu Feed, devis
+     * annonceur) — extraite ici pour qu'il n'existe qu'un seul endroit où
+     * le ratio 50/50 (AMD-0002) et son arrondi (ADR-0010, « Amendement
+     * 2026-07-26 — Arrondi du partage égal ») sont exprimés.
+     */
+    public function userShareOfAmount(int $amount): int
+    {
+        return intdiv($amount + 1, 2);
+    }
+
+    /**
+     * Part Wasplex symétrique de {@see userShareOfAmount()} — même
+     * formule que la ligne `wasplexShare` de `acceptQualifiedEvent()`.
+     */
+    public function wasplexShareOfAmount(int $amount): int
+    {
+        return intdiv($amount, 2);
+    }
+
+    /**
+     * Aperçu honnête du gain qu'une personne précise recevrait réellement
+     * si elle validait cet événement maintenant (instruction explicite du
+     * fondateur, 2026-07-31 ; docs/03 §10 : « le montant affiché avant la
+     * participation doit être le montant effectivement crédité ») — utilisé
+     * par le Feed, jamais un montant générique {@see userShareOfAmount()}
+     * qui ignorerait le type économique, la cagnotte de campagne déjà
+     * consommée pour ce type et le quota déjà consommé de cette personne
+     * précise. Même formule exacte que {@see acceptQualifiedEvent()}, sans
+     * écriture Ledger ni effet de bord : une lecture pure.
+     */
+    public function previewUserShareForPerson(int $amount, string $personId, string $personAccountLinkId, Campaign $campaign, CampaignVersion $version): int
+    {
+        $alreadyRewarded = QualifiedEvent::query()
+            ->where('beneficiary_person_account_link_id', $personAccountLinkId)
+            ->where('campaign_version_id', $version->id)
+            ->where('billing_status', BillingStatus::Accepted)
+            ->exists();
+
+        if ($alreadyRewarded) {
+            return 0;
+        }
+
+        $economicType = $this->economicTypeResolver->forPerson($personId);
+        $quotaExceeded = $economicType->monthly_quota !== null
+            && $this->quotaProjection->consumedThisMonth($personAccountLinkId) >= $economicType->monthly_quota;
+
+        if ($quotaExceeded) {
+            return 0;
+        }
+
+        $standardUserShare = intdiv($amount + 1, 2);
+        $subPoolAllocated = $this->economicTypeSubPoolAllocated($campaign, $economicType);
+        $subPoolConsumed = $this->economicTypeSubPoolConsumed($campaign, $economicType);
+
+        if ($subPoolConsumed + $standardUserShare > $subPoolAllocated) {
+            return 0;
+        }
+
+        return $standardUserShare;
+    }
+
+    /**
+     * Taille de la cagnotte d'un type économique pour une campagne
+     * précise (instruction explicite du fondateur, 2026-07-31) :
+     * pourcentage du type appliqué à la part utilisateur totale déjà
+     * financée sur cette campagne — jamais un pourcentage du montant brut
+     * de la campagne, qui romprait le plafond 50/50 constitutionnel
+     * (AMD-0002). Grandit automatiquement si l'annonceur recrédite la
+     * campagne plus tard ({@see CampaignBudgetProjection::totalFunded()}).
+     * Si la somme des pourcentages actifs ne totalise pas 100 %, la
+     * différence n'est simplement jamais allouée à aucun type — aucune
+     * fuite, aucun débordement inventé entre types (arbitrage explicite du
+     * fondateur, 2026-07-31).
+     */
+    private function economicTypeSubPoolAllocated(Campaign $campaign, EconomicType $economicType): int
+    {
+        $totalUserPool = $this->userShareOfAmount($this->budgetProjection->totalFunded($campaign));
+
+        return intdiv($totalUserPool * $economicType->user_share_percentage, 100);
+    }
+
+    /**
+     * Montant déjà versé, sur cette campagne précise, aux bénéficiaires de
+     * ce type économique précis — jamais un solde stocké, toujours
+     * reconstruit depuis les `QualifiedEvent` déjà `accepted` (ADR-0003
+     * §19, même discipline que le reste du Ledger).
+     */
+    private function economicTypeSubPoolConsumed(Campaign $campaign, EconomicType $economicType): int
+    {
+        return (int) QualifiedEvent::query()
+            ->where('campaign_id', $campaign->id)
+            ->where('economic_type_id', $economicType->id)
+            ->where('billing_status', BillingStatus::Accepted)
+            ->sum('user_share_amount');
     }
 
     /**
