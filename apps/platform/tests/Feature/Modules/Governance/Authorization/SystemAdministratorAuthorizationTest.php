@@ -75,7 +75,7 @@ class SystemAdministratorAuthorizationTest extends AuthorizationTestCase
         ['user' => $user, 'link' => $link] = $this->makeSystemAdministrator();
 
         $futureCapability = $this->makeCapability(
-            stableKey: 'admin.future_configuration',
+            stableKey: 'governance.future_configuration',
             minimumSessionAssurance: SessionAssurance::Weak,
             operation: Operation::Read,
             effectiveFrom: now()->subMinute(),
@@ -105,7 +105,7 @@ class SystemAdministratorAuthorizationTest extends AuthorizationTestCase
     {
         $user = $this->makeUser('ordinaire-'.Str::uuid().'@example.com');
         $futureCapability = $this->makeCapability(
-            stableKey: 'admin.future_configuration_for_ordinary_user',
+            stableKey: 'governance.future_configuration_for_ordinary_user',
             operation: Operation::Read,
             effectiveFrom: now()->subMinute(),
         );
@@ -125,7 +125,7 @@ class SystemAdministratorAuthorizationTest extends AuthorizationTestCase
     {
         ['user' => $user] = $this->makeSystemAdministrator();
         $futureCapability = $this->makeCapability(
-            stableKey: 'admin.future_sensitive_screen',
+            stableKey: 'governance.future_sensitive_screen',
             operation: Operation::Read,
             effectiveFrom: now()->subMinute(),
         );
@@ -144,7 +144,7 @@ class SystemAdministratorAuthorizationTest extends AuthorizationTestCase
     {
         ['user' => $user] = $this->makeSystemAdministrator();
         $readCapability = $this->makeCapability(
-            stableKey: 'admin.read_only_configuration',
+            stableKey: 'governance.read_only_configuration',
             operation: Operation::Read,
             effectiveFrom: now()->subMinute(),
         );
@@ -164,7 +164,7 @@ class SystemAdministratorAuthorizationTest extends AuthorizationTestCase
     {
         ['user' => $user, 'link' => $link, 'grant' => $grant] = $this->makeSystemAdministrator();
         $futureCapability = $this->makeCapability(
-            stableKey: 'admin.configuration_after_revocation',
+            stableKey: 'governance.configuration_after_revocation',
             operation: Operation::Read,
             effectiveFrom: now()->subMinute(),
         );
