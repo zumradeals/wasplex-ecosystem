@@ -47,6 +47,7 @@ use Illuminate\Support\Str;
  * @property string|null $economic_type_id
  * @property int|null $economic_type_percentage_applied
  * @property bool|null $quota_exceeded
+ * @property bool|null $economic_type_pool_exhausted
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -66,6 +67,7 @@ class QualifiedEvent extends Model
         'distribution_transaction_id', 'release_transaction_id',
         'correlation_id', 'idempotency_key',
         'user_share_amount', 'economic_type_id', 'economic_type_percentage_applied', 'quota_exceeded',
+        'economic_type_pool_exhausted',
     ];
 
     protected function casts(): array
@@ -81,6 +83,7 @@ class QualifiedEvent extends Model
             'user_share_amount' => 'integer',
             'economic_type_percentage_applied' => 'integer',
             'quota_exceeded' => 'boolean',
+            'economic_type_pool_exhausted' => 'boolean',
         ];
     }
 

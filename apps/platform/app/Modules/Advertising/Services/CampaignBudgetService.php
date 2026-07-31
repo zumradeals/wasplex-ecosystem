@@ -8,6 +8,7 @@ use App\Modules\Advertising\Enums\CampaignState;
 use App\Modules\Advertising\Enums\FraudDecision;
 use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
+use App\Modules\Advertising\Models\EconomicType;
 use App\Modules\Advertising\Models\QualifiedEvent;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Projections\PersonMonthlyQuotaProjection;
@@ -230,22 +231,34 @@ class CampaignBudgetService
         // réduire, jamais l'augmenter.
         $standardUserShare = intdiv($amount + 1, 2);
 
-        // Instruction explicite du fondateur 2026-07-31 : le type
-        // économique du bénéficiaire module la part utilisateur standard —
-        // un type à 100 % reçoit exactement `$standardUserShare`, un type à
-        // 60 % en reçoit 60 %. Le reliquat non versé reste chez Wasplex :
-        // `$wasplexShare` se déduit toujours de `$amount - $userShare`,
-        // jamais d'un second calcul indépendant, pour que la conservation
-        // de valeur soit garantie par construction (aucune fuite d'arrondi
-        // possible). Quota mensuel (docs/02 §4, décision confirmée : ne se
-        // consomme que sur un événement validé qui paie réellement) évalué
-        // sur les événements déjà `accepted` avant celui-ci — jamais sur
-        // lui-même.
+        // Instruction explicite du fondateur 2026-07-31 (confirmée par
+        // exemple concret Orange CI, 2026-07-31) : le type économique du
+        // bénéficiaire ne réduit plus la part de CET événement — chaque
+        // spectateur touche la part utilisateur standard pleine
+        // (`$standardUserShare`) tant que la cagnotte de son type n'est pas
+        // épuisée. Cette cagnotte est propre à la campagne, dimensionnée en
+        // pourcentage de la part utilisateur totale déjà financée
+        // (ex. gratuit 10 %, premium 25 %, gold 30 %, platinum 35 %,
+        // totalisant 100 %) — voir {@see economicTypeSubPoolAllocated()}.
+        // Cagnotte épuisée ou quota mensuel personnel dépassé (docs/02 §4,
+        // décision confirmée : ne se consomme que sur un événement validé
+        // qui paie réellement, évalué sur les événements déjà `accepted`
+        // avant celui-ci, jamais sur lui-même) : deux raisons distinctes
+        // d'un versement nul, chacune tracée dans sa propre colonne pour
+        // ne jamais les confondre dans un audit. Le reliquat non versé
+        // reste chez Wasplex : `$wasplexShare` se déduit toujours de
+        // `$amount - $userShare`, jamais d'un second calcul indépendant,
+        // pour que la conservation de valeur soit garantie par
+        // construction (aucune fuite d'arrondi possible).
         $economicType = $this->economicTypeResolver->forPerson($event->beneficiary->person_id);
         $quotaExceeded = $economicType->monthly_quota !== null
             && $this->quotaProjection->consumedThisMonth($event->beneficiary_person_account_link_id) >= $economicType->monthly_quota;
 
-        $userShare = $quotaExceeded ? 0 : intdiv($standardUserShare * $economicType->user_share_percentage, 100);
+        $subPoolAllocated = $this->economicTypeSubPoolAllocated($campaign, $economicType);
+        $subPoolConsumed = $this->economicTypeSubPoolConsumed($campaign, $economicType);
+        $poolExhausted = $subPoolConsumed + $standardUserShare > $subPoolAllocated;
+
+        $userShare = ($quotaExceeded || $poolExhausted) ? 0 : $standardUserShare;
         $wasplexShare = $amount - $userShare;
 
         // Dimensions conservées pour retrouver, par requête directe sur les
@@ -302,6 +315,7 @@ class CampaignBudgetService
             'economic_type_id' => $economicType->id,
             'economic_type_percentage_applied' => $economicType->user_share_percentage,
             'quota_exceeded' => $quotaExceeded,
+            'economic_type_pool_exhausted' => $poolExhausted,
         ])->save();
 
         return $event->fresh();
@@ -352,12 +366,12 @@ class CampaignBudgetService
      * fondateur, 2026-07-31 ; docs/03 §10 : « le montant affiché avant la
      * participation doit être le montant effectivement crédité ») — utilisé
      * par le Feed, jamais un montant générique {@see userShareOfAmount()}
-     * qui ignorerait le type économique et le quota déjà consommé de cette
-     * personne précise. Même formule exacte que
-     * {@see acceptQualifiedEvent()}, sans écriture Ledger ni effet de bord :
-     * une lecture pure.
+     * qui ignorerait le type économique, la cagnotte de campagne déjà
+     * consommée pour ce type et le quota déjà consommé de cette personne
+     * précise. Même formule exacte que {@see acceptQualifiedEvent()}, sans
+     * écriture Ledger ni effet de bord : une lecture pure.
      */
-    public function previewUserShareForPerson(int $amount, string $personId, string $personAccountLinkId): int
+    public function previewUserShareForPerson(int $amount, string $personId, string $personAccountLinkId, Campaign $campaign): int
     {
         $economicType = $this->economicTypeResolver->forPerson($personId);
         $quotaExceeded = $economicType->monthly_quota !== null
@@ -367,7 +381,50 @@ class CampaignBudgetService
             return 0;
         }
 
-        return intdiv(intdiv($amount + 1, 2) * $economicType->user_share_percentage, 100);
+        $standardUserShare = intdiv($amount + 1, 2);
+        $subPoolAllocated = $this->economicTypeSubPoolAllocated($campaign, $economicType);
+        $subPoolConsumed = $this->economicTypeSubPoolConsumed($campaign, $economicType);
+
+        if ($subPoolConsumed + $standardUserShare > $subPoolAllocated) {
+            return 0;
+        }
+
+        return $standardUserShare;
+    }
+
+    /**
+     * Taille de la cagnotte d'un type économique pour une campagne
+     * précise (instruction explicite du fondateur, 2026-07-31) :
+     * pourcentage du type appliqué à la part utilisateur totale déjà
+     * financée sur cette campagne — jamais un pourcentage du montant brut
+     * de la campagne, qui romprait le plafond 50/50 constitutionnel
+     * (AMD-0002). Grandit automatiquement si l'annonceur recrédite la
+     * campagne plus tard ({@see CampaignBudgetProjection::totalFunded()}).
+     * Si la somme des pourcentages actifs ne totalise pas 100 %, la
+     * différence n'est simplement jamais allouée à aucun type — aucune
+     * fuite, aucun débordement inventé entre types (arbitrage explicite du
+     * fondateur, 2026-07-31).
+     */
+    private function economicTypeSubPoolAllocated(Campaign $campaign, EconomicType $economicType): int
+    {
+        $totalUserPool = $this->userShareOfAmount($this->budgetProjection->totalFunded($campaign));
+
+        return intdiv($totalUserPool * $economicType->user_share_percentage, 100);
+    }
+
+    /**
+     * Montant déjà versé, sur cette campagne précise, aux bénéficiaires de
+     * ce type économique précis — jamais un solde stocké, toujours
+     * reconstruit depuis les `QualifiedEvent` déjà `accepted` (ADR-0003
+     * §19, même discipline que le reste du Ledger).
+     */
+    private function economicTypeSubPoolConsumed(Campaign $campaign, EconomicType $economicType): int
+    {
+        return (int) QualifiedEvent::query()
+            ->where('campaign_id', $campaign->id)
+            ->where('economic_type_id', $economicType->id)
+            ->where('billing_status', BillingStatus::Accepted)
+            ->sum('user_share_amount');
     }
 
     /**

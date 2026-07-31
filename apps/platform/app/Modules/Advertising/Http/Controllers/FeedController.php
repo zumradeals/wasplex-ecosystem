@@ -283,7 +283,7 @@ class FeedController extends Controller
             // résolvable retombe sur le plafond générique — la seule
             // information disponible sans identité confirmée.
             'reward_amount' => $subject !== null
-                ? $this->campaignBudgetService->previewUserShareForPerson($basePrice, $subject->personAccountLink->person_id, $subject->personAccountLink->id)
+                ? $this->campaignBudgetService->previewUserShareForPerson($basePrice, $subject->personAccountLink->person_id, $subject->personAccountLink->id, $campaign)
                 : $this->campaignBudgetService->userShareOfAmount($basePrice),
             'currency' => $campaign->currency,
         ];
