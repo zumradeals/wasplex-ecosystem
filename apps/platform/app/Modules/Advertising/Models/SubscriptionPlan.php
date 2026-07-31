@@ -35,6 +35,18 @@ class SubscriptionPlan extends Model
 
     protected $keyType = 'string';
 
+    /**
+     * Préserve la précision microseconde de `effective_from`/`effective_to`
+     * (colonnes `timestamptz`) : le format par défaut de Laravel
+     * ('Y-m-d H:i:s') tronque à la seconde à l'écriture, alors que
+     * `effective_from DEFAULT now()` côté Postgres garde la précision
+     * complète — un retrait rapproché
+     * (`AdminSubscriptionPlansController::store`) pouvait alors produire un
+     * `effective_to` tronqué antérieur au `effective_from` de la même
+     * seconde et violer la contrainte `subscription_plans_period_check`.
+     */
+    protected $dateFormat = 'Y-m-d H:i:s.u';
+
     protected $fillable = [
         'stable_key', 'name', 'version', 'price_amount', 'currency',
         'duration_days', 'economic_type_id', 'state', 'effective_from', 'effective_to',
