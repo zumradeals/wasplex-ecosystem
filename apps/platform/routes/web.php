@@ -12,6 +12,9 @@ use App\Modules\Advertising\Http\Controllers\Admin\AdminSectorClassificationCont
 use App\Modules\Advertising\Http\Controllers\Admin\AdminVideoDurationController;
 use App\Modules\Advertising\Http\Controllers\Admin\ModerationOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertiserProfileController;
+use App\Modules\Advertising\Http\Controllers\AdvertiserWalletAllocationController;
+use App\Modules\Advertising\Http\Controllers\AdvertiserWalletDepositInitiationController;
+use App\Modules\Advertising\Http\Controllers\AdvertiserWalletDepositReturnController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingAudiencesController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingBillingController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingBudgetController;
@@ -21,6 +24,7 @@ use App\Modules\Advertising\Http\Controllers\AdvertisingCreationsController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingOrganizationController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingOverviewController;
 use App\Modules\Advertising\Http\Controllers\AdvertisingReportsController;
+use App\Modules\Advertising\Http\Controllers\AdvertisingWalletController;
 use App\Modules\Advertising\Http\Controllers\AudienceEstimateController;
 use App\Modules\Advertising\Http\Controllers\CampaignController;
 use App\Modules\Advertising\Http\Controllers\CampaignFundingController;
@@ -125,6 +129,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('advertising/campaigns/{campaign}/self-funding/{campaignFunding}/return', [CampaignFundingReturnController::class, 'show'])
         ->name('advertising.campaigns.self-funding.return');
 
+    // Instruction explicite du fondateur 2026-07-31 : page de retour après
+    // redirection GeniusPay pour un dépôt Wallet annonceur — même
+    // raisonnement que les deux routes de retour ci-dessus.
+    Route::get('advertising/wallet/deposits/{deposit}/return', [AdvertiserWalletDepositReturnController::class, 'show'])
+        ->name('advertising.wallet.deposits.return');
+
     // P007-W1 : tableau de bord annonceur (A-001-01/A-002-01) — reprend
     // l'autorisation campaign.view (portée self) et affiche un état d'écran
     // plutôt qu'une erreur JSON en cas de refus (voir
@@ -148,6 +158,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('advertising.creations');
     Route::get('advertising/budget', [AdvertisingBudgetController::class, 'index'])
         ->name('advertising.budget');
+    // Instruction explicite du fondateur 2026-07-31 : Wallet annonceur
+    // mutualisé, distinct du Budget par campagne ci-dessus — voir
+    // AdvertisingWalletController.
+    Route::get('advertising/wallet', [AdvertisingWalletController::class, 'index'])
+        ->name('advertising.wallet');
     Route::get('advertising/reports', [AdvertisingReportsController::class, 'index'])
         ->name('advertising.reports');
     Route::get('advertising/billing', [AdvertisingBillingController::class, 'index'])
@@ -341,6 +356,28 @@ Route::middleware('web')->post('advertising/campaigns/{campaign}/funding', [Camp
 // elle-même — seul le webhook signé le fait (webhooks.geniuspay.store).
 Route::middleware('web')->post('advertising/campaigns/{campaign}/self-funding', [CampaignFundingInitiationController::class, 'store'])
     ->name('advertising.campaigns.self-funding.store');
+
+// Instruction explicite du fondateur 2026-07-31 : dépôt en libre-service
+// dans le solde Wallet mutualisé de l'annonceur via GeniusPay
+// (advertiser_wallet.deposit, portée self) — distinct de la route
+// ci-dessus (financement direct d'une campagne précise) : les deux
+// coexistent, l'annonceur choisit son chemin. Même discipline : groupe
+// 'web' hors du groupe 'auth', 401 JSON structuré pour un appel non
+// authentifié. Ne crédite jamais de valeur elle-même — seul le webhook
+// signé le fait (webhooks.geniuspay.store).
+Route::middleware('web')->post('advertising/wallet/deposits', [AdvertiserWalletDepositInitiationController::class, 'store'])
+    ->name('advertising.wallet.deposits.store');
+
+// Instruction explicite du fondateur 2026-07-31 : allocation d'un montant du
+// solde Wallet annonceur vers le budget disponible d'une campagne précise
+// (advertiser_wallet.allocate, portée self) — un transfert interne, jamais
+// un appel externe, mais crédite réellement le budget de la campagne au
+// moment même de l'appel (contrairement aux deux routes de dépôt
+// ci-dessus, qui n'engagent qu'un paiement à confirmer par webhook). Même
+// discipline : groupe 'web' hors du groupe 'auth', 401 JSON structuré pour
+// un appel non authentifié.
+Route::middleware('web')->post('advertising/wallet/allocations', [AdvertiserWalletAllocationController::class, 'store'])
+    ->name('advertising.wallet.allocations.store');
 
 // P005-F : cycle de vie d'un QualifiedEvent (ADR-0010 §4 lignes 3-5).
 // event.submit/event.accept/event.reject sont réservées au personnel

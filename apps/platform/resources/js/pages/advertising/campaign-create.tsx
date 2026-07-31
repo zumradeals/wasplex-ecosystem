@@ -161,7 +161,6 @@ type VideoDurationBounds = { min_seconds: number; max_seconds: number };
 type IndicativePricing = {
     unit_price: number;
     user_share: number;
-    wasplex_share: number;
 };
 
 type VideoUploadResult = {
@@ -1165,12 +1164,8 @@ export default function AdvertisingCampaignCreate({
                                                             value={`${indicativePricing.unit_price} ${currency || '—'}`}
                                                         />
                                                         <SummaryRow
-                                                            label="Dont récompense utilisateur (50 %)"
+                                                            label="Dont récompense utilisateur"
                                                             value={`${indicativePricing.user_share} ${currency || '—'}`}
-                                                        />
-                                                        <SummaryRow
-                                                            label="Dont part Wasplex (50 %)"
-                                                            value={`${indicativePricing.wasplex_share} ${currency || '—'}`}
                                                         />
                                                     </dl>
                                                     <p className="text-xs text-[var(--text-secondary)]">

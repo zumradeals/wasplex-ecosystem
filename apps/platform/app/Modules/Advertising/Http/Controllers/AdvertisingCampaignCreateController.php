@@ -98,7 +98,11 @@ class AdvertisingCampaignCreateController extends Controller
     }
 
     /**
-     * @return array{unit_price: int, user_share: int, wasplex_share: int}|null
+     * Part Wasplex volontairement absente de ce payload (instruction
+     * explicite du fondateur) : la marge de la plateforme n'est jamais
+     * communiquée à l'annonceur, y compris dans la réponse réseau brute.
+     *
+     * @return array{unit_price: int, user_share: int}|null
      */
     private function indicativePricing(): ?array
     {
@@ -111,7 +115,6 @@ class AdvertisingCampaignCreateController extends Controller
         return [
             'unit_price' => $unitPrice,
             'user_share' => $this->campaignBudgetService->userShareOfAmount($unitPrice),
-            'wasplex_share' => $this->campaignBudgetService->wasplexShareOfAmount($unitPrice),
         ];
     }
 }

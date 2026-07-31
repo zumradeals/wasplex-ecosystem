@@ -24,7 +24,6 @@ type CampaignBudget = {
     consumed: number;
     unit_price: number | null;
     user_share_per_event: number | null;
-    wasplex_share_per_event: number | null;
     events_affordable: number | null;
 };
 
@@ -206,14 +205,10 @@ export default function AdvertisingBudget({
                                                         {row.currency}
                                                     </span>
                                                     <p className="text-xs text-[var(--text-secondary)]">
+                                                        Récompense utilisateur :{' '}
                                                         {
                                                             row.user_share_per_event
-                                                        }{' '}
-                                                        utilisateur /{' '}
-                                                        {
-                                                            row.wasplex_share_per_event
-                                                        }{' '}
-                                                        Wasplex
+                                                        }
                                                     </p>
                                                 </>
                                             ) : (

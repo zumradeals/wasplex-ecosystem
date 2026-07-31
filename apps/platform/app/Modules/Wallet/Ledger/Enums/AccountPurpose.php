@@ -13,6 +13,7 @@ enum AccountPurpose: string
 {
     case Coverage = 'coverage';
     case AdvertiserCampaign = 'advertiser_campaign';
+    case AdvertiserWallet = 'advertiser_wallet';
     case UserRights = 'user_rights';
     case WasplexOwnResources = 'wasplex_own_resources';
     case SocialFund = 'social_fund';

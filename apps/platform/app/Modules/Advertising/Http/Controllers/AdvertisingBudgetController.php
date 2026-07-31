@@ -30,6 +30,10 @@ use Inertia\Response;
  * budget disponible peut encore financer — un devis réel, jamais estimé
  * (docs/01-modele-economique-publicitaire.md §6 « nombre d'événements
  * visés » / §4 « le nombre de vues que son budget peut acheter »).
+ *
+ * La part Wasplex par événement n'est volontairement pas incluse dans ce
+ * payload (instruction explicite du fondateur) : jamais communiquée à
+ * l'annonceur.
  */
 class AdvertisingBudgetController extends Controller
 {
@@ -82,9 +86,6 @@ class AdvertisingBudgetController extends Controller
                     'unit_price' => $unitPrice,
                     'user_share_per_event' => $unitPrice !== null
                         ? $this->campaignBudgetService->userShareOfAmount($unitPrice)
-                        : null,
-                    'wasplex_share_per_event' => $unitPrice !== null
-                        ? $this->campaignBudgetService->wasplexShareOfAmount($unitPrice)
                         : null,
                     'events_affordable' => $unitPrice !== null && $unitPrice > 0
                         ? intdiv($available, $unitPrice)
