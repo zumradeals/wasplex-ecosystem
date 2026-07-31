@@ -268,7 +268,9 @@ export default function AdvertisingCampaignCreate({
     // retiré est simplement ignoré ici, jamais persisté).
     const mediaLockedFormat = video ? 'video' : null;
     const formatOptions = (
-        sector?.allowed_formats.length ? sector.allowed_formats : Object.keys(FORMAT_LABELS)
+        sector?.allowed_formats.length
+            ? sector.allowed_formats
+            : Object.keys(FORMAT_LABELS)
     ).filter((value) => value !== 'video');
     const effectiveFormat =
         mediaLockedFormat ?? (formatOptions.includes(format) ? format : '');
@@ -295,7 +297,8 @@ export default function AdvertisingCampaignCreate({
     // (`handleSubmit`) — un aperçu qui diffère de ce qui part au serveur
     // serait lui-même une nouvelle incohérence du type de celle que ce
     // chantier corrige.
-    const submittedFormat = effectiveFormat || sector?.allowed_formats[0] || 'banner';
+    const submittedFormat =
+        effectiveFormat || sector?.allowed_formats[0] || 'banner';
     const previewFormat = submittedFormat;
     const previewFormatLabel = FORMAT_LABELS[previewFormat] ?? previewFormat;
     const previewDestinationHost = destinationHost(destinationUrl);
@@ -767,7 +770,8 @@ export default function AdvertisingCampaignCreate({
                                                     <p className="text-sm text-[var(--text-primary)]">
                                                         {FORMAT_LABELS[
                                                             mediaLockedFormat
-                                                        ] ?? mediaLockedFormat}{' '}
+                                                        ] ??
+                                                            mediaLockedFormat}{' '}
                                                         <span className="text-xs text-[var(--text-secondary)]">
                                                             (déterminé par le
                                                             média envoyé
@@ -814,16 +818,14 @@ export default function AdvertisingCampaignCreate({
 
                                             {formatMismatch && (
                                                 <p className="text-xs text-[var(--status-danger)]">
-                                                    Le secteur choisi
-                                                    n'autorise pas le format
-                                                    «
+                                                    Le secteur choisi n'autorise
+                                                    pas le format «
                                                     {FORMAT_LABELS[
                                                         mediaLockedFormat ?? ''
                                                     ] ?? mediaLockedFormat}
-                                                     » déterminé par ce
-                                                    média : choisissez un
-                                                    autre secteur ou un autre
-                                                    média.
+                                                    » déterminé par ce média :
+                                                    choisissez un autre secteur
+                                                    ou un autre média.
                                                 </p>
                                             )}
 
@@ -1173,30 +1175,27 @@ export default function AdvertisingCampaignCreate({
                                                     </dl>
                                                     <p className="text-xs text-[var(--text-secondary)]">
                                                         Valeur de la
-                                                        configuration
-                                                        actuelle, encore
-                                                        démonstrative — pas
-                                                        un tarif commercial
-                                                        validé, ni un
-                                                        catalogue par format
-                                                        ou durée. Le nombre
-                                                        de vues achetables
-                                                        avec votre budget et
-                                                        le traitement du
-                                                        reliquat non consommé
-                                                        seront visibles une
-                                                        fois la campagne
-                                                        financée, sur l'écran
-                                                        Budget.
+                                                        configuration actuelle,
+                                                        encore démonstrative —
+                                                        pas un tarif commercial
+                                                        validé, ni un catalogue
+                                                        par format ou durée. Le
+                                                        nombre de vues
+                                                        achetables avec votre
+                                                        budget et le traitement
+                                                        du reliquat non consommé
+                                                        seront visibles une fois
+                                                        la campagne financée,
+                                                        sur l'écran Budget.
                                                     </p>
                                                 </>
                                             ) : (
                                                 <p className="text-xs text-[var(--text-secondary)]">
                                                     Aucun prix n'est
                                                     actuellement configuré :
-                                                    cette campagne ne pourra
-                                                    pas encore accepter
-                                                    d'événement qualifié.
+                                                    cette campagne ne pourra pas
+                                                    encore accepter d'événement
+                                                    qualifié.
                                                 </p>
                                             )}
                                         </CardContent>

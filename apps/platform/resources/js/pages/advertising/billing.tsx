@@ -51,9 +51,9 @@ export default function AdvertisingBilling({
                         GeniusPay) ; le budget n'est crédité qu'après
                         confirmation signée du paiement, jamais avant. Le
                         traitement du solde non consommé (reliquat) en fin de
-                        campagne n'est pas encore décidé : il reste affiché
-                        ici comme « encore disponible », ni remboursé ni
-                        réengagé automatiquement pour l'instant.
+                        campagne n'est pas encore décidé : il reste affiché ici
+                        comme « encore disponible », ni remboursé ni réengagé
+                        automatiquement pour l'instant.
                     </p>
                 </div>
 

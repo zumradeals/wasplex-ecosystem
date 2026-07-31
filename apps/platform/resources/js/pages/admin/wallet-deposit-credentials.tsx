@@ -25,8 +25,8 @@ function StepUpNotice() {
                 Confirmation de mot de passe requise
             </p>
             <p className="mt-1">
-                Cette action exige une session renforcée. Confirmez votre mot
-                de passe puis réessayez.{' '}
+                Cette action exige une session renforcée. Confirmez votre mot de
+                passe puis réessayez.{' '}
                 <a
                     href="/user/confirm-password"
                     className="underline underline-offset-2"
@@ -250,7 +250,9 @@ export default function AdminWalletDepositCredentials({
 
             <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
                 <AdminAccessGate access={access}>
-                    {credentials && <CredentialsForm credentials={credentials} />}
+                    {credentials && (
+                        <CredentialsForm credentials={credentials} />
+                    )}
                 </AdminAccessGate>
             </div>
         </AdminLayout>

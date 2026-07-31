@@ -42,9 +42,7 @@ function ProfileForm({
     initial: Profile | null;
     onSaved: (profile: Profile) => void;
 }) {
-    const [countryCode, setCountryCode] = useState(
-        initial?.country_code ?? '',
-    );
+    const [countryCode, setCountryCode] = useState(initial?.country_code ?? '');
     const [city, setCity] = useState(initial?.city ?? '');
     const [neighborhood, setNeighborhood] = useState(
         initial?.neighborhood ?? '',
@@ -94,9 +92,7 @@ function ProfileForm({
 
     return (
         <form onSubmit={submit} className="space-y-5">
-            {error && (
-                <p className="text-sm text-[#FF6B6B]">{error}</p>
-            )}
+            {error && <p className="text-sm text-[#FF6B6B]">{error}</p>}
 
             <div className="space-y-1.5">
                 <span className="text-sm font-medium text-[#A9B7C8]">
@@ -251,9 +247,8 @@ function WithdrawButton({ onWithdrawn }: { onWithdrawn: () => void }) {
         <div className="space-y-3 rounded-xl border border-[#FF6B6B]/40 bg-[#FF6B6B]/10 p-4">
             <p className="text-sm text-[#F5F8FC]">
                 Vos publicités redeviendront génériques. La tranche d'âge, le
-                genre et les centres d'intérêt déjà enregistrés seront
-                effacés — vous pourrez les ressaisir plus tard si vous le
-                souhaitez.
+                genre et les centres d'intérêt déjà enregistrés seront effacés —
+                vous pourrez les ressaisir plus tard si vous le souhaitez.
             </p>
             <div className="flex gap-2">
                 <button
@@ -298,9 +293,9 @@ export default function AdvertisingProfile({
                     <p className="mt-1 text-xs leading-relaxed text-[#A9B7C8]">
                         Utilisé uniquement pour vous proposer des publicités
                         plus pertinentes. Jamais vendu, jamais transmis à un
-                        annonceur sous une forme qui vous identifie.
-                        Entièrement facultatif — vous pouvez retirer ce
-                        consentement à tout moment.
+                        annonceur sous une forme qui vous identifie. Entièrement
+                        facultatif — vous pouvez retirer ce consentement à tout
+                        moment.
                     </p>
                 </div>
 
@@ -340,15 +335,13 @@ export default function AdvertisingProfile({
                                 <p>
                                     Quartier :{' '}
                                     <span className="text-[#F5F8FC]">
-                                        {current?.neighborhood ??
-                                            'non précisé'}
+                                        {current?.neighborhood ?? 'non précisé'}
                                     </span>
                                 </p>
                                 <p>
                                     Tranche d'âge :{' '}
                                     <span className="text-[#F5F8FC]">
-                                        {current?.age_bracket ??
-                                            'non précisée'}
+                                        {current?.age_bracket ?? 'non précisée'}
                                     </span>
                                 </p>
                                 <p>
