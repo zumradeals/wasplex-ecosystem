@@ -27,8 +27,18 @@ export function AdminAccessGate({
         // `session_assurance_insufficient` (TD-0002-B) : une reconfirmation
         // de mot de passe pourrait suffire — jamais un simple refus, un
         // lien d'action réel (même raisonnement que StepUpNotice sur les
-        // écrans moderation.tsx).
-        if (access.reason === 'session_assurance_insufficient') {
+        // écrans moderation.tsx). `system_administrator_session_assurance_insufficient`
+        // est le même palier de refus, produit par
+        // `SystemAdministratorAuthorizationEngine` lorsque l'override
+        // Administrateur Système s'applique (session `strong` requise) —
+        // sans ce second code, tout titulaire du rôle dont la session
+        // n'est pas encore reconfirmée voyait « Section indisponible »
+        // sans jamais être invité à confirmer son mot de passe.
+        if (
+            access.reason === 'session_assurance_insufficient' ||
+            access.reason ===
+                'system_administrator_session_assurance_insufficient'
+        ) {
             return (
                 <div className="rounded-xl border border-[var(--status-danger)]/30 bg-[var(--status-danger)]/10 px-5 py-4">
                     <p className="text-sm font-semibold text-[var(--status-danger)]">
