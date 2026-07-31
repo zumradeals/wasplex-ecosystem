@@ -158,8 +158,21 @@ class ModerationOverviewController extends Controller
      */
     private function fundableCampaigns(): array
     {
+        // docs/01-modele-economique-publicitaire.md §7 : le paiement (étape
+        // 4) suit la confirmation du budget par l'annonceur — jamais une
+        // campagne encore en brouillon, jamais montrée à ce stade à aucun
+        // annonceur. `campaign.submit_for_review` (draft → in_review) est le
+        // seul geste explicite de l'annonceur qui matérialise cette
+        // confirmation dans le code actuel ; une campagne dont aucune
+        // version n'a jamais quitté `draft` n'est donc pas encore
+        // financeable ici, même si `Campaign.state` reste `active` dès la
+        // création (P005-B).
         return Campaign::query()
             ->where('state', '!=', 'closed')
+            ->whereHas('versions', fn ($query) => $query->whereIn('state', [
+                CampaignVersionState::InReview->value,
+                CampaignVersionState::Approved->value,
+            ]))
             ->with('advertiserProfile')
             ->orderByDesc('created_at')
             ->get()

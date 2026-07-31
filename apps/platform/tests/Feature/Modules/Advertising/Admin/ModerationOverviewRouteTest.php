@@ -94,6 +94,16 @@ class ModerationOverviewRouteTest extends AdvertisingTestCase
 
         $advertiser = $this->makeAdvertiserProfile();
         $campaign = $this->makeCampaign($advertiser);
+        $version = app(CampaignVersionService::class)->propose(
+            campaign: $campaign,
+            sector: $this->makeSectorClassification(),
+            creations: ['headline' => 'Titre de test'],
+            expectedEvent: ['format' => 'banner', 'condition' => 'completion'],
+            destination: ['url' => 'https://annonceur.example.com'],
+            territory: ['CI'],
+            author: $advertiser->representative,
+        );
+        app(CampaignVersionService::class)->submitForReview($version);
         $this->fundCampaign($campaign, 7_500);
 
         $response = $this->actingAs($staff->user)->get('/admin/moderation');
@@ -105,6 +115,26 @@ class ModerationOverviewRouteTest extends AdvertisingTestCase
             ->has('campaignFunding.items', 1)
             ->where('campaignFunding.items.0.campaign_id', $campaign->id)
             ->where('campaignFunding.items.0.available', 7_500)
+            ->where('campaignApproval.access.allowed', false),
+        );
+    }
+
+    public function test_a_draft_campaign_never_submitted_is_not_fundable(): void
+    {
+        $staff = $this->makeRepresentative();
+        $this->grantStaffCapability($staff, 'campaign.fund', 'advertising.campaign');
+
+        $advertiser = $this->makeAdvertiserProfile();
+        $campaign = $this->makeCampaign($advertiser);
+        $this->fundCampaign($campaign, 7_500);
+
+        $response = $this->actingAs($staff->user)->get('/admin/moderation');
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('admin/moderation')
+            ->where('campaignFunding.access.allowed', true)
+            ->where('campaignFunding.items', [])
             ->where('campaignApproval.access.allowed', false),
         );
     }
