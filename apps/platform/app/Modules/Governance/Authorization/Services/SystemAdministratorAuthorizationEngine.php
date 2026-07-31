@@ -175,8 +175,8 @@ final class SystemAdministratorAuthorizationEngine extends AuthorizationEngine
             $systemAdministratorGrant->capabilityDefinition->minimum_session_assurance,
         );
 
-        if (!$conditionsResult->satisfied) {
-            if (!$conditionsResult->onlySessionAssuranceInsufficient) {
+        if (! $conditionsResult->satisfied) {
+            if (! $conditionsResult->onlySessionAssuranceInsufficient) {
                 return null;
             }
 
