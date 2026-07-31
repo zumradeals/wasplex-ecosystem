@@ -190,7 +190,10 @@ class FeedControllerTest extends AdvertisingTestCase
             ->has('ads', 1)
             ->where('ads.0.advertiser', $campaign->advertiserProfile->legal_name)
             ->where('ads.0.headline', 'Découvrez notre offre')
-            ->where('ads.0.reward_amount', 777)
+            // Part utilisateur du ratio 50/50 exact (AMD-0002), pas le
+            // prix de base entier réservé sur le budget campagne :
+            // intdiv(777 + 1, 2).
+            ->where('ads.0.reward_amount', 389)
             ->where('ads.0.currency', $campaign->currency)
             ->where('ads.0.format', 'banner')
             ->where('ads.0.condition', 'completion'),

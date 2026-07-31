@@ -9,6 +9,7 @@ use App\Modules\Advertising\Models\Campaign;
 use App\Modules\Advertising\Models\CampaignVersion;
 use App\Modules\Advertising\Projections\CampaignBudgetProjection;
 use App\Modules\Advertising\Projections\SocialEngagementProjection;
+use App\Modules\Advertising\Services\CampaignBudgetService;
 use App\Modules\Advertising\Services\Exceptions\PricingConfigurationNotResolvableException;
 use App\Modules\Advertising\Services\QualifiedEventPricingResolver;
 use App\Modules\Alerts\Projections\PublicAlertFeedProjection;
@@ -62,6 +63,7 @@ class FeedController extends Controller
     public function __construct(
         private readonly CampaignBudgetProjection $budgetProjection,
         private readonly QualifiedEventPricingResolver $pricingResolver,
+        private readonly CampaignBudgetService $campaignBudgetService,
         private readonly AuthenticatedSubjectHttpResolver $subjectResolver,
         private readonly AuthorizationRequestFactory $authorizationRequestFactory,
         private readonly AuthorizationGate $authorizationGate,
@@ -217,12 +219,16 @@ class FeedController extends Controller
         }
 
         try {
-            $reward = $this->pricingResolver->resolveBasePrice($version);
+            // Coût réellement réservé sur le budget campagne à la
+            // soumission de l'événement (`CampaignBudgetService::
+            // submitQualifiedEvent()`) — jamais ce que l'utilisateur
+            // reçoit lui-même, voir ci-dessous.
+            $basePrice = $this->pricingResolver->resolveBasePrice($version);
         } catch (PricingConfigurationNotResolvableException) {
             return null;
         }
 
-        if ($reward > $available) {
+        if ($basePrice > $available) {
             return null;
         }
 
@@ -236,7 +242,13 @@ class FeedController extends Controller
             'headline' => $version->creations['headline'] ?? $campaign->code,
             'format' => $version->expected_event['format'] ?? 'display',
             'condition' => $version->expected_event['condition'] ?? 'completion',
-            'reward_amount' => $reward,
+            // Part utilisateur réelle du partage 50/50 (AMD-0002,
+            // `CampaignBudgetService::userShareOfAmount()`) — jamais le
+            // prix de base entier : celui-ci finance aussi la part
+            // Wasplex, jamais versée au bénéficiaire (docs/03 §8 « le
+            // montant affiché avant la participation doit être le montant
+            // effectivement crédité lorsque l'événement est validé »).
+            'reward_amount' => $this->campaignBudgetService->userShareOfAmount($basePrice),
             'currency' => $campaign->currency,
         ];
     }

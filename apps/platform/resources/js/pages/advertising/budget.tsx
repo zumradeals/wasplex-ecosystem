@@ -22,6 +22,10 @@ type CampaignBudget = {
     available: number;
     reserved: number;
     consumed: number;
+    unit_price: number | null;
+    user_share_per_event: number | null;
+    wasplex_share_per_event: number | null;
+    events_affordable: number | null;
 };
 
 // Véto du dirigeant 2026-07-30 : financement de campagne en libre-service
@@ -156,6 +160,12 @@ export default function AdvertisingBudget({
                                     <th className="px-5 py-2.5 font-medium">
                                         Consommé
                                     </th>
+                                    <th className="px-5 py-2.5 font-medium">
+                                        Prix / vue qualifiée
+                                    </th>
+                                    <th className="px-5 py-2.5 font-medium">
+                                        Vues finançables
+                                    </th>
                                     <th className="px-5 py-2.5 font-medium text-right">
                                         Financement
                                     </th>
@@ -190,6 +200,33 @@ export default function AdvertisingBudget({
                                                 row.consumed,
                                             )}{' '}
                                             {row.currency}
+                                        </td>
+                                        <td className="px-5 py-3 tabular-nums">
+                                            {row.unit_price !== null ? (
+                                                <>
+                                                    <span className="text-[var(--text-primary)]">
+                                                        {amountFormatter.format(
+                                                            row.unit_price,
+                                                        )}{' '}
+                                                        {row.currency}
+                                                    </span>
+                                                    <p className="text-xs text-[var(--text-secondary)]">
+                                                        {row.user_share_per_event}{' '}
+                                                        utilisateur /{' '}
+                                                        {
+                                                            row.wasplex_share_per_event
+                                                        }{' '}
+                                                        Wasplex
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <span className="text-[var(--text-secondary)]">
+                                                    Non résolvable
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-5 py-3 tabular-nums text-[var(--text-primary)]">
+                                            {row.events_affordable ?? '—'}
                                         </td>
                                         <td className="px-5 py-3 text-right">
                                             <FundCampaignButton

@@ -288,7 +288,28 @@ class CampaignBudgetService
      */
     public function userShareOf(QualifiedEvent $event): int
     {
-        return intdiv($event->applied_price_amount + 1, 2);
+        return $this->userShareOfAmount($event->applied_price_amount);
+    }
+
+    /**
+     * Même formule que {@see userShareOf()} mais applicable à un montant
+     * brut avant qu'un `QualifiedEvent` n'existe (aperçu Feed, devis
+     * annonceur) — extraite ici pour qu'il n'existe qu'un seul endroit où
+     * le ratio 50/50 (AMD-0002) et son arrondi (ADR-0010, « Amendement
+     * 2026-07-26 — Arrondi du partage égal ») sont exprimés.
+     */
+    public function userShareOfAmount(int $amount): int
+    {
+        return intdiv($amount + 1, 2);
+    }
+
+    /**
+     * Part Wasplex symétrique de {@see userShareOfAmount()} — même
+     * formule que la ligne `wasplexShare` de `acceptQualifiedEvent()`.
+     */
+    public function wasplexShareOfAmount(int $amount): int
+    {
+        return intdiv($amount, 2);
     }
 
     /**

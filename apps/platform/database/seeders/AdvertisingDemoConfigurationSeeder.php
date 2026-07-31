@@ -90,7 +90,14 @@ class AdvertisingDemoConfigurationSeeder extends Seeder
                     ['DÉMONSTRATION — aucune valeur réelle décidée ; ne pas utiliser en production (voir AdvertisingDemoConfigurationSeeder).'],
                     JSON_THROW_ON_ERROR
                 ),
-                'allowed_formats' => json_encode(['display'], JSON_THROW_ON_ERROR),
+                // 'video' ajouté (chantier « espace annonceur cohérent avec
+                // le modèle économique », véto du dirigeant) : le secteur de
+                // démonstration bloquait structurellement toute campagne
+                // vidéo — l'upload vidéo existe (`VideoAdDurationBounds`),
+                // mais aucun format compatible n'était jamais proposé,
+                // produisant l'incohérence média/format observée en capture
+                // (docs/01-modele-economique-publicitaire.md §2).
+                'allowed_formats' => json_encode(['display', 'video'], JSON_THROW_ON_ERROR),
                 'allowed_targeting' => json_encode(['broad'], JSON_THROW_ON_ERROR),
                 'frequency_rules' => json_encode(['note' => 'demonstration_placeholder'], JSON_FORCE_OBJECT | JSON_THROW_ON_ERROR),
                 'review_level' => 'standard',

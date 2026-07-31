@@ -2,7 +2,9 @@
 
 namespace App\Modules\Advertising\Http\Requests;
 
+use App\Modules\Advertising\Models\SectorClassification;
 use App\Modules\Governance\Authorization\Integration\AuthorizationGate;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -69,5 +71,80 @@ class StoreCampaignRequest extends FormRequest
             'audience' => ['required', 'array'],
             'audience.criteria' => ['required', 'array'],
         ];
+    }
+
+    /**
+     * Cohérence média/format/condition (chantier « espace annonceur
+     * cohérent avec le modèle économique », véto du dirigeant) : ferme
+     * l'incohérence observée en capture (média vidéo d'environ 29
+     * secondes, format « Affichage », condition « vue complète ») —
+     * jusqu'ici possible car `expected_event`/`creations` n'étaient
+     * validés que comme des tableaux non vides, sans lien entre eux.
+     *
+     * Règles, volontairement minimales (aucune ne décide un prix, un
+     * pourcentage ou un quota — CLAUDE.md §2) :
+     * - une création vidéo (`creations.video_path`) impose
+     *   `expected_event.format = 'video'` ;
+     * - une création image (`creations.image_path`) interdit
+     *   `expected_event.format = 'video'` ;
+     * - le format déclaré doit figurer parmi les formats autorisés par le
+     *   secteur choisi, quand ce secteur en restreint la liste ;
+     * - `expected_event.condition` reste `'completion'`, seule condition
+     *   dont le moteur (`CampaignBudgetService`) sait aujourd'hui tenir
+     *   compte (voir le texte déjà affiché à l'annonceur dans
+     *   `campaign-create.tsx`).
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->isNotEmpty()) {
+                // Les règles de forme de base n'ont pas passé : une
+                // vérification croisée sur des champs potentiellement
+                // absents produirait un message trompeur.
+                return;
+            }
+
+            $creations = (array) $this->input('creations', []);
+            $expectedEvent = (array) $this->input('expected_event', []);
+            $format = $expectedEvent['format'] ?? null;
+            $condition = $expectedEvent['condition'] ?? null;
+            $hasVideo = ! empty($creations['video_path']);
+            $hasImage = ! empty($creations['image_path']);
+
+            if ($hasVideo && $format !== 'video') {
+                $validator->errors()->add(
+                    'expected_event.format',
+                    "une création vidéo exige expected_event.format = 'video' (média et format déclarés incohérents)."
+                );
+            }
+
+            if ($hasImage && $format === 'video') {
+                $validator->errors()->add(
+                    'expected_event.format',
+                    "une création image ne peut pas déclarer expected_event.format = 'video' (média et format déclarés incohérents)."
+                );
+            }
+
+            if ($condition !== null && $condition !== 'completion') {
+                $validator->errors()->add(
+                    'expected_event.condition',
+                    "'completion' est la seule condition de crédit prise en charge aujourd'hui."
+                );
+            }
+
+            if ($format !== null) {
+                $sector = SectorClassification::query()
+                    ->where('id', $this->input('sector_classification_id'))
+                    ->first();
+                $allowedFormats = $sector === null ? [] : $sector->allowed_formats;
+
+                if ($allowedFormats !== [] && ! in_array($format, $allowedFormats, true)) {
+                    $validator->errors()->add(
+                        'expected_event.format',
+                        "le format « {$format} » n'est pas autorisé par le secteur choisi."
+                    );
+                }
+            }
+        });
     }
 }

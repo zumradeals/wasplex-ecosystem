@@ -158,6 +158,12 @@ type AudienceEstimate = {
 
 type VideoDurationBounds = { min_seconds: number; max_seconds: number };
 
+type IndicativePricing = {
+    unit_price: number;
+    user_share: number;
+    wasplex_share: number;
+};
+
 type VideoUploadResult = {
     path: string;
     url: string;
@@ -178,6 +184,7 @@ export default function AdvertisingCampaignCreate({
     audienceSizeThreshold,
     interestTaxonomy,
     videoDurationBounds,
+    indicativePricing,
 }: {
     access: AdvertiserAccess;
     advertiserProfile: AdvertiserProfileSummary | null;
@@ -185,6 +192,7 @@ export default function AdvertisingCampaignCreate({
     audienceSizeThreshold: number | null;
     interestTaxonomy: InterestOption[];
     videoDurationBounds: VideoDurationBounds | null;
+    indicativePricing: IndicativePricing | null;
 }) {
     const [step, setStep] = useState(0);
 
@@ -249,6 +257,27 @@ export default function AdvertisingCampaignCreate({
         sectorClassifications.find((candidate) => candidate.id === sectorId) ??
         null;
 
+    // Chantier « espace annonceur cohérent avec le modèle économique »
+    // (véto du dirigeant) : le format n'est plus un choix libre découplé
+    // du média réellement envoyé (cause racine de l'incohérence vidéo
+    // ~29s / « Affichage » / « vue complète » constatée en capture) — une
+    // vidéo impose le format « Vidéo ». Sans vidéo (image ou aucun média),
+    // le format reste un choix manuel parmi les formats non-vidéo
+    // autorisés par le secteur. Dérivé au rendu (jamais via un effet qui
+    // réécrirait l'état — un ancien choix « video » resté d'un média
+    // retiré est simplement ignoré ici, jamais persisté).
+    const mediaLockedFormat = video ? 'video' : null;
+    const formatOptions = (
+        sector?.allowed_formats.length ? sector.allowed_formats : Object.keys(FORMAT_LABELS)
+    ).filter((value) => value !== 'video');
+    const effectiveFormat =
+        mediaLockedFormat ?? (formatOptions.includes(format) ? format : '');
+    const formatMismatch =
+        mediaLockedFormat !== null &&
+        sector !== null &&
+        sector.allowed_formats.length > 0 &&
+        !sector.allowed_formats.includes(mediaLockedFormat);
+
     const criteria = buildAudienceCriteria({
         targetCountries,
         targetCity,
@@ -262,7 +291,12 @@ export default function AdvertisingCampaignCreate({
     // Lot 5 (véto du dirigeant) : aperçu en direct, mirroir du rendu réel du
     // Feed (dashboard.tsx) — dérivé de l'état déjà présent, jamais un
     // nouveau champ ni un appel serveur supplémentaire.
-    const previewFormat = format || sector?.allowed_formats[0] || 'banner';
+    // Même valeur exacte que celle réellement soumise ci-dessous
+    // (`handleSubmit`) — un aperçu qui diffère de ce qui part au serveur
+    // serait lui-même une nouvelle incohérence du type de celle que ce
+    // chantier corrige.
+    const submittedFormat = effectiveFormat || sector?.allowed_formats[0] || 'banner';
+    const previewFormat = submittedFormat;
     const previewFormatLabel = FORMAT_LABELS[previewFormat] ?? previewFormat;
     const previewDestinationHost = destinationHost(destinationUrl);
 
@@ -273,7 +307,8 @@ export default function AdvertisingCampaignCreate({
         currency.trim().length === 3 &&
         headline.trim() &&
         destinationUrl.trim() &&
-        sectorId,
+        sectorId &&
+        !formatMismatch,
     );
     const step2Valid = territories.length > 0 && territories.every(Boolean);
 
@@ -441,7 +476,7 @@ export default function AdvertisingCampaignCreate({
                 ...(image ? { image_path: image.path } : {}),
             },
             expected_event: {
-                format: format || 'banner',
+                format: submittedFormat,
                 condition: 'completion',
             },
             destination: { url: destinationUrl },
@@ -680,43 +715,6 @@ export default function AdvertisingCampaignCreate({
                                                     </div>
                                                 )}
 
-                                            <Field label="Format de la publicité">
-                                                <Select
-                                                    value={format || undefined}
-                                                    onValueChange={setFormat}
-                                                >
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Choisir un format" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {(sector
-                                                            ?.allowed_formats
-                                                            .length
-                                                            ? sector.allowed_formats
-                                                            : Object.keys(
-                                                                  FORMAT_LABELS,
-                                                              )
-                                                        ).map((value) => (
-                                                            <SelectItem
-                                                                key={value}
-                                                                value={value}
-                                                            >
-                                                                {FORMAT_LABELS[
-                                                                    value
-                                                                ] ?? value}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </Field>
-
-                                            <p className="text-xs text-[var(--text-secondary)]">
-                                                Condition de crédit : vue
-                                                complète requise — la seule
-                                                condition prise en charge
-                                                aujourd'hui.
-                                            </p>
-
                                             <Field
                                                 label={`Média (facultatif — vidéo${videoDurationBounds ? ` ${videoDurationBounds.min_seconds}-${videoDurationBounds.max_seconds}s` : ''} ou image verticale)`}
                                             >
@@ -763,6 +761,78 @@ export default function AdvertisingCampaignCreate({
                                                     . Visible dans l'aperçu.
                                                 </p>
                                             )}
+
+                                            {mediaLockedFormat ? (
+                                                <Field label="Format de la publicité">
+                                                    <p className="text-sm text-[var(--text-primary)]">
+                                                        {FORMAT_LABELS[
+                                                            mediaLockedFormat
+                                                        ] ?? mediaLockedFormat}{' '}
+                                                        <span className="text-xs text-[var(--text-secondary)]">
+                                                            (déterminé par le
+                                                            média envoyé
+                                                            ci-dessus)
+                                                        </span>
+                                                    </p>
+                                                </Field>
+                                            ) : (
+                                                <Field label="Format de la publicité">
+                                                    <Select
+                                                        value={
+                                                            effectiveFormat ||
+                                                            undefined
+                                                        }
+                                                        onValueChange={
+                                                            setFormat
+                                                        }
+                                                    >
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Choisir un format" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {formatOptions.map(
+                                                                (value) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            value
+                                                                        }
+                                                                        value={
+                                                                            value
+                                                                        }
+                                                                    >
+                                                                        {FORMAT_LABELS[
+                                                                            value
+                                                                        ] ??
+                                                                            value}
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </Field>
+                                            )}
+
+                                            {formatMismatch && (
+                                                <p className="text-xs text-[var(--status-danger)]">
+                                                    Le secteur choisi
+                                                    n'autorise pas le format
+                                                    «
+                                                    {FORMAT_LABELS[
+                                                        mediaLockedFormat ?? ''
+                                                    ] ?? mediaLockedFormat}
+                                                     » déterminé par ce
+                                                    média : choisissez un
+                                                    autre secteur ou un autre
+                                                    média.
+                                                </p>
+                                            )}
+
+                                            <p className="text-xs text-[var(--text-secondary)]">
+                                                Condition de crédit : vue
+                                                complète requise — la seule
+                                                condition prise en charge
+                                                aujourd'hui.
+                                            </p>
                                         </CardContent>
                                     </Card>
                                 </div>
@@ -1075,6 +1145,60 @@ export default function AdvertisingCampaignCreate({
                                                     }
                                                 />
                                             </dl>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>
+                                                Devis indicatif
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-3">
+                                            {indicativePricing ? (
+                                                <>
+                                                    <dl className="space-y-2 text-sm">
+                                                        <SummaryRow
+                                                            label="Prix par vue qualifiée"
+                                                            value={`${indicativePricing.unit_price} ${currency || '—'}`}
+                                                        />
+                                                        <SummaryRow
+                                                            label="Dont récompense utilisateur (50 %)"
+                                                            value={`${indicativePricing.user_share} ${currency || '—'}`}
+                                                        />
+                                                        <SummaryRow
+                                                            label="Dont part Wasplex (50 %)"
+                                                            value={`${indicativePricing.wasplex_share} ${currency || '—'}`}
+                                                        />
+                                                    </dl>
+                                                    <p className="text-xs text-[var(--text-secondary)]">
+                                                        Valeur de la
+                                                        configuration
+                                                        actuelle, encore
+                                                        démonstrative — pas
+                                                        un tarif commercial
+                                                        validé, ni un
+                                                        catalogue par format
+                                                        ou durée. Le nombre
+                                                        de vues achetables
+                                                        avec votre budget et
+                                                        le traitement du
+                                                        reliquat non consommé
+                                                        seront visibles une
+                                                        fois la campagne
+                                                        financée, sur l'écran
+                                                        Budget.
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className="text-xs text-[var(--text-secondary)]">
+                                                    Aucun prix n'est
+                                                    actuellement configuré :
+                                                    cette campagne ne pourra
+                                                    pas encore accepter
+                                                    d'événement qualifié.
+                                                </p>
+                                            )}
                                         </CardContent>
                                     </Card>
 
