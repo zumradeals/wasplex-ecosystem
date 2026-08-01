@@ -20,6 +20,7 @@ use App\Modules\Identity\Enums\LinkStatus;
 use App\Modules\Identity\Enums\MembershipStatus;
 use App\Modules\Identity\Enums\OrganizationState;
 use App\Modules\Identity\Models\Membership;
+use App\Modules\Identity\Models\Organization;
 use App\Modules\Identity\Models\PersonAccountLink;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -115,7 +116,7 @@ final class SystemAdministratorAuthorizationEngine extends AuthorizationEngine
         $organization = null;
 
         if ($request->membershipId !== null) {
-            $membership = Membership::query()->with('organization')->find($request->membershipId);
+            $membership = Membership::query()->find($request->membershipId);
 
             if ($membership === null
                 || $membership->status !== MembershipStatus::Active
@@ -123,7 +124,7 @@ final class SystemAdministratorAuthorizationEngine extends AuthorizationEngine
                 return null;
             }
 
-            $organization = $membership->organization;
+            $organization = Organization::query()->find($membership->organization_id);
 
             if ($organization === null || $organization->state !== OrganizationState::Active) {
                 return null;
